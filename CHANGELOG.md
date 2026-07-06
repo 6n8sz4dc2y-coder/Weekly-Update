@@ -1,5 +1,13 @@
 # Changelog
 
+## Data source fix
+- Added permanent `data.js` source of truth.
+- Published GitHub data now takes priority over browser local storage.
+- Admin download now exports both dashboard data and publish metadata.
+- Designed for manual weekly replacement of `data.js` in GitHub.
+
+# Changelog
+
 ## v2.0
 - Added Trends tab.
 - Added weekly history engine using `history.js`.

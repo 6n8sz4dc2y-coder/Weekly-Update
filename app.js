@@ -7,6 +7,9 @@ function formatPublishedAt(iso){
   return d.toLocaleString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function getDashboardMeta(){
+  if(window.DASHBOARD_META && window.DASHBOARD_META.version){
+    return window.DASHBOARD_META;
+  }
   try{
     const saved = JSON.parse(localStorage.getItem(DASHBOARD_META_KEY) || 'null');
     if(saved && saved.version) return saved;
@@ -40,7 +43,9 @@ let DATA = {"q3_regs":[{"centre":"Bolton","jul_counting":0,"jul_clcp":0,"jul_fle
 
 try {
   const saved = localStorage.getItem('rrgDashboardData_orderbank_v2');
-  if (saved) DATA = JSON.parse(saved);
+  // Published GitHub data.js must always win for public/shared dashboard views.
+  // Local browser data is only used when data.js has not been populated yet.
+  if (saved && !window.DASHBOARD_DATA) DATA = JSON.parse(saved);
 } catch (e) { console.warn('Saved dashboard data could not be loaded', e); }
 let PENDING_DATA = null;
 
@@ -411,7 +416,10 @@ build();
   document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>This browser is now using the uploaded data. Download data.js and replace it in GitHub so everyone sees the same figures.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
 }
 function downloadDataBackup(){
-  const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
+  const meta = getDashboardMeta();
+  const payload =
+    'window.DASHBOARD_META = ' + JSON.stringify(meta, null, 2) + ';\n\n' +
+    'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
   const blob = new Blob([payload],{type:'application/javascript'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -586,7 +594,10 @@ build();
   document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>This browser is now using the uploaded data. Download data.js and replace it in GitHub so everyone sees the same figures.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
 }
 function downloadDataBackup(){
-  const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
+  const meta = getDashboardMeta();
+  const payload =
+    'window.DASHBOARD_META = ' + JSON.stringify(meta, null, 2) + ';\n\n' +
+    'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
   const blob = new Blob([payload],{type:'application/javascript'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
