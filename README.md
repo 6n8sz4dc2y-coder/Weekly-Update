@@ -1,21 +1,22 @@
 # RRG Group Dashboard
 
-Root-file GitHub Pages dashboard.
+GitHub Pages dashboard for weekly RRG Group performance reporting.
 
-Upload these files directly to the root of the repo:
+## Important
 
-- `index.html`
-- `styles.css`
-- `app.js`
-- `README.md`
-- `CHANGELOG.md`
-- `LICENSE`
+This version uses `data.js` as the shared data source.
 
-This version keeps the existing style and adds richer KPI boxes for New Registrations, Used Cars and Non-Counting Fleet.
+Monday update process:
 
+1. Open the Admin Update tab.
+2. Upload Weekly Update, Sales Activity and Order Bank files.
+3. Click Preview Import.
+4. Click Publish.
+5. Click Download data.js.
+6. Upload/replace `data.js` in the root of this GitHub repository and commit.
 
-## v2.0 Trends
-- Adds a Trends tab.
-- Saves weekly snapshots in the browser.
-- Admin Publish automatically saves a trend snapshot.
-- Root files only for GitHub Pages.
+Once `data.js` is committed, everyone opening the dashboard link will see the same data.
+
+## Deploy
+
+Upload all files to the root of your GitHub Pages repository.
