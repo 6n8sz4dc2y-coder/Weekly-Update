@@ -7,9 +7,6 @@ function formatPublishedAt(iso){
   return d.toLocaleString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function getDashboardMeta(){
-  if(window.DASHBOARD_META && window.DASHBOARD_META.version){
-    return window.DASHBOARD_META;
-  }
   try{
     const saved = JSON.parse(localStorage.getItem(DASHBOARD_META_KEY) || 'null');
     if(saved && saved.version) return saved;
@@ -43,9 +40,7 @@ let DATA = {"q3_regs":[{"centre":"Bolton","jul_counting":0,"jul_clcp":0,"jul_fle
 
 try {
   const saved = localStorage.getItem('rrgDashboardData_orderbank_v2');
-  // Published GitHub data.js must always win for public/shared dashboard views.
-  // Local browser data is only used when data.js has not been populated yet.
-  if (saved && !window.DASHBOARD_DATA) DATA = JSON.parse(saved);
+  if (saved) DATA = JSON.parse(saved);
 } catch (e) { console.warn('Saved dashboard data could not be loaded', e); }
 let PENDING_DATA = null;
 
@@ -406,20 +401,16 @@ async function previewImport(){
 function publishImport(){
   if(!PENDING_DATA){ document.getElementById('adminStatus').innerHTML='Preview an import first.'; return; }
   DATA=PENDING_DATA;
-  localStorage.setItem('rrgDashboardData_orderbank_v2', JSON.stringify(DATA));
   const publishedMeta = saveDashboardMeta();
   document.getElementById('previewImport')?.addEventListener('click', previewImport);
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
 build();
-  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>This browser is now using the uploaded data. Download data.js and replace it in GitHub so everyone sees the same figures.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
+  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the three workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
 }
 function downloadDataBackup(){
-  const meta = getDashboardMeta();
-  const payload =
-    'window.DASHBOARD_META = ' + JSON.stringify(meta, null, 2) + ';\n\n' +
-    'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
+  const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
   const blob = new Blob([payload],{type:'application/javascript'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -584,20 +575,16 @@ async function previewImport(){
 function publishImport(){
   if(!PENDING_DATA){ document.getElementById('adminStatus').innerHTML='Preview an import first.'; return; }
   DATA=PENDING_DATA;
-  localStorage.setItem('rrgDashboardData_orderbank_v2', JSON.stringify(DATA));
   const publishedMeta = saveDashboardMeta();
   document.getElementById('previewImport')?.addEventListener('click', previewImport);
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
 build();
-  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>This browser is now using the uploaded data. Download data.js and replace it in GitHub so everyone sees the same figures.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
+  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the three workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
 }
 function downloadDataBackup(){
-  const meta = getDashboardMeta();
-  const payload =
-    'window.DASHBOARD_META = ' + JSON.stringify(meta, null, 2) + ';\n\n' +
-    'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
+  const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
   const blob = new Blob([payload],{type:'application/javascript'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -609,6 +596,51 @@ function resetSavedData(){
   localStorage.removeItem('rrgDashboardData_orderbank_v2');
   localStorage.removeItem(DASHBOARD_META_KEY);
   location.reload();
+}
+
+
+async function fetchWorkbook(path){
+  const res = await fetch(path + '?v=' + Date.now(), { cache: 'no-store' });
+  if(!res.ok) throw new Error(path + ' not found (' + res.status + ')');
+  const buf = await res.arrayBuffer();
+  return XLSX.read(buf, { type: 'array' });
+}
+async function fetchRowsWorkbook(path, raw=false){
+  const wb = await fetchWorkbook(path);
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(ws, { header:1, defval:null, raw });
+}
+async function loadGithubWorkbookData(){
+  const status=document.getElementById('adminStatus');
+  const messages=[];
+  try{
+    const data = cloneData();
+    try{
+      const wb = await fetchWorkbook('./weekly-update.xlsx');
+      parseWeeklyWorkbook(wb, data);
+      messages.push('weekly-update.xlsx loaded');
+    }catch(e){ messages.push('weekly-update.xlsx not loaded: ' + e.message); }
+    try{
+      const rows = await fetchRowsWorkbook('./sales-activity.xls', false);
+      const count = parseSalesRows(rows, data);
+      messages.push('sales-activity.xls loaded (' + count + ' centres)');
+    }catch(e){ messages.push('sales-activity.xls not loaded: ' + e.message); }
+    try{
+      const wb = await fetchWorkbook('./order-bank.xlsx');
+      const count = parseOrderWorkbook(wb, data);
+      messages.push('order-bank.xlsx loaded (' + count + ' rows)');
+    }catch(e){ messages.push('order-bank.xlsx not loaded: ' + e.message); }
+    DATA = data;
+    build();
+    if(typeof rrgRenderTrends === 'function') rrgRenderTrends();
+    const el=document.getElementById('dataSourceStatus');
+    if(el) el.innerHTML = '<strong>Workbook source active.</strong><br>' + messages.join('<br>');
+    if(status) status.innerHTML = '<strong>Workbook files loaded from GitHub.</strong><br>' + messages.join('<br>');
+  }catch(e){
+    console.error(e);
+    build();
+    if(status) status.innerHTML = '<strong>Workbook load failed.</strong><br>' + (e.message || e);
+  }
 }
 
 document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('click',()=>{
@@ -623,4 +655,4 @@ document.getElementById('previewImport')?.addEventListener('click', previewImpor
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
-build();
+loadGithubWorkbookData();
