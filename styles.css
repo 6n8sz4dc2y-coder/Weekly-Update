@@ -1,0 +1,65 @@
+:root{--bg:#f5f7fb;--card:#ffffff;--ink:#111827;--muted:#6b7280;--line:#d9dee8;--head:#0f172a;--blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#b91c1c;--lightblue:#eff6ff;--lightgreen:#ecfdf5;--lightamber:#fffbeb;--lightred:#fef2f2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}header{background:var(--head);color:#fff;padding:22px 26px;position:sticky;top:0;z-index:20;box-shadow:0 4px 16px rgba(15,23,42,.18)}.header-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}h1{font-size:28px;margin:0 0 4px;font-weight:800;letter-spacing:-.03em}.subtitle{color:#cbd5e1;font-size:14px}nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}nav button{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:9px 13px;cursor:pointer;font-weight:700}nav button.active{background:#fff;color:var(--head)}main{padding:24px;max-width:1440px;margin:0 auto}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 20px rgba(15,23,42,.04)}.kpi{grid-column:span 3;min-height:126px}.kpi .label{font-size:13px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.kpi .value{font-size:34px;font-weight:900;margin-top:8px;letter-spacing:-.04em}.kpi .note{font-size:13px;color:var(--muted);margin-top:4px}.wide{grid-column:span 12}.half{grid-column:span 6}.third{grid-column:span 4}.section{display:none}.section.active{display:block}.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:0 0 12px;flex-wrap:wrap}h2{margin:0;font-size:22px;letter-spacing:-.02em}h3{margin:0 0 12px;font-size:17px}.search{border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:270px;font-size:14px;background:#fff}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff;max-height:70vh}table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}th{position:sticky;top:0;background:#f8fafc;color:#334155;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;z-index:5}th,td{padding:12px 14px;border-bottom:1px solid #e5e7eb;white-space:nowrap}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}tr:nth-child(even) td{background:#fbfdff}tr.group td{background:#eef2ff!important;font-weight:900;color:#1e3a8a}tr:hover td{background:#f1f5f9!important}.status{display:inline-flex;align-items:center;gap:6px;font-weight:800;border-radius:999px;padding:5px 9px;font-size:12px}.green{background:var(--lightgreen);color:var(--green)}.amber{background:var(--lightamber);color:var(--amber)}.red{background:var(--lightred);color:var(--red)}.blue{background:var(--lightblue);color:var(--blue)}.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;min-width:120px}.bar{height:100%;background:var(--blue);border-radius:999px}.bar.green{background:var(--green)}.bar.amber{background:#d97706}.bar.red{background:var(--red)}.mini{font-size:12px;color:var(--muted)}.leader{display:grid;gap:10px}.leader-row{display:grid;grid-template-columns:40px 1fr 90px 120px;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff}.rank{font-weight:900;color:#64748b}.centre{font-weight:900}.pct{text-align:right;font-weight:900}.note-box{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:14px;color:#475569;line-height:1.5}.footer-note{font-size:12px;color:#64748b;margin-top:18px}@media(max-width:900px){main{padding:14px}.kpi,.half,.third{grid-column:span 12}header{padding:18px 14px}.leader-row{grid-template-columns:34px 1fr 70px}.leader-row .progress{display:none}th,td{padding:10px 9px;font-size:13px}}
+
+.hint{font-size:13px;color:var(--muted);margin:-4px 0 12px}.leader-row .progress{min-width:100px}
+
+.period-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.period-pill{display:inline-flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}.period-pill.active{background:#dcfce7;color:#166534;border-color:#86efac}.period-pill.muted{background:rgba(255,255,255,.08);color:#cbd5e1}
+
+.kpi.primary{grid-column:span 4;min-height:140px}.kpi.secondary{grid-column:span 3;min-height:116px}.kpi.primary .value{font-size:42px}.kpi strong{color:#111827}@media(max-width:900px){.kpi.primary,.kpi.secondary{grid-column:span 12}}
+
+.split-card .value{margin-bottom:10px}
+.split-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;font-size:12px;color:var(--muted)}
+.split-grid div{border:1px solid var(--line);border-radius:10px;background:#f8fafc;padding:7px 6px;text-align:center;font-weight:800}
+.split-grid strong{display:block;color:var(--ink);font-size:15px;margin-top:2px}
+@media(max-width:900px){.split-grid{grid-template-columns:repeat(3,1fr)}}
+
+.admin-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:9px 13px;cursor:pointer;font-weight:800;margin-left:6px}.primary-btn{background:var(--head);color:#fff;border-color:var(--head)}.danger-btn{background:#fef2f2;color:var(--red);border-color:#fecaca}.split-card .value{font-size:26px}.split-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}.split-grid div{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px}.split-grid strong{display:block;color:var(--ink);font-size:15px;margin-top:2px}
+
+.version-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:#f8fafc}
+.version-card div{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;color:#475569}
+.version-card strong{color:#111827}
+@media(max-width:900px){.version-card{grid-template-columns:1fr}}
+
+/* Headline KPI month / quarter progress cards */
+.kpi-progress-card{padding:20px;min-height:260px;display:flex;flex-direction:column;gap:14px}
+.kpi-progress-card .label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#64748b}
+.kpi-split-main{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.kpi-split-main>div:first-child{border-right:1px solid var(--line);padding-right:16px}
+.mini-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;font-weight:900;margin-bottom:4px}
+.green-card .mini-label{color:#15803d}.purple-card .mini-label{color:#7e22ce}
+.kpi-progress-card .value{font-size:40px;line-height:1;font-weight:950;letter-spacing:-.05em;margin:4px 0 8px}
+.month-progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.month-progress-grid>div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px;text-align:center}
+.month-progress-grid span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:900}
+.month-progress-grid strong{display:block;font-size:22px;margin:4px 0 2px}
+.month-progress-grid small{display:block;color:#64748b;font-size:12px}
+.kpi-footer-strip{margin:2px -20px -20px;padding:14px 20px;background:#f8fafc;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px;border-radius:0 0 18px 18px}
+.kpi-footer-strip span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:900}
+.kpi-footer-strip strong{font-size:20px;letter-spacing:-.03em}.blue-card .kpi-footer-strip strong{color:#1d4ed8}.green-card .kpi-footer-strip strong{color:#15803d}.purple-card .kpi-footer-strip strong{color:#7e22ce}
+@media(max-width:900px){.kpi-progress-card{min-height:auto}.kpi-split-main{grid-template-columns:1fr}.kpi-split-main>div:first-child{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:12px}.month-progress-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi-footer-strip{grid-template-columns:1fr}}
+
+/* Fix: keep run rate value and '/ week' on one line with matching KPI font */
+.kpi-footer-strip strong span{
+  display:inline !important;
+  font-size:inherit !important;
+  text-transform:none !important;
+  letter-spacing:inherit !important;
+  color:inherit !important;
+  font-weight:inherit !important;
+}
+.kpi-footer-strip strong{
+  display:inline-flex;
+  align-items:baseline;
+  gap:4px;
+  white-space:nowrap;
+}
+
+
+.trend-big{font-size:34px;font-weight:900;letter-spacing:-.04em;margin-top:6px}
+.trend-chart{display:grid;gap:10px}
+.trend-row{display:grid;grid-template-columns:80px 1fr 74px;gap:10px;align-items:center}
+.trend-week{font-size:12px;font-weight:800;color:#64748b}
+.trend-track{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.trend-fill{height:100%;background:var(--blue);border-radius:999px}
+.trend-value{text-align:right;font-weight:900;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.trend-row{grid-template-columns:66px 1fr 64px}.trend-big{font-size:30px}}
