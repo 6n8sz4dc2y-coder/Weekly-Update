@@ -757,3 +757,162 @@ function exportWeeklyPdf(){
 }
 document.getElementById('exportPdf')?.addEventListener('click', exportWeeklyPdf);
 document.getElementById('exportPdfHeader')?.addEventListener('click', exportWeeklyPdf);
+
+
+// --- PowerPoint Board Pack Export ---
+function asNum(v){ return Number(v) || 0; }
+function fmtPpt(n){ return Math.round(Number(n)||0).toLocaleString('en-GB'); }
+function pctPpt(n){ return `${Math.round((Number(n)||0)*100)}%`; }
+function safeRows(rows){ return Array.isArray(rows) ? rows : []; }
+function sumPpt(rows, key){ return safeRows(rows).reduce((a,r)=>a+asNum(r && r[key]),0); }
+function siteDisplay(name){ return name === 'SQ' ? 'Salford Quays' : (name || '-'); }
+function currentWeekLabel(){
+  try { if(typeof rrgISOWeek === 'function') return rrgISOWeek(new Date()); } catch(e){}
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function pptStatusColour(ratio){ return ratio >= 1 ? '15803D' : ratio >= 0.9 ? 'B45309' : 'B91C1C'; }
+function addSlideTitle(slide, title, subtitle){
+  slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:13.333, h:0.62, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addText(title, { x:0.35, y:0.15, w:8.5, h:0.3, fontFace:'Aptos Display', fontSize:17, bold:true, color:'FFFFFF', margin:0 });
+  slide.addText(subtitle || 'RRG Group Dashboard', { x:9.2, y:0.18, w:3.7, h:0.25, fontFace:'Aptos', fontSize:9, color:'CBD5E1', align:'right', margin:0 });
+}
+function addFooter(slide){
+  slide.addText(`Generated ${new Date().toLocaleDateString('en-GB')} · RRG Group Dashboard`, { x:0.35, y:7.15, w:12.6, h:0.2, fontFace:'Aptos', fontSize:7, color:'64748B', margin:0 });
+}
+function addMetricCard(slide, x, y, w, h, title, value, sub, color='2563EB'){
+  slide.addShape(pptx.ShapeType.roundRect, { x, y, w, h, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8', width:1} });
+  slide.addText(title.toUpperCase(), { x:x+0.15, y:y+0.15, w:w-0.3, h:0.22, fontFace:'Aptos', fontSize:7.5, bold:true, color:'6B7280', margin:0 });
+  slide.addText(String(value), { x:x+0.15, y:y+0.45, w:w-0.3, h:0.45, fontFace:'Aptos Display', fontSize:24, bold:true, color, margin:0 });
+  slide.addText(String(sub||''), { x:x+0.15, y:y+h-0.35, w:w-0.3, h:0.2, fontFace:'Aptos', fontSize:8, color:'6B7280', margin:0 });
+}
+function addTableSlide(slide, title, rows, columns, subtitle){
+  addSlideTitle(slide, title, subtitle || currentWeekLabel());
+  const data = [columns.map(c=>({text:c.label, options:{bold:true,color:'334155',fill:'F8FAFC'}}))];
+  rows.slice(0,18).forEach(r=>{
+    data.push(columns.map(c=>{
+      let v = typeof c.value === 'function' ? c.value(r) : r[c.key];
+      if(c.format === 'pct') v = pctPpt(v);
+      else if(c.num) v = fmtPpt(v);
+      return { text: String(v ?? '-'), options:{ color:'111827', fill: String(r.centre||'').includes('CDA') || r.centre==='TOTAL' ? 'EEF2FF' : 'FFFFFF' } };
+    }));
+  });
+  slide.addTable(data, { x:0.35, y:0.9, w:12.65, h:5.95, border:{type:'solid',color:'E5E7EB',pt:0.5}, fontFace:'Aptos', fontSize:8, color:'111827', margin:0.04, valign:'mid', fit:'shrink', colW:columns.map(c=>c.w||1) });
+  addFooter(slide);
+}
+function efficiencyRows(){
+  const acts = safeRows(DATA.dashboard_activity).filter(r=>r.centre && r.centre !== 'TOTAL');
+  if(typeof funnelEfficiencyScore === 'function'){
+    return acts.map(r=>({ ...r, effScore:funnelEfficiencyScore(r), effGrade:efficiencyGrade(funnelEfficiencyScore(r)) })).sort((a,b)=>b.effScore-a.effScore);
+  }
+  return acts.map(r=>{
+    const td=asNum(r.td_ratio), os=asNum(r.os_ratio), conv=asNum(r.orders_ratio);
+    const score=Math.round(Math.min(td/0.5,1)*25 + Math.min(os/0.75,1)*35 + Math.min(conv/0.15,1)*40);
+    return { ...r, effScore:score, effGrade:score>=90?'A':score>=80?'B':score>=70?'C':'D' };
+  }).sort((a,b)=>b.effScore-a.effScore);
+}
+async function exportBoardPack(){
+  if(typeof pptxgen === 'undefined'){
+    alert('PowerPoint generator did not load. Please check internet connection and try again.');
+    return;
+  }
+  const pptx = new pptxgen();
+  pptx.layout = 'LAYOUT_WIDE';
+  pptx.author = 'Gavin Barry';
+  pptx.subject = 'RRG Group Weekly Performance Dashboard';
+  pptx.title = 'RRG Weekly Performance Pack';
+  pptx.company = 'RRG Group';
+  pptx.theme = { headFontFace:'Aptos Display', bodyFontFace:'Aptos', lang:'en-GB' };
+
+  const week = currentWeekLabel();
+  const regs = safeRows(DATA.dashboard_regs);
+  const used = safeRows(DATA.dashboard_used);
+  const nonRows = safeRows(DATA.q3_non).filter(r=>['NORTH CDA','WY CDA','SOUTH CDA'].includes(String(r.centre||'').toUpperCase()));
+  const acts = safeRows(DATA.dashboard_activity).filter(r=>r.centre && r.centre !== 'TOTAL');
+  const orders = safeRows(DATA.dashboard_orders);
+
+  const newActual = sumPpt(regs,'qtr_total'), newTarget = sumPpt(regs,'qtr_target');
+  const usedActual = sumPpt(used,'qtr_counting'), usedTarget = sumPpt(used,'qtr_target');
+  const fleetActual = sumPpt(nonRows,'qtr_total'), fleetTarget = sumPpt(nonRows,'qtr_budget');
+  const enq = sumPpt(acts,'total_enquiries'), td = sumPpt(acts,'total_test_drives'), os = sumPpt(acts,'total_os'), salesOrders = sumPpt(acts,'total_orders');
+
+  // Cover
+  let slide = pptx.addSlide();
+  slide.background = { color:'F5F7FB' };
+  slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:13.333, h:7.5, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addText('RRG Group', { x:0.75, y:0.75, w:4.5, h:0.4, fontFace:'Aptos', fontSize:18, bold:true, color:'CBD5E1', margin:0 });
+  slide.addText('Weekly Performance\nDashboard', { x:0.75, y:1.6, w:8.5, h:1.6, fontFace:'Aptos Display', fontSize:44, bold:true, color:'FFFFFF', margin:0, breakLine:false });
+  slide.addText(`${week}\nPrepared by Gavin Barry`, { x:0.8, y:4.4, w:5, h:0.6, fontFace:'Aptos', fontSize:16, color:'CBD5E1', margin:0 });
+  slide.addShape(pptx.ShapeType.roundRect, { x:8.1, y:1.15, w:4.4, h:4.7, rectRadius:0.12, fill:{color:'FFFFFF', transparency:5}, line:{color:'334155'} });
+  slide.addText('Board Pack', { x:8.45, y:1.55, w:3.6, h:0.35, fontSize:18, bold:true, color:'FFFFFF', margin:0 });
+  slide.addText(`New Regs: ${pctPpt(newTarget?newActual/newTarget:0)}\nUsed Cars: ${pctPpt(usedTarget?usedActual/usedTarget:0)}\nFleet: ${pctPpt(fleetTarget?fleetActual/fleetTarget:0)}\nConversion: ${pctPpt(enq?salesOrders/enq:0)}`, { x:8.45, y:2.15, w:3.8, h:2.0, fontSize:18, color:'E5E7EB', breakLine:false, fit:'shrink' });
+
+  // Executive Dashboard
+  slide = pptx.addSlide();
+  slide.background = { color:'F5F7FB' };
+  addSlideTitle(slide, 'Executive Dashboard', week);
+  addMetricCard(slide, 0.35, 0.9, 4.05, 1.35, 'Q3 New Registrations', pctPpt(newTarget?newActual/newTarget:0), `${fmtPpt(newActual)} / ${fmtPpt(newTarget)} target`, '2563EB');
+  addMetricCard(slide, 4.65, 0.9, 4.05, 1.35, 'Q3 Used Cars', pctPpt(usedTarget?usedActual/usedTarget:0), `${fmtPpt(usedActual)} / ${fmtPpt(usedTarget)} target`, '15803D');
+  addMetricCard(slide, 8.95, 0.9, 4.05, 1.35, 'Non-Counting Fleet', pctPpt(fleetTarget?fleetActual/fleetTarget:0), `${fmtPpt(fleetActual)} / ${fmtPpt(fleetTarget)} budget`, '6D28D9');
+  addMetricCard(slide, 0.35, 2.55, 3.0, 1.05, 'Enquiries', fmtPpt(enq), 'Total sales funnel', '2563EB');
+  addMetricCard(slide, 3.65, 2.55, 3.0, 1.05, 'Test Drive %', pctPpt(enq?td/enq:0), `${fmtPpt(td)} test drives`, '2563EB');
+  addMetricCard(slide, 6.95, 2.55, 3.0, 1.05, 'Offer Sheet %', pctPpt(enq?os/enq:0), `${fmtPpt(os)} offer sheets`, '2563EB');
+  addMetricCard(slide, 10.25, 2.55, 2.75, 1.05, 'Conversion %', pctPpt(enq?salesOrders/enq:0), `${fmtPpt(salesOrders)} orders`, '2563EB');
+  slide.addShape(pptx.ShapeType.roundRect, { x:0.35, y:4.0, w:6.25, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addText('Highlights', { x:0.6, y:4.2, w:5.75, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
+  const topReg = regs.filter(r=>!String(r.centre).includes('CDA')).sort((a,b)=>(b.qtr_target?b.qtr_total/b.qtr_target:0)-(a.qtr_target?a.qtr_total/a.qtr_target:0))[0];
+  const topUsed = used.filter(r=>!String(r.centre).includes('CDA')).sort((a,b)=>(b.qtr_target?b.qtr_counting/b.qtr_target:0)-(a.qtr_target?a.qtr_counting/a.qtr_target:0))[0];
+  const topEff = efficiencyRows()[0];
+  const highlights = [
+    topReg ? `${siteDisplay(topReg.centre)} leads registrations at ${pctPpt(topReg.qtr_target?topReg.qtr_total/topReg.qtr_target:0)} of target.` : '',
+    topUsed ? `${siteDisplay(topUsed.centre)} leads used cars at ${pctPpt(topUsed.qtr_target?topUsed.qtr_counting/topUsed.qtr_target:0)} of target.` : '',
+    topEff ? `${siteDisplay(topEff.centre)} leads Sales Funnel Efficiency with score ${topEff.effScore}.` : ''
+  ].filter(Boolean).join('\n');
+  slide.addText(highlights || 'No highlights available yet.', { x:0.6, y:4.65, w:5.75, h:1.8, fontSize:12, color:'475569', breakLine:false, fit:'shrink' });
+  slide.addShape(pptx.ShapeType.roundRect, { x:6.9, y:4.0, w:6.1, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addText('CDA Summary', { x:7.15, y:4.2, w:5.6, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
+  const cda = safeRows(DATA.q3_regs).filter(r=>String(r.centre||'').includes('CDA')).map(r=>`${r.centre}: ${pctPpt(r.qtr_target?r.qtr_total/r.qtr_target:0)} (${fmtPpt(r.qtr_total)} / ${fmtPpt(r.qtr_target)})`).join('\n');
+  slide.addText(cda, { x:7.15, y:4.65, w:5.6, h:1.7, fontSize:12, color:'475569', breakLine:false, fit:'shrink' });
+  addFooter(slide);
+
+  // Tables
+  addTableSlide(pptx.addSlide(), 'Q3 Registrations', safeRows(DATA.q3_regs), [
+    {label:'Centre',key:'centre',w:1.55},{label:'Jul',key:'jul_total',num:true,w:0.65},{label:'Jul Tgt',key:'jul_target',num:true,w:0.7},{label:'Aug',key:'aug_total',num:true,w:0.65},{label:'Aug Tgt',key:'aug_target',num:true,w:0.7},{label:'Sep',key:'sep_total',num:true,w:0.65},{label:'Sep Tgt',key:'sep_target',num:true,w:0.7},{label:'QTR',key:'qtr_total',num:true,w:0.65},{label:'Target',key:'qtr_target',num:true,w:0.75},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true,w:0.6},{label:'To Go',key:'to_go',num:true,w:0.65}
+  ], week);
+  addTableSlide(pptx.addSlide(), 'Used Cars', safeRows(DATA.q3_used), [
+    {label:'Centre',key:'centre',w:1.8},{label:'Jul',key:'jul_counting',num:true,w:0.75},{label:'Jul Tgt',key:'jul_target',num:true,w:0.75},{label:'Aug',key:'aug_counting',num:true,w:0.75},{label:'Aug Tgt',key:'aug_target',num:true,w:0.75},{label:'Sep',key:'sep_counting',num:true,w:0.75},{label:'Sep Tgt',key:'sep_target',num:true,w:0.75},{label:'QTR',key:'qtr_counting',num:true,w:0.85},{label:'Target',key:'qtr_target',num:true,w:0.85},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true,w:0.65}
+  ], week);
+  addTableSlide(pptx.addSlide(), 'Fleet', safeRows(DATA.q3_fleet), [
+    {label:'Centre',key:'centre',w:2.0},{label:'BCH Regs',key:'regs',num:true,w:1.0},{label:'Target',key:'target',num:true,w:1.0},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true,w:0.8},{label:'Active Orders',key:'active_orders',num:true,w:1.2}
+  ], week);
+  addTableSlide(pptx.addSlide(), 'Order Bank', orders.slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())), [
+    {label:'Centre',key:'centre',w:1.6},{label:'H1 Tgt',key:'h1_target',num:true,w:0.8},{label:'H1 Orders',key:'h1_orders',num:true,w:0.9},{label:'H1 %',key:'h1_pct',format:'pct',num:true,w:0.7},{label:'H2 Tgt',key:'h2_target',num:true,w:0.85},{label:'Jul Tgt',key:'jul_target',num:true,w:0.8},{label:'Jul Done',value:r=>orderDoneFor(r,'jul'),num:true,w:0.85},{label:'Jul %',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'pct',num:true,w:0.65},{label:'Q3 Tgt',key:'q3_target',num:true,w:0.8},{label:'Q4 Tgt',key:'q4_target',num:true,w:0.8}
+  ], week);
+  addTableSlide(pptx.addSlide(), 'Sales Funnel Volume', acts.slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)), [
+    {label:'Centre',key:'centre',w:1.5},{label:'Enq',key:'total_enquiries',num:true,w:0.7},{label:'TD',key:'total_test_drives',num:true,w:0.65},{label:'OS',key:'total_os',num:true,w:0.65},{label:'Orders',key:'total_orders',num:true,w:0.75},{label:'TD %',key:'td_ratio',format:'pct',num:true,w:0.65},{label:'OS %',key:'os_ratio',format:'pct',num:true,w:0.65},{label:'Conv %',key:'orders_ratio',format:'pct',num:true,w:0.7},{label:'Delivered',key:'delivered',num:true,w:0.8},{label:'Lost Opp',key:'lost_opportunities',num:true,w:0.8}
+  ], week);
+  addTableSlide(pptx.addSlide(), 'Sales Funnel Efficiency', efficiencyRows(), [
+    {label:'Centre',key:'centre',w:1.9},{label:'Score',key:'effScore',num:true,w:0.75},{label:'Grade',key:'effGrade',w:0.65},{label:'TD %',key:'td_ratio',format:'pct',num:true,w:0.75},{label:'OS %',key:'os_ratio',format:'pct',num:true,w:0.75},{label:'Conv %',key:'orders_ratio',format:'pct',num:true,w:0.75},{label:'Orders',key:'total_orders',num:true,w:0.8},{label:'Enquiries',key:'total_enquiries',num:true,w:0.9}
+  ], week);
+
+  // Trends summary (if available)
+  slide = pptx.addSlide();
+  slide.background = { color:'F5F7FB' };
+  addSlideTitle(slide, 'Trends', week);
+  const history = (typeof rrgLoadHistory === 'function') ? rrgLoadHistory() : [];
+  if(!history.length){
+    slide.addText('No saved weekly snapshots yet. Save snapshots from the Trends tab to build this section over time.', { x:0.65, y:1.3, w:11.8, h:0.6, fontSize:18, color:'475569', margin:0 });
+  } else {
+    const latest = history[history.length-1];
+    addMetricCard(slide, 0.5, 1.1, 3.0, 1.15, 'Latest New Regs', fmtPpt(latest.newActual), `${pctPpt(latest.newTarget?latest.newActual/latest.newTarget:0)} of target`, '2563EB');
+    addMetricCard(slide, 3.85, 1.1, 3.0, 1.15, 'Latest Used Cars', fmtPpt(latest.usedActual), `${pctPpt(latest.usedTarget?latest.usedActual/latest.usedTarget:0)} of target`, '15803D');
+    addMetricCard(slide, 7.2, 1.1, 2.6, 1.15, 'Enquiries', fmtPpt(latest.enquiries), 'latest snapshot', '2563EB');
+    addMetricCard(slide, 10.15, 1.1, 2.6, 1.15, 'Conversion', pctPpt(latest.conversionPct), 'latest snapshot', '2563EB');
+  }
+  addFooter(slide);
+
+  await pptx.writeFile({ fileName: `RRG Weekly Performance Pack - ${week}.pptx` });
+}
+
+document.getElementById('exportPpt')?.addEventListener('click', exportBoardPack);
+document.getElementById('exportPptHeader')?.addEventListener('click', exportBoardPack);
