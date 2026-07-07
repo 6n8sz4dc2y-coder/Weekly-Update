@@ -44,3 +44,8 @@
 - Kept the existing root-file GitHub Pages build.
 - Updated the three main dashboard boxes to show current-month %, Q3 total %, Jul/Aug/Sep progress, remaining volume and weekly run rate required.
 - No folder structure changes.
+
+## Q2 South + Progress Revert
+- Added South Manchester CDA to the Q2 Reference registration and used-car tables.
+- Restored dashboard registration/used snapshot bars to show actual progress against full target.
+- Removed Expected MTD and pace bars from the main Q3/Used tables; pace status remains as a separate indicator.
