@@ -173,6 +173,62 @@ function updateProgressKpi(prefix, rows, config){
  setText(prefix+'RunRate', fmt(Math.max(0, Math.ceil(remaining / weeks))));
 }
 
+
+function funnelEfficiencyScore(row){
+  const td = Number(row.td_ratio) || 0;
+  const os = Number(row.os_ratio) || 0;
+  const conv = Number(row.orders_ratio) || 0;
+  // Benchmarks: TD 50%, OS 75%, Conversion 15%.
+  const tdScore = Math.min(td / 0.50, 1) * 25;
+  const osScore = Math.min(os / 0.75, 1) * 35;
+  const convScore = Math.min(conv / 0.15, 1) * 40;
+  return Math.round(tdScore + osScore + convScore);
+}
+function funnelGrade(score){
+  if(score >= 95) return 'A+';
+  if(score >= 90) return 'A';
+  if(score >= 80) return 'B';
+  if(score >= 70) return 'C';
+  return 'D';
+}
+function funnelOpportunity(row){
+  const gaps = [
+    {name:'Test drives', gap:Math.max(0, 0.50 - (Number(row.td_ratio)||0)), target:0.50, actual:Number(row.td_ratio)||0},
+    {name:'Offer sheets', gap:Math.max(0, 0.75 - (Number(row.os_ratio)||0)), target:0.75, actual:Number(row.os_ratio)||0},
+    {name:'Conversion', gap:Math.max(0, 0.15 - (Number(row.orders_ratio)||0)), target:0.15, actual:Number(row.orders_ratio)||0}
+  ].sort((a,b)=>b.gap-a.gap);
+  const g = gaps[0];
+  if(!g || g.gap <= 0) return 'Maintain standards';
+  return `${g.name} (+${Math.round(g.gap*100)} pts)`;
+}
+function renderEfficiencyAwards(rows){
+  const el = document.getElementById('efficiencyAwards');
+  if(!el) return;
+  const valid = (rows||[]).filter(r=>r.centre && r.centre !== 'TOTAL' && (Number(r.total_enquiries)||0)>0);
+  const top = (key)=> valid.slice().sort((a,b)=>(Number(b[key])||0)-(Number(a[key])||0))[0];
+  const conv = top('orders_ratio'), td = top('td_ratio'), os = top('os_ratio');
+  const card = (title,row,key)=> row ? `<div class="award-card"><span>${title}</span><strong>${siteLabel(row.centre)}</strong><em>${pct(Number(row[key])||0)}</em></div>` : '';
+  el.innerHTML = card('Best conversion',conv,'orders_ratio') + card('Best test drive rate',td,'td_ratio') + card('Best offer sheet rate',os,'os_ratio');
+}
+function renderEfficiencyTable(rows){
+  const valid = (rows||[]).filter(r=>r.centre && r.centre !== 'TOTAL' && (Number(r.total_enquiries)||0)>0)
+    .map(r=>Object.assign({}, r, { efficiency_score:funnelEfficiencyScore(r), efficiency_grade:funnelGrade(funnelEfficiencyScore(r)), efficiency_opportunity:funnelOpportunity(r) }))
+    .sort((a,b)=>b.efficiency_score-a.efficiency_score);
+  renderEfficiencyAwards(valid);
+  makeTable('efficiencyTable',[
+    {label:'Rank', value:(r)=>valid.findIndex(x=>x.centre===r.centre)+1, num:true},
+    {label:'Centre', key:'centre'},
+    {label:'Score', key:'efficiency_score', num:true},
+    {label:'Grade', key:'efficiency_grade'},
+    {label:'TD %', key:'td_ratio', format:'pct', num:true},
+    {label:'OS %', key:'os_ratio', format:'pct', num:true},
+    {label:'Conversion %', key:'orders_ratio', format:'pct', num:true},
+    {label:'Enquiries', key:'total_enquiries', num:true},
+    {label:'Orders', key:'total_orders', num:true},
+    {label:'Biggest Opportunity', key:'efficiency_opportunity'}
+  ], valid);
+}
+
 function build(){
  updateVersionDisplays();
  const regs=DATA.dashboard_regs, used=DATA.dashboard_used, non=DATA.q3_non, acts=DATA.dashboard_activity;
@@ -240,6 +296,7 @@ function build(){
  makeTable('orderBankTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'July Target',key:'jul_target',num:true},{label:'July Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'July To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'July Progress',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'progress'},{label:'July %',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'pct',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'CY26 OB',key:'cy26_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  makeTable('monthlyOrderTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'Jul To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Done',key:'aug_orders',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Done',key:'sep_orders',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'Oct Target',key:'oct_target',num:true},{label:'Nov Target',key:'nov_target',num:true},{label:'Dec Target',key:'dec_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  makeTable('activityTable',[{label:'Rank',value:(r)=>((DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)).findIndex(x=>x.centre===r.centre)+1),num:true},{label:'Centre',key:'centre'},{label:'Enquiries',key:'total_enquiries',num:true},{label:'Test Drives',key:'total_test_drives',num:true},{label:'OS',key:'total_os',num:true},{label:'Orders',key:'total_orders',num:true},{label:'TD %',key:'td_ratio',format:'pct',num:true},{label:'Order %',key:'orders_ratio',format:'pct',num:true},{label:'OS %',key:'os_ratio',format:'pct',num:true},{label:'New Enq',key:'new_enquiries',num:true},{label:'New TD',key:'new_test_drives',num:true},{label:'New OS',key:'new_os',num:true},{label:'New Orders',key:'new_orders',num:true},{label:'Used Enq',key:'used_enquiries',num:true},{label:'Used TD',key:'used_test_drives',num:true},{label:'Used OS',key:'used_os',num:true},{label:'Used Orders',key:'used_orders',num:true},{label:'Delivered',key:'delivered',num:true},{label:'Lost Opp',key:'lost_opportunities',num:true}],(DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)));
+ renderEfficiencyTable(DATA.dashboard_activity||[]);
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
  makeTable('q2UsedTable',[{label:'Centre',key:'centre'},{label:'Apr Used',key:'apr_counting',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'May Used',key:'may_counting',num:true},{label:'May Target',key:'may_target',num:true},{label:'Jun Used',key:'jun_counting',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q2_used);
 }
@@ -278,7 +335,7 @@ function totalsFor(rows, names, fields){
 }
 function recomputeDashboardSets(data){
   ensureCdaTotals(data);
-  const userSites = data.user_sites || ALL_DASHBOARD_SITES;
+  const userSites = ALL_DASHBOARD_SITES;
   data.user_sites = userSites;
   data.dashboard_regs = (data.q3_regs||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_used = (data.q3_used||[]).filter(r=>userSites.includes(r.centre));
@@ -474,7 +531,7 @@ function totalsFor(rows, names, fields){
 }
 function recomputeDashboardSets(data){
   ensureCdaTotals(data);
-  const userSites = data.user_sites || ALL_DASHBOARD_SITES;
+  const userSites = ALL_DASHBOARD_SITES;
   data.user_sites = userSites;
   data.dashboard_regs = (data.q3_regs||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_used = (data.q3_used||[]).filter(r=>userSites.includes(r.centre));

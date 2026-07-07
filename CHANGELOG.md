@@ -1,3 +1,9 @@
+## Sales Funnel Efficiency Update
+- Added Sales Funnel Efficiency League.
+- Added weighted score: Test Drive Rate 25%, Offer Sheet Rate 35%, Conversion 40%.
+- Added Best Conversion, Best Test Drive Rate and Best Offer Sheet Rate cards.
+- Ensured South Manchester centres are included in dashboard activity when workbook data is present.
+
 # Changelog
 
 ## South CDA fleet snapshot patch
