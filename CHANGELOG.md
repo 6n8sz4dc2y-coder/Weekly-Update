@@ -19,3 +19,9 @@
 - Kept the existing root-file GitHub Pages build.
 - Updated the three main dashboard boxes to show current-month %, Q3 total %, Jul/Aug/Sep progress, remaining volume and weekly run rate required.
 - No folder structure changes.
+
+
+## v1.1 South Manchester CDA
+- Added South Manchester CDA site support: Denton, Altrincham, Macclesfield and Stockport.
+- Expanded dashboard filters/rankings/orders/sales activity to include South sites when present in the source sheets.
+- Added South CDA summary support when the weekly sheet contains a SOUTH CDA row.
