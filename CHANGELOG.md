@@ -1,3 +1,8 @@
+## Run-rate logic update
+- Q3 Registrations and Used Cars now use expected MTD pace for RAG/progress colouring.
+- Required weekly run rate remains visible as information, not the colour driver.
+- Added Expected MTD to Q3 and Used tables.
+
 ## Sortable tables
 - Added click-to-sort table headers across dashboard tables.
 - Click a header once to sort high-to-low, click again to reverse.

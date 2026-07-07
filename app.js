@@ -107,9 +107,12 @@ function activityOrdersFor(centre){const normal=x=>String(x||'').trim().toLowerC
 function orderDoneFor(row, month){const v=row ? row[month+'_orders'] : null;return (v===null||v===undefined||v==='') ? 0 : (Number(v)||0);}
 function currentOrderMonth(){const m=new Date().getMonth();return ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][m] || 'jul';}
 const statusClass=n=> n>=1?'green':n>=.9?'amber':'red';
+const paceStatusClass=n=> n>=1?'green':n>=.92?'amber':'red';
 const progress=n=>`<div class="progress"><div class="bar ${statusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
+const paceProgress=n=>`<div class="progress"><div class="bar ${paceStatusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
 const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.9?'Watch':'Behind'}</span>`;
-function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v);if(col.format==='status')return status(v);return col.num?fmt(v):(v??'-')}
+const paceStatus=n=>`<span class="status ${paceStatusClass(n)}">${n>=1?'On pace':n>=.92?'Watch':'Behind pace'}</span>`;
+function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);return col.num?fmt(v):(v??'-')}
 
 const TABLE_SORT_STATE = {};
 function rawCellValue(col,row){
@@ -150,7 +153,24 @@ function renderTable(id,cols,rows){
   });
 }
 function makeTable(id,cols,rows){renderTable(id,cols,rows||[])}
-function leaderRows(rows, valueFn, subFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${progress(v)}</div>`}).join('')}
+function leaderRows(rows, valueFn, subFn, barFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);const b=barFn?barFn(r):v;return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${barFn?paceProgress(b):progress(v)}</div>`}).join('')}
+function q3ElapsedRatio(){
+ const now=new Date();
+ const start=new Date(now.getFullYear(),6,1,0,0,0); // 1 July
+ const end=new Date(now.getFullYear(),8,30,23,59,59); // 30 September
+ if(now<=start) return 0;
+ if(now>=end) return 1;
+ return Math.max(0, Math.min(1, (now-start)/(end-start)));
+}
+function paceRatio(actual,target){
+ const expected=(Number(target)||0)*q3ElapsedRatio();
+ if(!expected) return 0;
+ return (Number(actual)||0)/expected;
+}
+function paceMini(actual,target){
+ const expected=(Number(target)||0)*q3ElapsedRatio();
+ return `QTR ${fmt(actual)} / ${fmt(target)} · Expected MTD ${fmt(expected)}`;
+}
 function sum(rows,key){return rows.reduce((a,r)=>a+(Number(r[key])||0),0)}
 
 function topRow(rows, valueFn){return rows && rows.length ? rows.slice().sort((a,b)=>valueFn(b)-valueFn(a))[0] : null}
@@ -321,14 +341,14 @@ function build(){
  document.getElementById('totalConvPctSplit').textContent = pct(totalConvRatio);
  document.getElementById('h2Period').innerHTML='<span class="period-pill muted">H1 closed</span><span class="period-pill active">H2 active · July onwards</span>';
  const north=DATA.q3_regs.find(r=>r.centre==='NORTH CDA'), wy=DATA.q3_regs.find(r=>r.centre==='WY CDA'), south=DATA.q3_regs.find(r=>r.centre==='SOUTH CDA');
- document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>`<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)}</div></div><div class="pct">${pct(r.qtr_target?r.qtr_total/r.qtr_target:0)}</div>${progress(r.qtr_target?r.qtr_total/r.qtr_target:0)}</div>`).join('');
- document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)}`);
- document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))}`);
+ document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">${paceMini(actual,target)} · To go ${fmt(r.to_go)}</div></div><div class="pct">${pct(qtrPct)}</div>${paceProgress(pace)}</div>`}).join('');
+ document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`${paceMini(r.qtr_total,r.qtr_target)} · To go ${fmt(r.to_go)}`,r=>paceRatio(r.qtr_total,r.qtr_target));
+ document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`${paceMini(r.qtr_counting,r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))}`,r=>paceRatio(r.qtr_counting,r.qtr_target));
  document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${fmt(r.qtr_total)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
- makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'status'}],DATA.q3_regs);
- makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Status',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'status'}],DATA.q3_used);
+ makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Pace',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceProgress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'Expected MTD',value:r=>(Number(r.qtr_target)||0)*q3ElapsedRatio(),num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
+ makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Pace',value:r=>paceRatio(r.qtr_counting,r.qtr_target),format:'paceProgress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Expected MTD',value:r=>(Number(r.qtr_target)||0)*q3ElapsedRatio(),num:true},{label:'Status',value:r=>paceRatio(r.qtr_counting,r.qtr_target),format:'paceStatus'}],DATA.q3_used);
  makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'BCH Progress',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'progress'},{label:'BCH %',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true}],DATA.q3_fleet_monthly);
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>r.target?r.regs/r.target:0,format:'status'}],DATA.q3_fleet);
  makeTable('nonTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Budget',key:'jul_budget',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Budget',key:'aug_budget',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Budget',key:'sep_budget',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Budget',key:'qtr_budget',num:true}],DATA.q3_non);
