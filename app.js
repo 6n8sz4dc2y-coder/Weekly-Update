@@ -166,6 +166,31 @@ function q3ElapsedRatio(){
  if(now>=end) return 1;
  return Math.max(0, Math.min(1, (now-start)/(end-start)));
 }
+
+function q3TotalWeeks(){
+ const start=new Date(new Date().getFullYear(),6,1,0,0,0);
+ const end=new Date(new Date().getFullYear(),8,30,23,59,59);
+ return Math.max(1, (end-start)/(7*24*60*60*1000));
+}
+function q3WeeksElapsed(){
+ return Math.max(0.01, q3ElapsedRatio()*q3TotalWeeks());
+}
+function usedForecastFinish(row){
+ const actual=Number(row && row.qtr_counting)||0;
+ const runRate=actual/q3WeeksElapsed();
+ return Math.round(runRate*q3TotalWeeks());
+}
+function usedForecastPct(row){
+ const target=Number(row && row.qtr_target)||0;
+ return target ? usedForecastFinish(row)/target : 0;
+}
+function usedForecastMini(row){
+ const forecast=usedForecastFinish(row);
+ const target=Number(row && row.qtr_target)||0;
+ const pctText=target ? pct(forecast/target) : '-';
+ return `Forecast ${fmt(forecast)} / ${fmt(target)} (${pctText})`;
+}
+
 function paceRatio(actual,target){
  const expected=(Number(target)||0)*q3ElapsedRatio();
  if(!expected) return 0;
@@ -347,12 +372,12 @@ function build(){
  const north=DATA.q3_regs.find(r=>r.centre==='NORTH CDA'), wy=DATA.q3_regs.find(r=>r.centre==='WY CDA'), south=DATA.q3_regs.find(r=>r.centre==='SOUTH CDA');
  document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct)}</div>`}).join('');
  document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} · ${paceRatio(r.qtr_total,r.qtr_target)>=1?'On pace':paceRatio(r.qtr_total,r.qtr_target)>=.9?'Slightly behind pace':'Behind pace'}`);
- document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${paceRatio(r.qtr_counting,r.qtr_target)>=1?'On pace':paceRatio(r.qtr_counting,r.qtr_target)>=.9?'Slightly behind pace':'Behind pace'}`);
+ document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${usedForecastMini(r)} · ${usedForecastPct(r)>=1?'On pace':usedForecastPct(r)>=.95?'Slightly behind pace':'Behind pace'}`);
  document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${fmt(r.qtr_total)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
  makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
- makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Status',value:r=>paceRatio(r.qtr_counting,r.qtr_target),format:'paceStatus'}],DATA.q3_used);
+ makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Forecast',value:r=>usedForecastFinish(r),num:true},{label:'Forecast %',value:r=>usedForecastPct(r),format:'pct',num:true},{label:'Status',value:r=>usedForecastPct(r),format:'paceStatus'}],DATA.q3_used);
  makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'BCH Progress',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'progress'},{label:'BCH %',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true}],DATA.q3_fleet_monthly);
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>r.target?r.regs/r.target:0,format:'status'}],DATA.q3_fleet);
  makeTable('nonTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Budget',key:'jul_budget',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Budget',key:'aug_budget',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Budget',key:'sep_budget',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Budget',key:'qtr_budget',num:true}],DATA.q3_non);

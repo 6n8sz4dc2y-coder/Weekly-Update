@@ -49,3 +49,9 @@
 - Added South Manchester CDA to the Q2 Reference registration and used-car tables.
 - Restored dashboard registration/used snapshot bars to show actual progress against full target.
 - Removed Expected MTD and pace bars from the main Q3/Used tables; pace status remains as a separate indicator.
+
+
+## Used Forecast View
+- Added Used Cars forecast finish and forecast % based on current quarter run rate.
+- Used status now reflects forecast finish vs Q3 target rather than colouring the progress bar.
+- Kept dashboard progress bars showing actual progress against full target.
