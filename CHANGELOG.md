@@ -1,5 +1,11 @@
 # Changelog
 
+## South CDA fleet snapshot patch
+- Added Denton into the front dashboard Non-Counting Fleet Snapshot.
+- No other dashboard layout or workbook-reading changes made.
+
+# Changelog
+
 ## v2.0
 - Added Trends tab.
 - Added weekly history engine using `history.js`.
