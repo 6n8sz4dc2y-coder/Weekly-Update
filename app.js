@@ -110,7 +110,46 @@ const statusClass=n=> n>=1?'green':n>=.9?'amber':'red';
 const progress=n=>`<div class="progress"><div class="bar ${statusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
 const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.9?'Watch':'Behind'}</span>`;
 function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v);if(col.format==='status')return status(v);return col.num?fmt(v):(v??'-')}
-function makeTable(id,cols,rows){const table=document.getElementById(id);if(!table)return;table.innerHTML=`<thead><tr>${cols.map(c=>`<th class="${c.num?'num':''}">${c.label}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${cols.map(c=>`<td class="${c.num?'num':''}">${cell(null,c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`}
+
+const TABLE_SORT_STATE = {};
+function rawCellValue(col,row){
+  try{
+    return typeof col.value==='function' ? col.value(row) : row[col.key];
+  }catch(e){ return ''; }
+}
+function sortableValue(col,row){
+  const v = rawCellValue(col,row);
+  if(v===null || v===undefined) return '';
+  if(col.num || col.format==='pct' || col.format==='progress' || col.format==='status') return Number(v) || 0;
+  const n = Number(String(v).replace(/[%£,]/g,''));
+  if(String(v).trim()!=='' && !Number.isNaN(n)) return n;
+  return String(v).toLowerCase();
+}
+function renderTable(id,cols,rows){
+  const table=document.getElementById(id);if(!table)return;
+  const state=TABLE_SORT_STATE[id]||{};
+  const sorted=rows.slice();
+  if(state.index!==undefined){
+    const col=cols[state.index];
+    sorted.sort((a,b)=>{
+      const av=sortableValue(col,a), bv=sortableValue(col,b);
+      const bothNum=typeof av==='number' && typeof bv==='number';
+      let cmp=bothNum ? av-bv : String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
+      return state.dir==='desc' ? -cmp : cmp;
+    });
+  }
+  table.innerHTML=`<thead><tr>${cols.map((c,i)=>{const active=state.index===i;const arrow=active?(state.dir==='desc'?' ▼':' ▲'):'';return `<th data-sort-index="${i}" class="sortable ${c.num?'num':''} ${active?'sorted':''}" title="Click to sort">${c.label}${arrow}</th>`}).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${cols.map(c=>`<td class="${c.num?'num':''}">${cell(null,c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  table.querySelectorAll('th[data-sort-index]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const index=Number(th.dataset.sortIndex);
+      const current=TABLE_SORT_STATE[id]||{};
+      const dir=current.index===index && current.dir==='desc' ? 'asc' : 'desc';
+      TABLE_SORT_STATE[id]={index,dir};
+      renderTable(id,cols,rows);
+    });
+  });
+}
+function makeTable(id,cols,rows){renderTable(id,cols,rows||[])}
 function leaderRows(rows, valueFn, subFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${progress(v)}</div>`}).join('')}
 function sum(rows,key){return rows.reduce((a,r)=>a+(Number(r[key])||0),0)}
 

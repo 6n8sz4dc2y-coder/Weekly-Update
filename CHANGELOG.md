@@ -1,3 +1,7 @@
+## Sortable tables
+- Added click-to-sort table headers across dashboard tables.
+- Click a header once to sort high-to-low, click again to reverse.
+
 ## PDF export button visible
 - Added Export PDF button to the header and Admin Update.
 - Added print styling to preserve dashboard colours.

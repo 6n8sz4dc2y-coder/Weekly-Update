@@ -79,3 +79,8 @@
   .table-wrap{max-height:none!important;overflow:visible!important}
   .grid{gap:12px!important}
 }
+
+/* Sortable table headers */
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{background:#eef2ff;color:#1e3a8a}
+th.sorted{background:#e0e7ff;color:#1e3a8a}
