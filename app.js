@@ -742,4 +742,15 @@ document.getElementById('previewImport')?.addEventListener('click', previewImpor
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
+
+function exportWeeklyPdf(){
+  document.body.classList.add('print-pack');
+  const currentActive = document.querySelector('nav button.active');
+  setTimeout(()=>{ window.print(); }, 150);
+  const cleanup = () => { document.body.classList.remove('print-pack'); window.removeEventListener('afterprint', cleanup); if(currentActive) currentActive.click(); };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(()=>{ document.body.classList.remove('print-pack'); }, 3000);
+}
+document.getElementById('exportPdf')?.addEventListener('click', exportWeeklyPdf);
+
 loadGithubWorkbookData();
