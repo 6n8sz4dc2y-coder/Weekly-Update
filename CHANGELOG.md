@@ -1,3 +1,7 @@
+## PDF export button visible
+- Added Export PDF button to the header and Admin Update.
+- Added print styling to preserve dashboard colours.
+
 ## Sales Funnel Efficiency Update
 - Added Sales Funnel Efficiency League.
 - Added weighted score: Test Drive Rate 25%, Offer Sheet Rate 35%, Conversion 40%.
