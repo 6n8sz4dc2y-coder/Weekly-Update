@@ -61,3 +61,7 @@
 ## Fleet percentage + Trends hidden
 - Front-page Non-Counting Fleet Snapshot now displays achievement as a percentage of budget.
 - Trends navigation and section are hidden; existing trend code is retained for possible future use.
+
+## Fleet BCH date status and active orders
+- Fleet BCH status now compares registrations with the expected quarter position as of today.
+- Active Orders now reads the populated workbook column, with fallback support for the prior layout.
