@@ -19,3 +19,7 @@ This version keeps the existing style and adds richer KPI boxes for New Registra
 - Saves weekly snapshots in the browser.
 - Admin Publish automatically saves a trend snapshot.
 - Root files only for GitHub Pages.
+
+
+## Board Pack Export
+Upload `pptxgen.bundle.js` to the repo root along with the other files. The Generate Board Pack button uses this local file to create the PowerPoint.
