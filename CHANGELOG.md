@@ -1,3 +1,9 @@
+# Board Pack + Fleet BCH Run Rate Fix
+- Fixed Generate Board Pack scope/constructor issue.
+- Added visible export error reporting.
+- Added date-based BCH required run rate per week by centre.
+- Preserved the working full Order Bank parser.
+
 # Changelog
 
 ## Full Order Bank import fix

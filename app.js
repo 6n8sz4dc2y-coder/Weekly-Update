@@ -385,7 +385,7 @@ function build(){
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
  makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
  makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Req / Week',value:r=>usedRequiredPerWeek(r),num:true},{label:'Forecast',value:r=>usedForecastFinish(r),num:true},{label:'Forecast %',value:r=>usedForecastPct(r),format:'pct',num:true},{label:'Status',value:r=>usedForecastPct(r),format:'paceStatus'}],DATA.q3_used);
- makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'BCH Progress',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'progress'},{label:'BCH %',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true}],DATA.q3_fleet_monthly);
+ makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'BCH Progress',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'progress'},{label:'BCH %',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'pct',num:true},{label:'Run Rate / Wk',value:r=>Math.max(0,Math.ceil(((Number(r.bch_target)||0)-(Number(r.bch_regs)||0))/q3WeeksRemaining())),num:true},{label:'Active Orders',key:'active_orders',num:true}],DATA.q3_fleet_monthly);
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>r.target?r.regs/r.target:0,format:'status'}],DATA.q3_fleet);
  makeTable('nonTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Budget',key:'jul_budget',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Budget',key:'aug_budget',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Budget',key:'sep_budget',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Budget',key:'qtr_budget',num:true}],DATA.q3_non);
  makeTable('orderBankTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'July Target',key:'jul_target',num:true},{label:'July Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'July To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'July Progress',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'progress'},{label:'July %',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'pct',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'CY26 OB',key:'cy26_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
@@ -999,8 +999,17 @@ function currentWeekLabel(){
   return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
 }
 function pptStatusColour(ratio){ return ratio >= 1 ? '15803D' : ratio >= 0.9 ? 'B45309' : 'B91C1C'; }
+let ACTIVE_PPTX_CTOR = null;
+function getPptxCtor(){
+  const candidate = window.pptxgen || window.PptxGenJS || window.pptxgenjs;
+  return candidate && candidate.default ? candidate.default : candidate;
+}
+function pptShape(name){
+  const ctor = ACTIVE_PPTX_CTOR || getPptxCtor();
+  return (ctor && ctor.ShapeType && ctor.ShapeType[name]) || name;
+}
 function addSlideTitle(slide, title, subtitle){
-  slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:13.333, h:0.62, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addShape(pptShape('rect'), { x:0, y:0, w:13.333, h:0.62, fill:{color:'0F172A'}, line:{color:'0F172A'} });
   slide.addText(title, { x:0.35, y:0.15, w:8.5, h:0.3, fontFace:'Aptos Display', fontSize:17, bold:true, color:'FFFFFF', margin:0 });
   slide.addText(subtitle || 'RRG Group Dashboard', { x:9.2, y:0.18, w:3.7, h:0.25, fontFace:'Aptos', fontSize:9, color:'CBD5E1', align:'right', margin:0 });
 }
@@ -1008,7 +1017,7 @@ function addFooter(slide){
   slide.addText(`Generated ${new Date().toLocaleDateString('en-GB')} · RRG Group Dashboard`, { x:0.35, y:7.15, w:12.6, h:0.2, fontFace:'Aptos', fontSize:7, color:'64748B', margin:0 });
 }
 function addMetricCard(slide, x, y, w, h, title, value, sub, color='2563EB'){
-  slide.addShape(pptx.ShapeType.roundRect, { x, y, w, h, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8', width:1} });
+  slide.addShape(pptShape('roundRect'), { x, y, w, h, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8', width:1} });
   slide.addText(title.toUpperCase(), { x:x+0.15, y:y+0.15, w:w-0.3, h:0.22, fontFace:'Aptos', fontSize:7.5, bold:true, color:'6B7280', margin:0 });
   slide.addText(String(value), { x:x+0.15, y:y+0.45, w:w-0.3, h:0.45, fontFace:'Aptos Display', fontSize:24, bold:true, color, margin:0 });
   slide.addText(String(sub||''), { x:x+0.15, y:y+h-0.35, w:w-0.3, h:0.2, fontFace:'Aptos', fontSize:8, color:'6B7280', margin:0 });
@@ -1039,11 +1048,13 @@ function efficiencyRows(){
   }).sort((a,b)=>b.effScore-a.effScore);
 }
 async function exportBoardPack(){
-  if(typeof pptxgen === 'undefined'){
-    alert('PowerPoint generator did not load. Please check internet connection and try again.');
+  const PptxCtor = getPptxCtor();
+  if(typeof PptxCtor !== 'function'){
+    alert('PowerPoint generator did not load. Make sure pptxgen.bundle.js is in the GitHub root, then hard-refresh the page.');
     return;
   }
-  const pptx = new pptxgen();
+  ACTIVE_PPTX_CTOR = PptxCtor;
+  const pptx = new PptxCtor();
   pptx.layout = 'LAYOUT_WIDE';
   pptx.author = 'Gavin Barry';
   pptx.subject = 'RRG Group Weekly Performance Dashboard';
@@ -1066,11 +1077,11 @@ async function exportBoardPack(){
   // Cover
   let slide = pptx.addSlide();
   slide.background = { color:'F5F7FB' };
-  slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:13.333, h:7.5, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addShape(pptShape('rect'), { x:0, y:0, w:13.333, h:7.5, fill:{color:'0F172A'}, line:{color:'0F172A'} });
   slide.addText('RRG Group', { x:0.75, y:0.75, w:4.5, h:0.4, fontFace:'Aptos', fontSize:18, bold:true, color:'CBD5E1', margin:0 });
   slide.addText('Weekly Performance\nDashboard', { x:0.75, y:1.6, w:8.5, h:1.6, fontFace:'Aptos Display', fontSize:44, bold:true, color:'FFFFFF', margin:0, breakLine:false });
   slide.addText(`${week}\nPrepared by Gavin Barry`, { x:0.8, y:4.4, w:5, h:0.6, fontFace:'Aptos', fontSize:16, color:'CBD5E1', margin:0 });
-  slide.addShape(pptx.ShapeType.roundRect, { x:8.1, y:1.15, w:4.4, h:4.7, rectRadius:0.12, fill:{color:'FFFFFF', transparency:5}, line:{color:'334155'} });
+  slide.addShape(pptShape('roundRect'), { x:8.1, y:1.15, w:4.4, h:4.7, rectRadius:0.12, fill:{color:'FFFFFF', transparency:5}, line:{color:'334155'} });
   slide.addText('Board Pack', { x:8.45, y:1.55, w:3.6, h:0.35, fontSize:18, bold:true, color:'FFFFFF', margin:0 });
   slide.addText(`New Regs: ${pctPpt(newTarget?newActual/newTarget:0)}\nUsed Cars: ${pctPpt(usedTarget?usedActual/usedTarget:0)}\nFleet: ${pctPpt(fleetTarget?fleetActual/fleetTarget:0)}\nConversion: ${pctPpt(enq?salesOrders/enq:0)}`, { x:8.45, y:2.15, w:3.8, h:2.0, fontSize:18, color:'E5E7EB', breakLine:false, fit:'shrink' });
 
@@ -1085,7 +1096,7 @@ async function exportBoardPack(){
   addMetricCard(slide, 3.65, 2.55, 3.0, 1.05, 'Test Drive %', pctPpt(enq?td/enq:0), `${fmtPpt(td)} test drives`, '2563EB');
   addMetricCard(slide, 6.95, 2.55, 3.0, 1.05, 'Offer Sheet %', pctPpt(enq?os/enq:0), `${fmtPpt(os)} offer sheets`, '2563EB');
   addMetricCard(slide, 10.25, 2.55, 2.75, 1.05, 'Conversion %', pctPpt(enq?salesOrders/enq:0), `${fmtPpt(salesOrders)} orders`, '2563EB');
-  slide.addShape(pptx.ShapeType.roundRect, { x:0.35, y:4.0, w:6.25, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addShape(pptShape('roundRect'), { x:0.35, y:4.0, w:6.25, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
   slide.addText('Highlights', { x:0.6, y:4.2, w:5.75, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
   const topReg = regs.filter(r=>!String(r.centre).includes('CDA')).sort((a,b)=>(b.qtr_target?b.qtr_total/b.qtr_target:0)-(a.qtr_target?a.qtr_total/a.qtr_target:0))[0];
   const topUsed = used.filter(r=>!String(r.centre).includes('CDA')).sort((a,b)=>(b.qtr_target?b.qtr_counting/b.qtr_target:0)-(a.qtr_target?a.qtr_counting/a.qtr_target:0))[0];
@@ -1096,7 +1107,7 @@ async function exportBoardPack(){
     topEff ? `${siteDisplay(topEff.centre)} leads Sales Funnel Efficiency with score ${topEff.effScore}.` : ''
   ].filter(Boolean).join('\n');
   slide.addText(highlights || 'No highlights available yet.', { x:0.6, y:4.65, w:5.75, h:1.8, fontSize:12, color:'475569', breakLine:false, fit:'shrink' });
-  slide.addShape(pptx.ShapeType.roundRect, { x:6.9, y:4.0, w:6.1, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addShape(pptShape('roundRect'), { x:6.9, y:4.0, w:6.1, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
   slide.addText('CDA Summary', { x:7.15, y:4.2, w:5.6, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
   const cda = safeRows(DATA.q3_regs).filter(r=>String(r.centre||'').includes('CDA')).map(r=>`${r.centre}: ${pctPpt(r.qtr_target?r.qtr_total/r.qtr_target:0)} (${fmtPpt(r.qtr_total)} / ${fmtPpt(r.qtr_target)})`).join('\n');
   slide.addText(cda, { x:7.15, y:4.65, w:5.6, h:1.7, fontSize:12, color:'475569', breakLine:false, fit:'shrink' });
@@ -1141,5 +1152,13 @@ async function exportBoardPack(){
   await pptx.writeFile({ fileName: `RRG Weekly Performance Pack - ${week}.pptx` });
 }
 
-document.getElementById('exportPpt')?.addEventListener('click', exportBoardPack);
-document.getElementById('exportPptHeader')?.addEventListener('click', exportBoardPack);
+async function runBoardPackExport(){
+  try {
+    await exportBoardPack();
+  } catch (error) {
+    console.error('Board pack export failed', error);
+    alert(`Board pack export failed: ${error && error.message ? error.message : error}`);
+  }
+}
+document.getElementById('exportPpt')?.addEventListener('click', runBoardPackExport);
+document.getElementById('exportPptHeader')?.addEventListener('click', runBoardPackExport);
