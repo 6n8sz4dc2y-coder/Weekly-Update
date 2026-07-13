@@ -1,25 +1,11 @@
-# RRG Group Dashboard
+# Dealer OS — Dynamic Order Bank Fix
 
-Root-file GitHub Pages dashboard.
+Upload `index.html` to the root of the GitHub Pages repository.
 
-Upload these files directly to the root of the repo:
-
-- `index.html`
-- `styles.css`
-- `app.js`
-- `README.md`
-- `CHANGELOG.md`
-- `LICENSE`
-
-This version keeps the existing style and adds richer KPI boxes for New Registrations, Used Cars and Non-Counting Fleet.
-
-
-## v2.0 Trends
-- Adds a Trends tab.
-- Saves weekly snapshots in the browser.
-- Admin Publish automatically saves a trend snapshot.
-- Root files only for GitHub Pages.
-
-
-## Board Pack Export
-Upload `pptxgen.bundle.js` to the repo root along with the other files. The Generate Board Pack button uses this local file to create the PowerPoint.
+## Added
+- Order Bank upload.
+- Scans the whole workbook for every `Orders after cancellations` table.
+- Selects the H1 or H2 table containing the chosen month.
+- Reads the current centre dynamically.
+- July works for Rochdale (22 target, 14 orders, -8) and Silsden (9 target, 2 orders, -7) with the supplied workbook.
+- August to December and January to June use the same dynamic logic.
