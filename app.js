@@ -264,85 +264,52 @@ function parseWeeklyWorkbook(wb, data){
 
 function parseOrderWorkbook(wb, data){
   const ws = wb.Sheets['Order Bank Targets'] || wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
-  const monthMap = {jan:'jan',feb:'feb',mar:'mar',apr:'apr',may:'may',jun:'jun',jul:'jul',aug:'aug',sep:'sep',oct:'oct',nov:'nov',dec:'dec'};
+  const a = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
   const ensureOrderRow = (centre)=>{
-    const normal = normCentreName(centre);
-    let row = (data.order_bank||[]).find(r=>normCentreName(r.centre).toLowerCase()===normal.toLowerCase());
-    if(!row){
-      row={centre:normal};
-      data.order_bank = data.order_bank || [];
-      data.order_bank.push(row);
-    }
+    let row = (data.order_bank||[]).find(r=>normCentreName(r.centre).toLowerCase()===normCentreName(centre).toLowerCase());
+    if(!row){ row={centre:normCentreName(centre)}; data.order_bank = data.order_bank || []; data.order_bank.push(row); }
     return row;
   };
-
-  // Read the annual/quarter target table above the first order block.
-  const firstBlock = rows.findIndex(r=>String((r&&r[0])||'').trim().toLowerCase().includes('orders after cancellations'));
   const topTargets = {};
-  const targetEnd = firstBlock >= 0 ? firstBlock : rows.length;
-  for(let i=0;i<targetEnd;i++){
-    const r=rows[i];
-    if(!r || !r[0] || !/^RRG\s+/i.test(String(r[0]))) continue;
+  for(let i=1;i<=11 && i<a.length;i++){
+    const r=a[i]; if(!r || !r[0]) continue;
     const centre=normCentreName(r[0]);
-    topTargets[centre]={
-      aso:nval(r[1]), q1_target:nval(r[3]), q2_target:nval(r[4]),
-      q3_target:nval(r[5]), q4_target:nval(r[6]), cy26_target:nval(r[8])
-    };
+    topTargets[centre]={aso:nval(r[1]), q1_target:nval(r[3]), q2_target:nval(r[4]), q3_target:nval(r[5]), q4_target:nval(r[6]), cy26_target:nval(r[8])};
   }
-
-  // Find every H1/H2 "Orders after cancellations" block dynamically.
-  // Each month is represented by three columns: Target, Orders, Diff.
-  for(let headerIndex=0; headerIndex<rows.length; headerIndex++){
-    const header=rows[headerIndex] || [];
-    if(!String(header[0]||'').trim().toLowerCase().includes('orders after cancellations')) continue;
-
-    const monthColumns=[];
-    for(let c=1;c<header.length;c++){
-      const label=String(header[c]||'').trim().slice(0,3).toLowerCase();
-      if(monthMap[label]) monthColumns.push({month:monthMap[label], targetCol:c, ordersCol:c+1, diffCol:c+2});
+  for(let i=14;i<=24 && i<a.length;i++){
+    const r=a[i]; if(!r || !r[0]) continue;
+    const centre=normCentreName(r[0]); const row=ensureOrderRow(centre);
+    Object.assign(row, topTargets[centre]||{});
+    Object.assign(row, {
+      jan_target:nval(r[1]), jan_orders:nval(r[2]), jan_diff:nval(r[3]),
+      feb_target:nval(r[4]), feb_orders:nval(r[5]), feb_diff:nval(r[6]),
+      mar_target:nval(r[7]), mar_orders:nval(r[8]), mar_diff:nval(r[9]),
+      apr_target:nval(r[10]), apr_orders:nval(r[11]), apr_diff:nval(r[12]),
+      may_target:nval(r[13]), may_orders:nval(r[14]), may_diff:nval(r[15]),
+      jun_target:nval(r[16]), jun_orders:nval(r[17]), jun_diff:nval(r[18])
+    });
+    row.h1_target = ['jan','feb','mar','apr','may','jun'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    row.h1_orders = ['jan','feb','mar','apr','may','jun'].reduce((t,m)=>t+(Number(row[m+'_orders'])||0),0);
+    row.h1_diff = row.h1_orders - row.h1_target;
+    row.h1_pct = row.h1_target ? row.h1_orders / row.h1_target : 0;
+  }
+  for(let i=29;i<=39 && i<a.length;i++){
+    const r=a[i]; if(!r || !r[0]) continue;
+    const centre=normCentreName(r[0]); const row=ensureOrderRow(centre);
+    Object.assign(row, topTargets[centre]||{});
+    const monthCols = {jul:[1,2,3], aug:[4,5,6], sep:[7,8,9], oct:[10,11,12], nov:[13,14,15], dec:[16,17,18]};
+    for(const [m,cols] of Object.entries(monthCols)){
+      const target=nval(r[cols[0]]);
+      const ordersRaw=r[cols[1]];
+      const orders=(ordersRaw===null || ordersRaw===undefined || ordersRaw==='') ? null : nval(ordersRaw);
+      row[m+'_target']=target;
+      row[m+'_orders']=orders;
+      row[m+'_diff']=(orders===null) ? -target : orders-target;
     }
-    if(!monthColumns.length) continue;
-
-    for(let rIndex=headerIndex+1;rIndex<rows.length;rIndex++){
-      const r=rows[rIndex] || [];
-      const first=String(r[0]||'').trim();
-      if(!first) break;
-      if(first.toLowerCase().includes('orders after cancellations')) break;
-      if(!/^RRG\s+/i.test(first)) continue;
-
-      const centre=normCentreName(first);
-      const row=ensureOrderRow(centre);
-      Object.assign(row, topTargets[centre]||{});
-
-      for(const m of monthColumns){
-        const target=nval(r[m.targetCol]);
-        const rawOrders=r[m.ordersCol];
-        const orders=(rawOrders===null || rawOrders===undefined || rawOrders==='') ? null : nval(rawOrders);
-        const rawDiff=r[m.diffCol];
-        const diff=(rawDiff===null || rawDiff===undefined || rawDiff==='')
-          ? (orders===null ? -target : orders-target)
-          : nval(rawDiff);
-        row[m.month+'_target']=target;
-        row[m.month+'_orders']=orders;
-        row[m.month+'_diff']=diff;
-      }
-    }
+    row.q3_target = row.q3_target || ['jul','aug','sep'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    row.q4_target = row.q4_target || ['oct','nov','dec'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    row.h2_target = ['jul','aug','sep','oct','nov','dec'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
   }
-
-  // Recalculate half-year totals from whichever month blocks were found.
-  for(const row of (data.order_bank||[])){
-    const h1=['jan','feb','mar','apr','may','jun'];
-    const h2=['jul','aug','sep','oct','nov','dec'];
-    row.h1_target=h1.reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
-    row.h1_orders=h1.reduce((t,m)=>t+(Number(row[m+'_orders'])||0),0);
-    row.h1_diff=row.h1_orders-row.h1_target;
-    row.h1_pct=row.h1_target ? row.h1_orders/row.h1_target : 0;
-    row.h2_target=h2.reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
-    row.q3_target=Number(row.q3_target)||['jul','aug','sep'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
-    row.q4_target=Number(row.q4_target)||['oct','nov','dec'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
-  }
-
   recomputeDashboardSets(data);
   return (data.order_bank||[]).length;
 }

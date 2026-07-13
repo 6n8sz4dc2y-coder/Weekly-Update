@@ -1,5 +1,21 @@
-# RRG Dashboard – Dynamic Order Bank Fix
+# RRG Group Dashboard
 
-Replace `app.js` and `order-bank.xlsx` in the GitHub root.
+Root-file GitHub Pages dashboard.
 
-The order parser now scans every `Orders after cancellations` block and reads Jan–Dec dynamically, including the H2 table beginning with July.
+Upload these files directly to the root of the repo:
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `README.md`
+- `CHANGELOG.md`
+- `LICENSE`
+
+This version keeps the existing style and adds richer KPI boxes for New Registrations, Used Cars and Non-Counting Fleet.
+
+
+## v2.0 Trends
+- Adds a Trends tab.
+- Saves weekly snapshots in the browser.
+- Admin Publish automatically saves a trend snapshot.
+- Root files only for GitHub Pages.
