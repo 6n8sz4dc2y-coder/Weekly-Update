@@ -1,4 +1,4 @@
-const DASHBOARD_BUILD_VERSION = '2026.07.07.south.1';
+const DASHBOARD_BUILD_VERSION = '2026.07.13.orderbank-full.1';
 const DASHBOARD_META_KEY = 'rrgDashboardMeta_v1';
 function formatPublishedAt(iso){
   if(!iso) return 'Not published in this browser yet';
@@ -389,7 +389,23 @@ function build(){
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>r.target?r.regs/r.target:0,format:'status'}],DATA.q3_fleet);
  makeTable('nonTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Budget',key:'jul_budget',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Budget',key:'aug_budget',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Budget',key:'sep_budget',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Budget',key:'qtr_budget',num:true}],DATA.q3_non);
  makeTable('orderBankTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'July Target',key:'jul_target',num:true},{label:'July Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'July To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'July Progress',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'progress'},{label:'July %',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'pct',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'CY26 OB',key:'cy26_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
- makeTable('monthlyOrderTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'Jul To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Done',key:'aug_orders',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Done',key:'sep_orders',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'Oct Target',key:'oct_target',num:true},{label:'Nov Target',key:'nov_target',num:true},{label:'Dec Target',key:'dec_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
+ makeTable('monthlyOrderTable',[
+  {label:'Centre',key:'centre'},
+  {label:'H1 Target',key:'h1_target',num:true},
+  {label:'H1 Orders',key:'h1_orders',num:true},
+  {label:'H1 Diff',key:'h1_diff',num:true},
+  {label:'H1 %',key:'h1_pct',format:'pct',num:true},
+  {label:'H2 Target',key:'h2_target',num:true},
+  {label:'H2 Orders',key:'h2_orders',num:true},
+  {label:'H2 Diff',key:'h2_diff',num:true},
+  {label:'H2 %',key:'h2_pct',format:'pct',num:true},
+  {label:'Jul Target',key:'jul_target',num:true},{label:'Jul Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'Jul Diff',key:'jul_diff',num:true},
+  {label:'Aug Target',key:'aug_target',num:true},{label:'Aug Done',value:r=>orderDoneFor(r,'aug'),num:true},{label:'Aug Diff',key:'aug_diff',num:true},
+  {label:'Sep Target',key:'sep_target',num:true},{label:'Sep Done',value:r=>orderDoneFor(r,'sep'),num:true},{label:'Sep Diff',key:'sep_diff',num:true},
+  {label:'Oct Target',key:'oct_target',num:true},{label:'Oct Done',value:r=>orderDoneFor(r,'oct'),num:true},{label:'Oct Diff',key:'oct_diff',num:true},
+  {label:'Nov Target',key:'nov_target',num:true},{label:'Nov Done',value:r=>orderDoneFor(r,'nov'),num:true},{label:'Nov Diff',key:'nov_diff',num:true},
+  {label:'Dec Target',key:'dec_target',num:true},{label:'Dec Done',value:r=>orderDoneFor(r,'dec'),num:true},{label:'Dec Diff',key:'dec_diff',num:true}
+],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  makeTable('activityTable',[{label:'Rank',value:(r)=>((DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)).findIndex(x=>x.centre===r.centre)+1),num:true},{label:'Centre',key:'centre'},{label:'Enquiries',key:'total_enquiries',num:true},{label:'Test Drives',key:'total_test_drives',num:true},{label:'OS',key:'total_os',num:true},{label:'Orders',key:'total_orders',num:true},{label:'TD %',key:'td_ratio',format:'pct',num:true},{label:'Order %',key:'orders_ratio',format:'pct',num:true},{label:'OS %',key:'os_ratio',format:'pct',num:true},{label:'New Enq',key:'new_enquiries',num:true},{label:'New TD',key:'new_test_drives',num:true},{label:'New OS',key:'new_os',num:true},{label:'New Orders',key:'new_orders',num:true},{label:'Used Enq',key:'used_enquiries',num:true},{label:'Used TD',key:'used_test_drives',num:true},{label:'Used OS',key:'used_os',num:true},{label:'Used Orders',key:'used_orders',num:true},{label:'Delivered',key:'delivered',num:true},{label:'Lost Opp',key:'lost_opportunities',num:true}],(DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)));
  renderEfficiencyTable(DATA.dashboard_activity||[]);
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
@@ -483,6 +499,122 @@ function parseWeeklyWorkbook(wb, data){
   });
   recomputeDashboardSets(data);
 }
+
+function parseOrderWorkbook(wb, data){
+  const ws = wb.Sheets['Order Bank Targets'] || wb.Sheets[wb.SheetNames[0]];
+  if(!ws) throw new Error('Order Bank Targets sheet not found.');
+
+  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+  const months = {
+    jan:'jan', january:'jan', feb:'feb', february:'feb', mar:'mar', march:'mar',
+    apr:'apr', april:'apr', may:'may', jun:'jun', june:'jun',
+    jul:'jul', july:'jul', aug:'aug', august:'aug', sep:'sep', sept:'sep', september:'sep',
+    oct:'oct', october:'oct', nov:'nov', november:'nov', dec:'dec', december:'dec'
+  };
+
+  const clean = v => String(v ?? '').trim().toLowerCase();
+  const normalMonth = v => months[clean(v)] || null;
+  const isCentre = v => {
+    const c = normCentreName(v);
+    return ALL_DASHBOARD_SITES.includes(c);
+  };
+  const ensureOrderRow = centre => {
+    data.order_bank = data.order_bank || [];
+    const wanted = normCentreName(centre);
+    let row = data.order_bank.find(r=>normCentreName(r.centre).toLowerCase()===wanted.toLowerCase());
+    if(!row){
+      row = {centre:wanted};
+      data.order_bank.push(row);
+    }
+    row.centre = wanted;
+    return row;
+  };
+  const blankOrder = v => v===null || v===undefined || v==='';
+
+  // Read the top annual/quarter target table dynamically.
+  for(const r of rows){
+    if(!r || !isCentre(r[0])) continue;
+    const centre = normCentreName(r[0]);
+    // The top table has ASO in column B and Q1-Q4/CY26 in D-I.
+    if(r.length >= 9 && (r[1] !== null || r[3] !== null || r[8] !== null)){
+      const row = ensureOrderRow(centre);
+      row.aso = nval(r[1]);
+      row.q1_target = nval(r[3]);
+      row.q2_target = nval(r[4]);
+      row.q3_target = nval(r[5]);
+      row.q4_target = nval(r[6]);
+      row.cy26_target = nval(r[8]);
+    }
+  }
+
+  // Find every "Orders after cancellations" block and derive month columns
+  // from its header. This supports both H1 and H2, plus layout shifts.
+  let blocksFound = 0;
+  for(let headerIndex=0; headerIndex<rows.length; headerIndex++){
+    const header = rows[headerIndex] || [];
+    if(!clean(header[0]).includes('orders after cancellations')) continue;
+
+    const monthColumns = [];
+    for(let c=1; c<header.length; c++){
+      const m = normalMonth(header[c]);
+      if(m) monthColumns.push({month:m,targetCol:c,ordersCol:c+1,diffCol:c+2});
+    }
+    if(!monthColumns.length) continue;
+    blocksFound++;
+
+    for(let rIndex=headerIndex+1; rIndex<rows.length; rIndex++){
+      const r = rows[rIndex] || [];
+      if(!r[0]) {
+        // Allow total rows, but stop before the next section after a short gap.
+        if(rIndex > headerIndex+15) break;
+        continue;
+      }
+      if(clean(r[0]).includes('orders after cancellations')) break;
+      if(!isCentre(r[0])) {
+        // Once centre rows have finished, stop at totals/other headings.
+        if(rIndex > headerIndex+1) break;
+        continue;
+      }
+
+      const row = ensureOrderRow(r[0]);
+      for(const m of monthColumns){
+        const target = nval(r[m.targetCol]);
+        const rawOrders = r[m.ordersCol];
+        const orders = blankOrder(rawOrders) ? null : nval(rawOrders);
+        const rawDiff = r[m.diffCol];
+
+        row[m.month+'_target'] = target;
+        row[m.month+'_orders'] = orders;
+        row[m.month+'_diff'] = blankOrder(rawDiff)
+          ? (orders===null ? -target : orders-target)
+          : nval(rawDiff);
+      }
+    }
+  }
+
+  if(!blocksFound) throw new Error('No "Orders after cancellations" tables found.');
+
+  const h1 = ['jan','feb','mar','apr','may','jun'];
+  const h2 = ['jul','aug','sep','oct','nov','dec'];
+  for(const row of (data.order_bank||[])){
+    row.h1_target = h1.reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    row.h1_orders = h1.reduce((t,m)=>t+(Number(row[m+'_orders'])||0),0);
+    row.h1_diff = row.h1_orders - row.h1_target;
+    row.h1_pct = row.h1_target ? row.h1_orders / row.h1_target : 0;
+
+    row.h2_target = h2.reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    row.h2_orders = h2.reduce((t,m)=>t+(Number(row[m+'_orders'])||0),0);
+    row.h2_diff = row.h2_orders - row.h2_target;
+    row.h2_pct = row.h2_target ? row.h2_orders / row.h2_target : 0;
+
+    if(!row.q3_target) row.q3_target = ['jul','aug','sep'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+    if(!row.q4_target) row.q4_target = ['oct','nov','dec'].reduce((t,m)=>t+(Number(row[m+'_target'])||0),0);
+  }
+
+  recomputeDashboardSets(data);
+  return (data.dashboard_orders||[]).length;
+}
+
 function parseSalesRows(rows, data){
   const siteRows=[];
   for(const r of rows){

@@ -1,5 +1,13 @@
 # Changelog
 
+## Full Order Bank import fix
+- Restored the working dashboard build.
+- Added a dynamic parser for both H1 and H2 `Orders after cancellations` blocks.
+- Reads Target, Orders and Difference for every month from January to December.
+- Added full July-December Target / Done / Diff columns to the Order Bank report.
+- Keeps blank future orders blank in the source data while displaying them as zero for calculations.
+
+
 ## Board Pack Generator
 - Added local PowerPoint engine (`pptxgen.bundle.js`) so the Generate Board Pack button works without relying on the CDN.
 - Generates a native editable PowerPoint board pack from the live dashboard data.
