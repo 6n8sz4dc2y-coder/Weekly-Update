@@ -57,3 +57,7 @@
 - Added amber `Slightly behind` status band for Used Cars forecast.
 - Added required weekly used car run rate column.
 - Kept progress bars as actual vs full target.
+
+## Fleet percentage + Trends hidden
+- Front-page Non-Counting Fleet Snapshot now displays achievement as a percentage of budget.
+- Trends navigation and section are hidden; existing trend code is retained for possible future use.
