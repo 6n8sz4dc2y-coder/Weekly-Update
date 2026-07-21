@@ -367,6 +367,30 @@ function renderEfficiencyTable(rows){
   ], valid);
 }
 
+function currentMonthForecast(actual){
+  const now=new Date();
+  const daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const elapsed=Math.max(1,Math.min(daysInMonth,now.getDate()));
+  return Math.round((Number(actual)||0) / elapsed * daysInMonth);
+}
+function signedVariance(value){
+  const n=Math.round(Number(value)||0);
+  return `${n>0?'+':''}${fmt(n)}`;
+}
+function varianceClass(value){
+  const n=Number(value)||0;
+  return n>0?'forecast-positive':n<0?'forecast-negative':'forecast-neutral';
+}
+function setForecastMetric(valueId,varianceId,forecast,target){
+  setText(valueId,fmt(forecast));
+  const el=document.getElementById(varianceId);
+  if(el){
+    const variance=(Number(forecast)||0)-(Number(target)||0);
+    el.textContent=`${signedVariance(variance)} vs target`;
+    el.className=varianceClass(variance);
+  }
+}
+
 function build(){
  updateVersionDisplays();
  const regs=DATA.dashboard_regs, used=DATA.dashboard_used, non=DATA.q3_non, acts=DATA.dashboard_activity;
@@ -394,6 +418,8 @@ function build(){
  setText('orderBankPct',pct(orderRatio));
  const obStatus=document.getElementById('orderBankStatus');
  if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(paceRatio(orderDone,orderTarget))}">${paceLabel(paceRatio(orderDone,orderTarget))}</span>`;}
+ const orderForecast=currentMonthForecast(orderDone);
+ setForecastMetric('orderBankForecast','orderBankVariance',orderForecast,orderTarget);
 
  const fleetRows=(DATA.q3_fleet||[]).filter(r=>!String(r.centre||'').toUpperCase().includes('CDA'));
  const fleetRegs=sum(fleetRows,'regs'), fleetTarget=sum(fleetRows,'target'), fleetOrders=sum(fleetRows,'active_orders');
@@ -406,6 +432,7 @@ function build(){
  const fleetPace=paceRatio(fleetExpected,fleetTarget);
  const fleetStatus=document.getElementById('fleetBchStatus');
  if(fleetStatus){fleetStatus.innerHTML=`<span class="status ${paceClass(fleetPace)}">${paceLabel(fleetPace)}</span>`;}
+ setForecastMetric('fleetBchForecast','fleetBchVariance',fleetExpected,fleetTarget);
  const act = DATA.dashboard_activity || [];
  const totalEnquiries = sum(act,'total_enquiries');
  const totalTestDrives = sum(act,'total_test_drives');
@@ -441,6 +468,10 @@ function build(){
  setText('usedOsPct',pct(usedOsRatio));
  setText('totalOsPctSplit',pct(totalOsRatio));
  document.getElementById('totalConvPct').textContent = pct(totalConvRatio);
+ const enquiryForecast=currentMonthForecast(totalEnquiries);
+ const ordersForecast=Math.round(enquiryForecast*totalConvRatio);
+ setText('forecastEnquiries',fmt(enquiryForecast));
+ setText('forecastOrders',fmt(ordersForecast));
  setText('newConvPct',pct(newConvRatio));
  setText('usedConvPct',pct(usedConvRatio));
  setText('totalConvPctSplit',pct(totalConvRatio));
