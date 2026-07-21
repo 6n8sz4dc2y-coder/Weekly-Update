@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RRG Group Dashboard</title>
-<link rel="stylesheet" href="./styles.css?v=20260721-insights-preview-1">
+<link rel="stylesheet" href="./styles.css?v=20260707-pdf-visible-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Generate Board Pack</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="insights">Insights</button><button data-target="admin">Admin Update</button></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Generate Board Pack</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="trends">Trends</button><button data-target="admin">Admin Update</button></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -61,21 +61,29 @@
 <section id="q2" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q2 Registrations Reference</h2><input class="search" data-filter="q2RegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2RegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q2 Used Reference</h2><input class="search" data-filter="q2UsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2UsedTable"></table></div></div></div></section>
 
 
-<section id="insights" class="section">
+<section id="trends" class="section">
   <div class="grid">
-    <div class="card wide insights-hero">
-      <div>
-        <div class="eyebrow">Management view</div>
-        <h2>Executive Insights</h2>
-        <div class="hint">Automatically generated from the latest loaded registration, used, fleet, order-bank and sales-funnel data.</div>
+    <div class="card wide">
+      <div class="toolbar">
+        <h2>Weekly Trends</h2>
+        <div>
+          <button class="admin-btn" id="saveTrendSnapshot">Save Current Snapshot</button>
+          <button class="admin-btn" id="downloadHistory">Download history backup</button>
+          <button class="admin-btn danger-btn" id="clearHistory">Clear history</button>
+        </div>
       </div>
-      <div class="insights-summary" id="insightsSummary">-</div>
+      <div class="hint">Snapshots are saved in this browser each time you publish in Admin, or manually using Save Current Snapshot. Use the backup button before clearing or changing device.</div>
     </div>
-    <div class="card third insight-card" id="insightStrength"></div>
-    <div class="card third insight-card" id="insightOpportunity"></div>
-    <div class="card third insight-card" id="insightRisk"></div>
-    <div class="card half"><h3>Centre Focus</h3><div id="insightCentreFocus" class="insight-list"></div></div>
-    <div class="card half"><h3>Commercial Headlines</h3><div id="insightCommercial" class="insight-list"></div></div>
+    <div class="card third"><h3>Snapshots</h3><div class="trend-big" id="trendSnapshotCount">-</div><div class="hint" id="trendLatestWeek">-</div></div>
+    <div class="card third"><h3>New Regs WoW</h3><div class="trend-big" id="trendNewWow">-</div><div class="hint">Latest week versus previous snapshot</div></div>
+    <div class="card third"><h3>Used Cars WoW</h3><div class="trend-big" id="trendUsedWow">-</div><div class="hint">Latest week versus previous snapshot</div></div>
+    <div class="card half"><h3>New Registrations Trend</h3><div id="newRegsTrend" class="trend-chart"></div></div>
+    <div class="card half"><h3>Used Cars Trend</h3><div id="usedCarsTrend" class="trend-chart"></div></div>
+    <div class="card half"><h3>Enquiries Trend</h3><div id="enquiriesTrend" class="trend-chart"></div></div>
+    <div class="card half"><h3>Conversion Trend</h3><div id="conversionTrend" class="trend-chart"></div></div>
+    <div class="card half"><h3>Best Performance</h3><div id="trendBestPerformance" class="note-box"></div></div>
+    <div class="card half"><h3>Biggest Opportunity</h3><div id="trendBiggestOpportunity" class="note-box"></div></div>
+    <div class="card wide"><h3>Centre Momentum</h3><div id="centreMomentumTable" class="table-wrap"><table id="momentumTable"></table></div></div>
   </div>
 </section>
 
@@ -122,5 +130,5 @@
 <div class="footer-note">RRG Group Dashboard · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="./pptxgen.bundle.js?v=20260707-boardpack-1"></script>
-<script src="./app.js?v=20260721-insights-preview-1"></script>
+<script src="./app.js?v=20260713-orderbank-full-1"></script>
 <script src="./history.js?v=20260707-efficiency-1"></script></body></html>
