@@ -156,3 +156,6 @@ table{border-collapse:separate;border-spacing:0}
 .fleet-overview{border-top:4px solid #7e22ce}
 .enquiry-overview{border-top:4px solid #15803d}
 @media(max-width:900px){.overview-card{grid-column:span 12}}
+
+/* Performance preview: two-item KPI footer after removing unreliable forecasts */
+.kpi-footer-strip.two-up{grid-template-columns:repeat(2,minmax(0,1fr));}

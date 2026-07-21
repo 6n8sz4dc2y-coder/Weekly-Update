@@ -1,4 +1,4 @@
-const DASHBOARD_BUILD_VERSION = '2026.07.13.orderbank-full.1';
+const DASHBOARD_BUILD_VERSION = '2026.07.21.performance.1';
 const DASHBOARD_META_KEY = 'rrgDashboardMeta_v1';
 function formatPublishedAt(iso){
   if(!iso) return 'Not published in this browser yet';
@@ -380,12 +380,8 @@ function build(){
  updateProgressKpi('q3', regs, {valueKey:'total', targetKey:'target', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_target'});
  updateProgressKpi('used', used, {valueKey:'counting', targetKey:'target', qtrValueKey:'qtr_counting', qtrTargetKey:'qtr_target'});
  updateProgressKpi('nonFleet', nonFleetTotals, {valueKey:'total', targetKey:'budget', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_budget'});
- const regForecast=quarterForecast(regCurrent);
  const usedGroupForecast=usedForecastFinish({qtr_counting:usedCurrent});
- const nonFleetForecast=quarterForecast(nonFleetCurrent);
- setForecastDisplay('q3Forecast','q3ForecastDelta',regForecast,regTarget);
  setForecastDisplay('usedGroupForecast','usedForecastDelta',usedGroupForecast,usedTarget);
- setForecastDisplay('nonFleetForecast','nonFleetForecastDelta',nonFleetForecast,nonFleetBudget);
 
  const orderRows=DATA.dashboard_orders||[];
  const orderMonth=currentOrderMonth();
@@ -401,11 +397,9 @@ function build(){
 
  const fleetRows=(DATA.q3_fleet||[]).filter(r=>!String(r.centre||'').toUpperCase().includes('CDA'));
  const fleetRegs=sum(fleetRows,'regs'), fleetTarget=sum(fleetRows,'target'), fleetOrders=sum(fleetRows,'active_orders');
- const fleetForecast=quarterForecast(fleetRegs);
  setText('fleetBchRegs',fmt(fleetRegs));
  setText('fleetBchTarget',fmt(fleetTarget));
  setText('fleetBchOrders',fmt(fleetOrders));
- setText('fleetBchForecast',fmt(fleetForecast));
  const fleetPace=paceRatio(fleetRegs,fleetTarget);
  const fleetStatus=document.getElementById('fleetBchStatus');
  if(fleetStatus){fleetStatus.innerHTML=`<span class="status ${paceClass(fleetPace)}">${paceLabel(fleetPace)}</span>`;}
@@ -986,7 +980,7 @@ function resetSavedData(){
 
 
 async function fetchWorkbook(path){
-  const res = await fetch(path + '?v=' + Date.now(), { cache: 'no-store' });
+  const res = await fetch(path, { cache: 'no-cache' });
   if(!res.ok) throw new Error(path + ' not found (' + res.status + ')');
   const buf = await res.arrayBuffer();
   return XLSX.read(buf, { type: 'array' });
@@ -998,34 +992,41 @@ async function fetchRowsWorkbook(path, raw=false){
 }
 async function loadGithubWorkbookData(){
   const status=document.getElementById('adminStatus');
+  const data=cloneData();
   const messages=[];
   try{
-    const data = cloneData();
-    try{
-      const wb = await fetchWorkbook('./weekly-update.xlsx');
-      parseWeeklyWorkbook(wb, data);
+    // Fetch the three source files together. This avoids waiting for each
+    // workbook to finish before starting the next one.
+    const [weeklyResult, activityResult, orderResult] = await Promise.allSettled([
+      fetchWorkbook('./weekly-update.xlsx'),
+      fetchRowsWorkbook('./sales-activity.xls', false),
+      fetchWorkbook('./order-bank.xlsx')
+    ]);
+
+    if(weeklyResult.status==='fulfilled'){
+      parseWeeklyWorkbook(weeklyResult.value, data);
       messages.push('weekly-update.xlsx loaded');
-    }catch(e){ messages.push('weekly-update.xlsx not loaded: ' + e.message); }
-    try{
-      const rows = await fetchRowsWorkbook('./sales-activity.xls', false);
-      const count = parseSalesRows(rows, data);
+    }else messages.push('weekly-update.xlsx not loaded: ' + weeklyResult.reason.message);
+
+    if(activityResult.status==='fulfilled'){
+      const count=parseSalesRows(activityResult.value, data);
       messages.push('sales-activity.xls loaded (' + count + ' centres)');
-    }catch(e){ messages.push('sales-activity.xls not loaded: ' + e.message); }
-    try{
-      const wb = await fetchWorkbook('./order-bank.xlsx');
-      const count = parseOrderWorkbook(wb, data);
+    }else messages.push('sales-activity.xls not loaded: ' + activityResult.reason.message);
+
+    if(orderResult.status==='fulfilled'){
+      const count=parseOrderWorkbook(orderResult.value, data);
       messages.push('order-bank.xlsx loaded (' + count + ' rows)');
-    }catch(e){ messages.push('order-bank.xlsx not loaded: ' + e.message); }
-    DATA = data;
+    }else messages.push('order-bank.xlsx not loaded: ' + orderResult.reason.message);
+
+    DATA=data;
     build();
-    if(typeof rrgRenderTrends === 'function') rrgRenderTrends();
     const el=document.getElementById('dataSourceStatus');
-    if(el) el.innerHTML = '<strong>Workbook source active.</strong><br>' + messages.join('<br>');
-    if(status) status.innerHTML = '<strong>Workbook files loaded from GitHub.</strong><br>' + messages.join('<br>');
+    if(el) el.innerHTML='<strong>Workbook source active.</strong><br>'+messages.join('<br>');
+    if(status) status.innerHTML='<strong>Workbook files loaded from GitHub.</strong><br>'+messages.join('<br>');
   }catch(e){
     console.error(e);
     build();
-    if(status) status.innerHTML = '<strong>Workbook load failed.</strong><br>' + (e.message || e);
+    if(status) status.innerHTML='<strong>Workbook load failed.</strong><br>'+(e.message||e);
   }
 }
 
@@ -1110,9 +1111,24 @@ function efficiencyRows(){
     return { ...r, effScore:score, effGrade:score>=90?'A':score>=80?'B':score>=70?'C':'D' };
   }).sort((a,b)=>b.effScore-a.effScore);
 }
+let pptxLibraryPromise=null;
+function ensurePptxLibrary(){
+  if(typeof pptxgen !== 'undefined') return Promise.resolve();
+  if(pptxLibraryPromise) return pptxLibraryPromise;
+  pptxLibraryPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='./pptxgen.bundle.js?v=20260721-performance-1';
+    script.onload=()=>typeof pptxgen!=='undefined' ? resolve() : reject(new Error('PowerPoint library unavailable'));
+    script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
+    document.head.appendChild(script);
+  });
+  return pptxLibraryPromise;
+}
 async function exportBoardPack(){
-  if(typeof pptxgen === 'undefined'){
-    alert('PowerPoint generator did not load. Please check internet connection and try again.');
+  try{
+    await ensurePptxLibrary();
+  }catch(e){
+    alert('PowerPoint generator did not load. Please check the site files and try again.');
     return;
   }
   const pptx = new pptxgen();
@@ -1194,21 +1210,6 @@ async function exportBoardPack(){
     {label:'Centre',key:'centre',w:1.9},{label:'Score',key:'effScore',num:true,w:0.75},{label:'Grade',key:'effGrade',w:0.65},{label:'TD %',key:'td_ratio',format:'pct',num:true,w:0.75},{label:'OS %',key:'os_ratio',format:'pct',num:true,w:0.75},{label:'Conv %',key:'orders_ratio',format:'pct',num:true,w:0.75},{label:'Orders',key:'total_orders',num:true,w:0.8},{label:'Enquiries',key:'total_enquiries',num:true,w:0.9}
   ], week);
 
-  // Trends summary (if available)
-  slide = pptx.addSlide();
-  slide.background = { color:'F5F7FB' };
-  addSlideTitle(slide, 'Trends', week);
-  const history = (typeof rrgLoadHistory === 'function') ? rrgLoadHistory() : [];
-  if(!history.length){
-    slide.addText('No saved weekly snapshots yet. Save snapshots from the Trends tab to build this section over time.', { x:0.65, y:1.3, w:11.8, h:0.6, fontSize:18, color:'475569', margin:0 });
-  } else {
-    const latest = history[history.length-1];
-    addMetricCard(slide, 0.5, 1.1, 3.0, 1.15, 'Latest New Regs', fmtPpt(latest.newActual), `${pctPpt(latest.newTarget?latest.newActual/latest.newTarget:0)} of target`, '2563EB');
-    addMetricCard(slide, 3.85, 1.1, 3.0, 1.15, 'Latest Used Cars', fmtPpt(latest.usedActual), `${pctPpt(latest.usedTarget?latest.usedActual/latest.usedTarget:0)} of target`, '15803D');
-    addMetricCard(slide, 7.2, 1.1, 2.6, 1.15, 'Enquiries', fmtPpt(latest.enquiries), 'latest snapshot', '2563EB');
-    addMetricCard(slide, 10.15, 1.1, 2.6, 1.15, 'Conversion', pctPpt(latest.conversionPct), 'latest snapshot', '2563EB');
-  }
-  addFooter(slide);
 
   await pptx.writeFile({ fileName: `RRG Weekly Performance Pack - ${week}.pptx` });
 }
