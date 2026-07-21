@@ -74,3 +74,9 @@
 - Added coloured pace badges to the New Registrations and Used Cars centre rows on the main dashboard.
 - Registration badges use the existing registration pace calculation.
 - Used badges use the existing forecast pace calculation.
+
+## Simple PowerPoint export fix
+- Replaced the previous Board Pack button wording with Export PowerPoint.
+- Fixed PowerPoint export to use the correct browser constructor from `pptxgen.bundle.js`.
+- Added visible export status/error messages in Admin Update.
+- Kept the export simple and reliable: Dashboard, Registrations, Used, Fleet, Order Bank, Sales Funnel Volume and Efficiency.
