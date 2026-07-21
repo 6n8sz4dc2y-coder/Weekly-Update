@@ -69,3 +69,8 @@
 - Corrected Centre Fleet BCH Active Orders mapping to read column F from the weekly workbook.
 - Included the latest weekly-update.xlsx supplied by the user.
 - Bradford now reads 9 active orders; Group total reads 14 active orders from the supplied workbook.
+
+## v1.10
+- Added coloured pace badges to the New Registrations and Used Cars centre rows on the main dashboard.
+- Registration badges use the existing registration pace calculation.
+- Used badges use the existing forecast pace calculation.
