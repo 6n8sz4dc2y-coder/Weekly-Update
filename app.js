@@ -134,18 +134,42 @@ function sortableValue(col,row){
 }
 function renderTable(id,cols,rows){
   const table=document.getElementById(id);if(!table)return;
+
+  // Work out the table structure from its headings rather than assuming that
+  // every table has the same first two columns.
+  const rankIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='rank');
+  const centreIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='centre');
+  const statusIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='status' && (c.format==='status' || c.format==='paceStatus'));
+  const statusCol=statusIndex>=0 ? cols[statusIndex] : null;
+  const displayCols=cols.filter((_,i)=>i!==statusIndex);
+
+  table.classList.remove('table-rank','table-centre');
+  if(rankIndex>=0 && centreIndex>=0) table.classList.add('table-rank');
+  else if(centreIndex>=0) table.classList.add('table-centre');
+
   const state=TABLE_SORT_STATE[id]||{};
   const sorted=rows.slice();
   if(state.index!==undefined){
-    const col=cols[state.index];
-    sorted.sort((a,b)=>{
-      const av=sortableValue(col,a), bv=sortableValue(col,b);
-      const bothNum=typeof av==='number' && typeof bv==='number';
-      let cmp=bothNum ? av-bv : String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
-      return state.dir==='desc' ? -cmp : cmp;
-    });
+    const col=displayCols[state.index];
+    if(col){
+      sorted.sort((a,b)=>{
+        const av=sortableValue(col,a), bv=sortableValue(col,b);
+        const bothNum=typeof av==='number' && typeof bv==='number';
+        let cmp=bothNum ? av-bv : String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
+        return state.dir==='desc' ? -cmp : cmp;
+      });
+    }
   }
-  table.innerHTML=`<thead><tr>${cols.map((c,i)=>{const active=state.index===i;const arrow=active?(state.dir==='desc'?' ▼':' ▲'):'';return `<th data-sort-index="${i}" class="sortable ${c.num?'num':''} ${active?'sorted':''}" title="Click to sort">${c.label}${arrow}</th>`}).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${cols.map(c=>`<td class="${c.num?'num':''}">${cell(null,c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+
+  function renderBodyCell(col,row){
+    const centreCol=String(col.label||'').trim().toLowerCase()==='centre';
+    if(centreCol && statusCol){
+      return `<div class="centre-cell"><span class="centre-name">${cell(null,col,row)}</span>${cell(null,statusCol,row)}</div>`;
+    }
+    return cell(null,col,row);
+  }
+
+  table.innerHTML=`<thead><tr>${displayCols.map((c,i)=>{const active=state.index===i;const arrow=active?(state.dir==='desc'?' ▼':' ▲'):'';return `<th data-sort-index="${i}" class="sortable ${c.num?'num':''} ${active?'sorted':''}" title="Click to sort">${c.label}${arrow}</th>`}).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${displayCols.map(c=>`<td class="${c.num?'num':''}">${renderBodyCell(c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
   table.querySelectorAll('th[data-sort-index]').forEach(th=>{
     th.addEventListener('click',()=>{
       const index=Number(th.dataset.sortIndex);
@@ -156,6 +180,7 @@ function renderTable(id,cols,rows){
     });
   });
 }
+
 function makeTable(id,cols,rows){renderTable(id,cols,rows||[])}
 function leaderRows(rows, valueFn, subFn, barFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);const b=barFn?barFn(r):v;return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${barFn?paceProgress(b):progress(v)}</div>`}).join('')}
 function q3ElapsedRatio(){
@@ -232,24 +257,6 @@ function q3WeeksRemaining(){
  if(now>end) return 1;
  return Math.max(1, Math.ceil((end-now)/(7*24*60*60*1000)));
 }
-
-function q3ElapsedProportion(){
-  const now=new Date();
-  const start=new Date(now.getFullYear(),6,1,0,0,0); // 1 July
-  const end=new Date(now.getFullYear(),8,30,23,59,59); // 30 September
-  if(now<=start) return 0;
-  if(now>=end) return 1;
-  return Math.max(0, Math.min(1, (now-start)/(end-start)));
-}
-function fleetPaceRatio(row){
-  const target=Number(row?.target)||0;
-  const actual=Number(row?.regs)||0;
-  if(!target) return 0;
-  const expected=target*q3ElapsedProportion();
-  if(expected<=0) return actual>0?1:0;
-  return actual/expected;
-}
-
 function quarterMonthKey(){
  const m=new Date().getMonth();
  if(m===7) return 'aug';
@@ -398,13 +405,13 @@ function build(){
  document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct)}</div>`}).join('');
  document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} · ${paceRatio(r.qtr_total,r.qtr_target)>=1?'On pace':paceRatio(r.qtr_total,r.qtr_target)>=.9?'Slightly behind pace':'Behind pace'}`);
  document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${usedForecastMini(r)} · ${usedForecastPct(r)>=1?'On pace':usedForecastPct(r)>=.9?'Slightly behind pace':'Behind pace'}`);
- document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${pct(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
+ document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${fmt(r.qtr_total)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
  makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
  makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Req / Week',value:r=>usedRequiredPerWeek(r),num:true},{label:'Forecast',value:r=>usedForecastFinish(r),num:true},{label:'Forecast %',value:r=>usedForecastPct(r),format:'pct',num:true},{label:'Status',value:r=>usedForecastPct(r),format:'paceStatus'}],DATA.q3_used);
  makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'BCH Progress',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'progress'},{label:'BCH %',value:r=>r.bch_target?r.bch_regs/r.bch_target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true}],DATA.q3_fleet_monthly);
- makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>fleetPaceRatio(r),format:'status'}],DATA.q3_fleet);
+ makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Progress',value:r=>r.target?r.regs/r.target:0,format:'progress'},{label:'%',value:r=>r.target?r.regs/r.target:0,format:'pct',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Status',value:r=>r.target?r.regs/r.target:0,format:'status'}],DATA.q3_fleet);
  makeTable('nonTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Budget',key:'jul_budget',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Budget',key:'aug_budget',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Budget',key:'sep_budget',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Budget',key:'qtr_budget',num:true}],DATA.q3_non);
  makeTable('orderBankTable',[{label:'Centre',key:'centre'},{label:'H1 Target',key:'h1_target',num:true},{label:'H1 Orders',key:'h1_orders',num:true},{label:'H1 Diff',key:'h1_diff',num:true},{label:'H1 %',key:'h1_pct',format:'pct',num:true},{label:'H2 Target',key:'h2_target',num:true},{label:'July Target',key:'jul_target',num:true},{label:'July Done',value:r=>orderDoneFor(r,'jul'),num:true},{label:'July To Go',value:r=>(Number(r.jul_target)||0)-orderDoneFor(r,'jul'),num:true},{label:'July Progress',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'progress'},{label:'July %',value:r=>r.jul_target?orderDoneFor(r,'jul')/r.jul_target:0,format:'pct',num:true},{label:'Q3 Target',key:'q3_target',num:true},{label:'Q4 Target',key:'q4_target',num:true},{label:'CY26 OB',key:'cy26_target',num:true}],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  makeTable('monthlyOrderTable',[
@@ -512,8 +519,8 @@ function parseWeeklyWorkbook(wb, data){
     updateRow(data.q3_used, centre, patch);
   });
   parseBetween(findSection('CENTRE FLEET'), (r, centre)=>{
-    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:(nval(r[5])||nval(r[4]))});
-    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:(nval(r[5])||nval(r[4]))});
+    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[4])});
+    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[4])});
   });
   recomputeDashboardSets(data);
 }
@@ -824,8 +831,8 @@ function parseWeeklyWorkbook(wb, data){
     updateRow(data.q3_used, centre, patch);
   });
   parseBetween(findSection('CENTRE FLEET'), (r, centre)=>{
-    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:(nval(r[5])||nval(r[4]))});
-    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:(nval(r[5])||nval(r[4]))});
+    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[4])});
+    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[4])});
   });
   recomputeDashboardSets(data);
 }
