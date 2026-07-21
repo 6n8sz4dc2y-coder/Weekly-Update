@@ -1,3 +1,11 @@
+# Version 1.9 – Fleet Expected Achievement
+
+- Centre Fleet BCH dashboard card now shows Expected Achievement.
+- Expected Achievement is calculated as (registrations + active orders) / target.
+- Fleet status and pace now use registrations plus active orders.
+- Fleet table uses the same calculation for percentage, progress and status.
+- Trends remains removed.
+
 # Changelog
 
 ## Full Order Bank import fix
