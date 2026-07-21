@@ -560,8 +560,8 @@ function parseWeeklyWorkbook(wb, data){
     updateRow(data.q3_used, centre, patch);
   });
   parseBetween(findSection('CENTRE FLEET'), (r, centre)=>{
-    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[4])});
-    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[4])});
+    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[5])});
+    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[5])});
   });
   recomputeDashboardSets(data);
 }
@@ -872,8 +872,8 @@ function parseWeeklyWorkbook(wb, data){
     updateRow(data.q3_used, centre, patch);
   });
   parseBetween(findSection('CENTRE FLEET'), (r, centre)=>{
-    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[4])});
-    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[4])});
+    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[5])});
+    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[5])});
   });
   recomputeDashboardSets(data);
 }

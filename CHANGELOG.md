@@ -57,3 +57,7 @@
 - Added amber `Slightly behind` status band for Used Cars forecast.
 - Added required weekly used car run rate column.
 - Kept progress bars as actual vs full target.
+## v1.7 – Centre Fleet BCH active orders fix
+- Corrected Centre Fleet BCH Active Orders mapping to read column F from the weekly workbook.
+- Included the latest weekly-update.xlsx supplied by the user.
+- Bradford now reads 9 active orders; Group total reads 14 active orders from the supplied workbook.
