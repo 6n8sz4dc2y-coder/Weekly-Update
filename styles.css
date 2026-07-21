@@ -138,3 +138,21 @@ table{border-collapse:separate;border-spacing:0}
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
 .centre-name{font-weight:800}
 .centre-cell .status{padding:3px 7px;font-size:11px;line-height:1.2}
+
+/* V1.5 front-page overview cards and group forecast line */
+.kpi-footer-strip .forecast-wide{grid-column:1/-1;border-top:1px solid var(--line);padding-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.kpi-footer-strip .forecast-wide span{margin-right:auto}
+.kpi-footer-strip .forecast-wide small{font-size:12px;font-weight:900;letter-spacing:0}
+.forecast-delta.positive{color:var(--green)}
+.forecast-delta.neutral{color:var(--amber)}
+.forecast-delta.negative{color:var(--red)}
+.overview-card{grid-column:span 4;min-height:168px}
+.overview-card .value{font-size:38px;margin:6px 0 2px}
+.overview-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
+.overview-caption{font-size:13px;color:var(--muted);font-weight:800}
+.overview-status{margin-left:auto}
+.overview-card .split-grid{margin-top:12px}
+.order-overview{border-top:4px solid #2563eb}
+.fleet-overview{border-top:4px solid #7e22ce}
+.enquiry-overview{border-top:4px solid #15803d}
+@media(max-width:900px){.overview-card{grid-column:span 12}}

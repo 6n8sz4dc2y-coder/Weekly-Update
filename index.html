@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260707-pdf-visible-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Generate Board Pack</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="trends">Trends</button><button data-target="admin">Admin Update</button></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Generate Board Pack</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -21,7 +21,7 @@
     <div><span>Aug</span><strong id="q3AugPct">-</strong><small id="q3AugVol">-</small></div>
     <div><span>Sep</span><strong id="q3SepPct">-</strong><small id="q3SepVol">-</small></div>
   </div>
-  <div class="kpi-footer-strip"><div><span>Remaining</span><strong id="q3Remaining">-</strong></div><div><span>Run rate required</span><strong><span id="q3RunRate">-</span> / week</strong></div></div>
+  <div class="kpi-footer-strip"><div><span>Remaining</span><strong id="q3Remaining">-</strong></div><div><span>Run rate required</span><strong><span id="q3RunRate">-</span> / week</strong></div><div class="forecast-wide"><span>Group forecast</span><strong id="q3Forecast">-</strong><small id="q3ForecastDelta">-</small></div></div>
 </div>
 <div class="card kpi primary kpi-progress-card green-card">
   <div class="label">Q3 Used Cars</div>
@@ -34,7 +34,7 @@
     <div><span>Aug</span><strong id="usedAugPct">-</strong><small id="usedAugVol">-</small></div>
     <div><span>Sep</span><strong id="usedSepPct">-</strong><small id="usedSepVol">-</small></div>
   </div>
-  <div class="kpi-footer-strip"><div><span>Remaining</span><strong id="usedRemaining">-</strong></div><div><span>Run rate required</span><strong><span id="usedRunRate">-</span> / week</strong></div></div>
+  <div class="kpi-footer-strip"><div><span>Remaining</span><strong id="usedRemaining">-</strong></div><div><span>Run rate required</span><strong><span id="usedRunRate">-</span> / week</strong></div><div class="forecast-wide"><span>Group forecast</span><strong id="usedGroupForecast">-</strong><small id="usedForecastDelta">-</small></div></div>
 </div>
 <div class="card kpi primary kpi-progress-card purple-card">
   <div class="label">Non-Counting Fleet</div>
@@ -47,12 +47,23 @@
     <div><span>Aug</span><strong id="nonFleetAugPct">-</strong><small id="nonFleetAugVol">-</small></div>
     <div><span>Sep</span><strong id="nonFleetSepPct">-</strong><small id="nonFleetSepVol">-</small></div>
   </div>
-  <div class="kpi-footer-strip"><div><span>Remaining / over</span><strong id="nonFleetRemaining">-</strong></div><div><span>Budget run rate</span><strong><span id="nonFleetRunRate">-</span> / week</strong></div></div>
+  <div class="kpi-footer-strip"><div><span>Remaining / over</span><strong id="nonFleetRemaining">-</strong></div><div><span>Budget run rate</span><strong><span id="nonFleetRunRate">-</span> / week</strong></div><div class="forecast-wide"><span>Group forecast</span><strong id="nonFleetForecast">-</strong><small id="nonFleetForecastDelta">-</small></div></div>
 </div>
-<div class="card kpi secondary split-card"><div class="label">Enquiries</div><div class="value" id="totalEnquiries">-</div><div class="split-grid"><div>New <strong id="newEnquiries">-</strong></div><div>Used <strong id="usedEnquiries">-</strong></div><div>Total <strong id="totalEnquiriesSplit">-</strong></div></div></div>
-<div class="card kpi secondary split-card"><div class="label">Test Drive %</div><div class="value" id="totalTdPct">-</div><div class="split-grid"><div>New <strong id="newTdPct">-</strong></div><div>Used <strong id="usedTdPct">-</strong></div><div>Total <strong id="totalTdPctSplit">-</strong></div></div></div>
-<div class="card kpi secondary split-card"><div class="label">Offer Sheet %</div><div class="value" id="totalOsPct">-</div><div class="split-grid"><div>New <strong id="newOsPct">-</strong></div><div>Used <strong id="usedOsPct">-</strong></div><div>Total <strong id="totalOsPctSplit">-</strong></div></div></div>
-<div class="card kpi secondary split-card"><div class="label">Conversion %</div><div class="value" id="totalConvPct">-</div><div class="split-grid"><div>New <strong id="newConvPct">-</strong></div><div>Used <strong id="usedConvPct">-</strong></div><div>Total <strong id="totalConvPctSplit">-</strong></div></div></div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card half"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
+<div class="card kpi overview-card order-overview">
+  <div class="label">Order Bank</div>
+  <div class="overview-main"><div class="value" id="orderBankDone">-</div><div class="overview-status" id="orderBankStatus">-</div></div>
+  <div class="split-grid"><div>Monthly target<strong id="orderBankTarget">-</strong></div><div>To go<strong id="orderBankToGo">-</strong></div><div>Progress<strong id="orderBankPct">-</strong></div></div>
+</div>
+<div class="card kpi overview-card fleet-overview">
+  <div class="label">Centre Fleet BCH</div>
+  <div class="overview-main"><div class="value" id="fleetBchRegs">-</div><div class="overview-status" id="fleetBchStatus">-</div></div>
+  <div class="split-grid"><div>Target<strong id="fleetBchTarget">-</strong></div><div>Active orders<strong id="fleetBchOrders">-</strong></div><div>Forecast<strong id="fleetBchForecast">-</strong></div></div>
+</div>
+<div class="card kpi overview-card enquiry-overview">
+  <div class="label">Sales Funnel</div>
+  <div class="overview-main"><div class="value" id="totalEnquiries">-</div><div class="overview-caption">enquiries</div></div>
+  <div class="split-grid"><div>Test drive<strong id="totalTdPct">-</strong></div><div>Offer sheet<strong id="totalOsPct">-</strong></div><div>Conversion<strong id="totalConvPct">-</strong></div></div>
+</div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card half"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
 <section id="q3regs" class="section"><div class="card wide"><div class="toolbar"><h2>Q3 Registrations</h2><input class="search" data-filter="q3Table" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3Table"></table></div></div></section>
 <section id="used" class="section"><div class="card wide"><div class="toolbar"><h2>Used Counting Volume</h2><input class="search" data-filter="usedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="usedTable"></table></div></div></section>
 <section id="fleet" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Centre Fleet BCH</h2><input class="search" data-filter="fleetTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="fleetTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Non-Counting Fleet</h2><input class="search" data-filter="nonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="nonTable"></table></div></div></div></section>
@@ -61,31 +72,6 @@
 <section id="q2" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q2 Registrations Reference</h2><input class="search" data-filter="q2RegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2RegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q2 Used Reference</h2><input class="search" data-filter="q2UsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2UsedTable"></table></div></div></div></section>
 
 
-<section id="trends" class="section">
-  <div class="grid">
-    <div class="card wide">
-      <div class="toolbar">
-        <h2>Weekly Trends</h2>
-        <div>
-          <button class="admin-btn" id="saveTrendSnapshot">Save Current Snapshot</button>
-          <button class="admin-btn" id="downloadHistory">Download history backup</button>
-          <button class="admin-btn danger-btn" id="clearHistory">Clear history</button>
-        </div>
-      </div>
-      <div class="hint">Snapshots are saved in this browser each time you publish in Admin, or manually using Save Current Snapshot. Use the backup button before clearing or changing device.</div>
-    </div>
-    <div class="card third"><h3>Snapshots</h3><div class="trend-big" id="trendSnapshotCount">-</div><div class="hint" id="trendLatestWeek">-</div></div>
-    <div class="card third"><h3>New Regs WoW</h3><div class="trend-big" id="trendNewWow">-</div><div class="hint">Latest week versus previous snapshot</div></div>
-    <div class="card third"><h3>Used Cars WoW</h3><div class="trend-big" id="trendUsedWow">-</div><div class="hint">Latest week versus previous snapshot</div></div>
-    <div class="card half"><h3>New Registrations Trend</h3><div id="newRegsTrend" class="trend-chart"></div></div>
-    <div class="card half"><h3>Used Cars Trend</h3><div id="usedCarsTrend" class="trend-chart"></div></div>
-    <div class="card half"><h3>Enquiries Trend</h3><div id="enquiriesTrend" class="trend-chart"></div></div>
-    <div class="card half"><h3>Conversion Trend</h3><div id="conversionTrend" class="trend-chart"></div></div>
-    <div class="card half"><h3>Best Performance</h3><div id="trendBestPerformance" class="note-box"></div></div>
-    <div class="card half"><h3>Biggest Opportunity</h3><div id="trendBiggestOpportunity" class="note-box"></div></div>
-    <div class="card wide"><h3>Centre Momentum</h3><div id="centreMomentumTable" class="table-wrap"><table id="momentumTable"></table></div></div>
-  </div>
-</section>
 
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">

@@ -233,6 +233,24 @@ function paceMini(actual,target){
  return `QTR ${fmt(actual)} / ${fmt(target)} · Expected MTD ${fmt(expected)}`;
 }
 function sum(rows,key){return rows.reduce((a,r)=>a+(Number(r[key])||0),0)}
+function quarterForecast(actual){
+ const elapsed=q3ElapsedRatio();
+ return elapsed>0 ? Math.round((Number(actual)||0)/elapsed) : 0;
+}
+function forecastDeltaText(forecast,target){
+ const delta=Math.round((Number(forecast)||0)-(Number(target)||0));
+ if(!target) return '';
+ return `${delta>=0?'▲ +':'▼ '}${fmt(delta)}`;
+}
+function setForecastDisplay(valueId,deltaId,forecast,target){
+ setText(valueId,fmt(forecast));
+ const el=document.getElementById(deltaId);
+ if(!el) return;
+ el.textContent=forecastDeltaText(forecast,target);
+ el.className='forecast-delta '+(forecast>=target?'positive':forecast>=target*.98?'neutral':'negative');
+}
+function paceLabel(ratio){return ratio>=1?'On pace':ratio>=.9?'Just behind':'Behind pace'}
+function paceClass(ratio){return ratio>=1?'green':ratio>=.9?'amber':'red'}
 
 function topRow(rows, valueFn){return rows && rows.length ? rows.slice().sort((a,b)=>valueFn(b)-valueFn(a))[0] : null}
 function highlights(regs,used,acts,orders){
@@ -362,6 +380,35 @@ function build(){
  updateProgressKpi('q3', regs, {valueKey:'total', targetKey:'target', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_target'});
  updateProgressKpi('used', used, {valueKey:'counting', targetKey:'target', qtrValueKey:'qtr_counting', qtrTargetKey:'qtr_target'});
  updateProgressKpi('nonFleet', nonFleetTotals, {valueKey:'total', targetKey:'budget', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_budget'});
+ const regForecast=quarterForecast(regCurrent);
+ const usedGroupForecast=usedForecastFinish({qtr_counting:usedCurrent});
+ const nonFleetForecast=quarterForecast(nonFleetCurrent);
+ setForecastDisplay('q3Forecast','q3ForecastDelta',regForecast,regTarget);
+ setForecastDisplay('usedGroupForecast','usedForecastDelta',usedGroupForecast,usedTarget);
+ setForecastDisplay('nonFleetForecast','nonFleetForecastDelta',nonFleetForecast,nonFleetBudget);
+
+ const orderRows=DATA.dashboard_orders||[];
+ const orderMonth=currentOrderMonth();
+ const orderDone=sum(orderRows,orderMonth+'_orders') || orderRows.reduce((a,r)=>a+orderDoneFor(r,orderMonth),0);
+ const orderTarget=sum(orderRows,orderMonth+'_target');
+ const orderRatio=orderTarget?orderDone/orderTarget:0;
+ setText('orderBankDone',fmt(orderDone));
+ setText('orderBankTarget',fmt(orderTarget));
+ setText('orderBankToGo',fmt(Math.max(0,orderTarget-orderDone)));
+ setText('orderBankPct',pct(orderRatio));
+ const obStatus=document.getElementById('orderBankStatus');
+ if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(paceRatio(orderDone,orderTarget))}">${paceLabel(paceRatio(orderDone,orderTarget))}</span>`;}
+
+ const fleetRows=(DATA.q3_fleet||[]).filter(r=>!String(r.centre||'').toUpperCase().includes('CDA'));
+ const fleetRegs=sum(fleetRows,'regs'), fleetTarget=sum(fleetRows,'target'), fleetOrders=sum(fleetRows,'active_orders');
+ const fleetForecast=quarterForecast(fleetRegs);
+ setText('fleetBchRegs',fmt(fleetRegs));
+ setText('fleetBchTarget',fmt(fleetTarget));
+ setText('fleetBchOrders',fmt(fleetOrders));
+ setText('fleetBchForecast',fmt(fleetForecast));
+ const fleetPace=paceRatio(fleetRegs,fleetTarget);
+ const fleetStatus=document.getElementById('fleetBchStatus');
+ if(fleetStatus){fleetStatus.innerHTML=`<span class="status ${paceClass(fleetPace)}">${paceLabel(fleetPace)}</span>`;}
  const act = DATA.dashboard_activity || [];
  const totalEnquiries = sum(act,'total_enquiries');
  const totalTestDrives = sum(act,'total_test_drives');
@@ -385,21 +432,21 @@ function build(){
  const newConvRatio = newEnquiries ? newOrders / newEnquiries : 0;
  const usedConvRatio = usedEnquiries ? usedOrders / usedEnquiries : 0;
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
- document.getElementById('newEnquiries').textContent = fmt(newEnquiries);
- document.getElementById('usedEnquiries').textContent = fmt(usedEnquiries);
- document.getElementById('totalEnquiriesSplit').textContent = fmt(totalEnquiries);
+ setText('newEnquiries',fmt(newEnquiries));
+ setText('usedEnquiries',fmt(usedEnquiries));
+ setText('totalEnquiriesSplit',fmt(totalEnquiries));
  document.getElementById('totalTdPct').textContent = pct(totalTdRatio);
- document.getElementById('newTdPct').textContent = pct(newTdRatio);
- document.getElementById('usedTdPct').textContent = pct(usedTdRatio);
- document.getElementById('totalTdPctSplit').textContent = pct(totalTdRatio);
+ setText('newTdPct',pct(newTdRatio));
+ setText('usedTdPct',pct(usedTdRatio));
+ setText('totalTdPctSplit',pct(totalTdRatio));
  document.getElementById('totalOsPct').textContent = pct(totalOsRatio);
- document.getElementById('newOsPct').textContent = pct(newOsRatio);
- document.getElementById('usedOsPct').textContent = pct(usedOsRatio);
- document.getElementById('totalOsPctSplit').textContent = pct(totalOsRatio);
+ setText('newOsPct',pct(newOsRatio));
+ setText('usedOsPct',pct(usedOsRatio));
+ setText('totalOsPctSplit',pct(totalOsRatio));
  document.getElementById('totalConvPct').textContent = pct(totalConvRatio);
- document.getElementById('newConvPct').textContent = pct(newConvRatio);
- document.getElementById('usedConvPct').textContent = pct(usedConvRatio);
- document.getElementById('totalConvPctSplit').textContent = pct(totalConvRatio);
+ setText('newConvPct',pct(newConvRatio));
+ setText('usedConvPct',pct(usedConvRatio));
+ setText('totalConvPctSplit',pct(totalConvRatio));
  document.getElementById('h2Period').innerHTML='<span class="period-pill muted">H1 closed</span><span class="period-pill active">H2 active · July onwards</span>';
  const north=DATA.q3_regs.find(r=>r.centre==='NORTH CDA'), wy=DATA.q3_regs.find(r=>r.centre==='WY CDA'), south=DATA.q3_regs.find(r=>r.centre==='SOUTH CDA');
  document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct)}</div>`}).join('');
