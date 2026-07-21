@@ -349,6 +349,78 @@ function renderEfficiencyTable(rows){
   ], valid);
 }
 
+function insightStatusLabel(ratio){
+  if(ratio>=1) return {label:'On pace', tone:'green'};
+  if(ratio>=0.9) return {label:'Just behind', tone:'amber'};
+  return {label:'Behind pace', tone:'red'};
+}
+function insightCardHtml(kicker,title,body,tone){
+  return `<div class="insight-icon ${tone}">${tone==='green'?'↑':tone==='red'?'!':'→'}</div><div class="eyebrow">${kicker}</div><h3>${title}</h3><p>${body}</p>`;
+}
+function renderInsights(){
+  const regs=(DATA.dashboard_regs||[]).filter(r=>r.centre && !String(r.centre).includes('CDA') && r.centre!=='TOTAL');
+  const used=(DATA.dashboard_used||[]).filter(r=>r.centre && !String(r.centre).includes('CDA') && r.centre!=='TOTAL');
+  const fleet=(DATA.q3_fleet||[]).filter(r=>r.centre && !String(r.centre).includes('CDA') && r.centre!=='TOTAL');
+  const acts=(DATA.dashboard_activity||[]).filter(r=>r.centre && r.centre!=='TOTAL');
+  const orders=(DATA.dashboard_orders||[]).filter(r=>r.centre && !String(r.centre).includes('CDA') && r.centre!=='TOTAL');
+  const allRegs=DATA.dashboard_regs||[], allUsed=DATA.dashboard_used||[];
+  const regActual=sum(allRegs,'qtr_total'), regTarget=sum(allRegs,'qtr_target');
+  const usedActual=sum(allUsed,'qtr_counting'), usedTarget=sum(allUsed,'qtr_target');
+  const regPace=paceRatio(regActual,regTarget), usedForecast=usedTarget?usedForecastFinish({qtr_counting:usedActual,qtr_target:usedTarget})/usedTarget:0;
+  const regState=insightStatusLabel(regPace), usedState=insightStatusLabel(usedForecast);
+  const centreStates=regs.map(r=>insightStatusLabel(paceRatio(r.qtr_total,r.qtr_target)).label);
+  const onPace=centreStates.filter(x=>x==='On pace').length;
+  const behind=centreStates.filter(x=>x==='Behind pace').length;
+  const summary=document.getElementById('insightsSummary');
+  if(summary) summary.innerHTML=`<strong>${onPace}</strong> centres on registration pace <span>·</span> <strong>${behind}</strong> require attention <span>·</span> Used forecast <strong>${pct(usedForecast)}</strong>`;
+
+  const bestReg=topRow(regs,r=>paceRatio(r.qtr_total,r.qtr_target));
+  const bestUsed=topRow(used,r=>usedForecastPct(r));
+  const bestEfficiency=topRow(acts,r=>funnelEfficiencyScore(r));
+  const weakestEfficiency=acts.length?acts.slice().sort((a,b)=>funnelEfficiencyScore(a)-funnelEfficiencyScore(b))[0]:null;
+  const fleetRisk=fleet.length?fleet.slice().sort((a,b)=>paceRatio(a.regs,a.target)-paceRatio(b.regs,b.target))[0]:null;
+  const strength=document.getElementById('insightStrength');
+  if(strength){
+    const title=bestReg?`${siteLabel(bestReg.centre)} leads registrations`:'Registration performance';
+    const body=bestReg?`${pct(bestReg.qtr_target?bestReg.qtr_total/bestReg.qtr_target:0)} of Q3 target and ${pct(paceRatio(bestReg.qtr_total,bestReg.qtr_target))} of date pace.`:`Group registrations are ${regState.label.toLowerCase()}.`;
+    strength.innerHTML=insightCardHtml('Greatest strength',title,body,'green');
+  }
+  const opportunity=document.getElementById('insightOpportunity');
+  if(opportunity){
+    const title=weakestEfficiency?`${siteLabel(weakestEfficiency.centre)} has the clearest funnel opportunity`:'Sales funnel opportunity';
+    const body=weakestEfficiency?`${funnelOpportunity(weakestEfficiency)}. Current efficiency score ${funnelEfficiencyScore(weakestEfficiency)}/100.`:'No material funnel gap identified.';
+    opportunity.innerHTML=insightCardHtml('Biggest opportunity',title,body,'amber');
+  }
+  const risk=document.getElementById('insightRisk');
+  if(risk){
+    const fr=fleetRisk?paceRatio(fleetRisk.regs,fleetRisk.target):1;
+    const title=fleetRisk && fr<1?`${siteLabel(fleetRisk.centre)} is furthest behind Fleet BCH pace`:'No material Fleet BCH risk';
+    const body=fleetRisk?`${fmt(fleetRisk.regs)} registrations against a target of ${fmt(fleetRisk.target)}, with ${fmt(fleetRisk.active_orders)} active orders.`:'Fleet BCH is currently on pace.';
+    risk.innerHTML=insightCardHtml('Requires attention',title,body,fr>=1?'green':'red');
+  }
+
+  const focus=[];
+  if(bestEfficiency) focus.push({tone:'green',title:`${siteLabel(bestEfficiency.centre)} — strongest funnel efficiency`,text:`Score ${funnelEfficiencyScore(bestEfficiency)}/100 · ${pct(bestEfficiency.orders_ratio)} conversion.`});
+  if(bestUsed) focus.push({tone:usedForecastPct(bestUsed)>=1?'green':'amber',title:`${siteLabel(bestUsed.centre)} — used-car forecast`,text:`Forecast ${fmt(usedForecastFinish(bestUsed))} against ${fmt(bestUsed.qtr_target)} target (${pct(usedForecastPct(bestUsed))}).`});
+  const weakestReg=regs.length?regs.slice().sort((a,b)=>paceRatio(a.qtr_total,a.qtr_target)-paceRatio(b.qtr_total,b.qtr_target))[0]:null;
+  if(weakestReg) focus.push({tone:paceRatio(weakestReg.qtr_total,weakestReg.qtr_target)>=.9?'amber':'red',title:`${siteLabel(weakestReg.centre)} — registration focus`,text:`${fmt(weakestReg.qtr_total)} of ${fmt(weakestReg.qtr_target)} delivered; ${fmt(Math.max(0,(weakestReg.qtr_target||0)-(weakestReg.qtr_total||0)))} remaining.`});
+  const focusEl=document.getElementById('insightCentreFocus');
+  if(focusEl) focusEl.innerHTML=focus.map(x=>`<div class="insight-row"><span class="insight-dot ${x.tone}"></span><div><strong>${x.title}</strong><p>${x.text}</p></div></div>`).join('');
+
+  const month=currentOrderMonth();
+  const orderDone=orders.reduce((a,r)=>a+orderDoneFor(r,month),0);
+  const orderTarget=orders.reduce((a,r)=>a+(Number(r[month+'_target'])||0),0);
+  const totalEnq=sum(acts,'total_enquiries'), totalOrd=sum(acts,'total_orders');
+  const commercial=[
+    {tone:regState.tone,title:`New registrations: ${regState.label}`,text:`${fmt(regActual)} of ${fmt(regTarget)} Q3 target; ${fmt(Math.max(0,regTarget-regActual))} remaining.`},
+    {tone:usedState.tone,title:`Used cars: ${usedState.label}`,text:`Current forecast ${fmt(usedForecastFinish({qtr_counting:usedActual,qtr_target:usedTarget}))} against ${fmt(usedTarget)} target.`},
+    {tone:orderTarget && orderDone/orderTarget>=q3ElapsedRatio()?'green':'amber',title:`Order bank: ${orderTarget?pct(orderDone/orderTarget):'-'} of current-month target`,text:`${fmt(orderDone)} active orders against ${fmt(orderTarget)} target.`},
+    {tone:totalEnq && totalOrd/totalEnq>=.15?'green':'amber',title:`Sales funnel conversion: ${pct(totalEnq?totalOrd/totalEnq:0)}`,text:`${fmt(totalOrd)} orders from ${fmt(totalEnq)} enquiries in the loaded activity report.`}
+  ];
+  const commercialEl=document.getElementById('insightCommercial');
+  if(commercialEl) commercialEl.innerHTML=commercial.map(x=>`<div class="insight-row"><span class="insight-dot ${x.tone}"></span><div><strong>${x.title}</strong><p>${x.text}</p></div></div>`).join('');
+}
+
 function build(){
  updateVersionDisplays();
  const regs=DATA.dashboard_regs, used=DATA.dashboard_used, non=DATA.q3_non, acts=DATA.dashboard_activity;
@@ -435,6 +507,7 @@ function build(){
  renderEfficiencyTable(DATA.dashboard_activity||[]);
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
  makeTable('q2UsedTable',[{label:'Centre',key:'centre'},{label:'Apr Used',key:'apr_counting',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'May Used',key:'may_counting',num:true},{label:'May Target',key:'may_target',num:true},{label:'Jun Used',key:'jun_counting',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q2_used);
+ renderInsights();
 }
 
 
