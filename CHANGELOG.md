@@ -1,3 +1,8 @@
+## By-site YoY comparison: ranked, New/Used/Total bars, Orders stat
+- "Enquiries vs Last Year by Site" now ranks centres by Total enquiries YoY growth (best first) instead of raw TY volume.
+- Each centre row now shows three separate TY/LY bar pairs — New, Used and Total — instead of just Total.
+- Added an Orders stat (this year's order count + % vs last year) to each row.
+
 ## Last-year sales funnel (LY %) + by-site comparison
 - Added a fourth weekly workbook, `sales-activity-ly.xls`, alongside weekly-update.xlsx, sales-activity.xls and order-bank.xlsx. Same layout as sales-activity.xls, one year behind. Replace it each week like the other three.
 - Sales Funnel KPI card on the front dashboard gains an "LY %" column showing enquiry growth/decline vs the same period last year, for New, Used and Total.
