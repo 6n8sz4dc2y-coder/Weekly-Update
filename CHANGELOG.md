@@ -1,3 +1,8 @@
+## Front dashboard bar colour matches pace
+- Centre Registration Targets, Used Car Snapshot and Q3 CDA Summary progress bars on the front dashboard now colour green/amber/red based on pace status, matching the "On pace / Slightly behind / Behind pace" badge shown next to them.
+- Bar length still reflects actual progress against the full target; only the colour source changed.
+- Detail tables in other tabs are unchanged.
+
 # Version 1.9 – Fleet Expected Achievement
 
 - Centre Fleet BCH dashboard card now shows Expected Achievement.
