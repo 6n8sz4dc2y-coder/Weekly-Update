@@ -145,6 +145,23 @@ table{border-collapse:separate;border-spacing:0}
 .variance-cell.positive{color:var(--green)}
 .variance-cell.negative{color:var(--red)}
 
+/* Enquiries vs Last Year by Site (Sales Funnel tab). */
+.yoy-grid{display:grid;gap:10px;margin-top:10px}
+.yoy-row{display:grid;grid-template-columns:130px 1fr 74px;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-centre{font-weight:900}
+.yoy-bars{display:flex;flex-direction:column;gap:5px}
+.yoy-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
+.yoy-bar-row span:first-child{width:20px}
+.yoy-bar-track{flex:1;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.yoy-bar-fill{height:100%;border-radius:999px}
+.yoy-bar-fill.ty{background:var(--blue)}
+.yoy-bar-fill.ly{background:#94a3b8}
+.yoy-bar-value{width:34px;text-align:right;color:var(--ink)}
+.yoy-pct{text-align:right;font-weight:900;font-size:15px}
+.yoy-pct.positive{color:var(--green)}
+.yoy-pct.negative{color:var(--red)}
+@media(max-width:900px){.yoy-row{grid-template-columns:1fr;text-align:left}.yoy-pct{text-align:left}}
+
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
 .centre-name{font-weight:800}
@@ -163,7 +180,8 @@ table{border-collapse:separate;border-spacing:0}
 .overview-caption{font-size:13px;color:var(--muted);font-weight:800}
 .overview-status{margin-left:auto}
 .overview-card .split-grid{margin-top:12px}
-.funnel-split{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+.funnel-split-wrap{overflow-x:auto;margin-top:12px}
+.funnel-split{width:100%;border-collapse:collapse;font-size:12px}
 .funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
 .funnel-split th:first-child,.funnel-split td:first-child{text-align:left;color:var(--muted);font-weight:800}
 .funnel-split td{padding:6px 2px;text-align:right;font-weight:800;border-top:1px solid var(--line)}

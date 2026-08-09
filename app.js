@@ -102,6 +102,8 @@ let PENDING_DATA = null;
 // Q2 Reference override from Toyota Registrations.xlsx - includes North, South and WY CDA.
 DATA.q2_regs = [{"centre":"Bolton","apr_total":26,"apr_target":21.0,"may_total":32,"may_target":27.0,"jun_total":43,"jun_target":48.0,"qtr_counting":99,"qtr_fleet":2,"qtr_total":101,"qtr_target":96,"to_go":-5,"per_week":5,"regs_v_target":1.052083333},{"centre":"Bury","apr_total":23,"apr_target":15.0,"may_total":28,"may_target":20.0,"jun_total":26,"jun_target":36.0,"qtr_counting":75,"qtr_fleet":2,"qtr_total":77,"qtr_target":71,"to_go":-6,"per_week":6,"regs_v_target":1.084507042},{"centre":"Rochdale","apr_total":22,"apr_target":17.0,"may_total":41,"may_target":23.0,"jun_total":27,"jun_target":40.0,"qtr_counting":90,"qtr_fleet":0,"qtr_total":90,"qtr_target":80,"to_go":-10,"per_week":10,"regs_v_target":1.125},{"centre":"SQ","apr_total":52,"apr_target":29.0,"may_total":45,"may_target":37.0,"jun_total":50,"jun_target":60.0,"qtr_counting":125,"qtr_fleet":22,"qtr_total":147,"qtr_target":126,"to_go":-21,"per_week":21,"regs_v_target":1.166666667},{"centre":"NORTH CDA","apr_total":123,"apr_target":82,"may_total":146,"may_target":107,"jun_total":146,"jun_target":184,"qtr_counting":389,"qtr_fleet":26,"qtr_total":415,"qtr_target":373,"to_go":-42,"per_week":42,"regs_v_target":1.112600536},{"centre":"Altrincham","apr_total":10,"apr_target":16.0,"may_total":31,"may_target":21.0,"jun_total":32,"jun_target":36.0,"qtr_counting":73,"qtr_fleet":0,"qtr_total":73,"qtr_target":73,"to_go":0,"per_week":0,"regs_v_target":1},{"centre":"Denton","apr_total":28,"apr_target":17.0,"may_total":26,"may_target":24.0,"jun_total":33,"jun_target":42.0,"qtr_counting":80,"qtr_fleet":7,"qtr_total":87,"qtr_target":83,"to_go":-4,"per_week":4,"regs_v_target":1.048192771},{"centre":"Macclesfield","apr_total":18,"apr_target":18.0,"may_total":26,"may_target":23.0,"jun_total":39,"jun_target":40.0,"qtr_counting":83,"qtr_fleet":0,"qtr_total":83,"qtr_target":81,"to_go":-2,"per_week":2,"regs_v_target":1.024691358},{"centre":"Stockport","apr_total":30,"apr_target":30.0,"may_total":40,"may_target":39.0,"jun_total":62,"jun_target":66.0,"qtr_counting":132,"qtr_fleet":0,"qtr_total":132,"qtr_target":135,"to_go":3,"per_week":-3,"regs_v_target":0.9777777778},{"centre":"SOUTH CDA","apr_total":86,"apr_target":81,"may_total":123,"may_target":107,"jun_total":166,"jun_target":184,"qtr_counting":368,"qtr_fleet":7,"qtr_total":375,"qtr_target":372,"to_go":-3,"per_week":3,"regs_v_target":1.008064516},{"centre":"Bradford","apr_total":22,"apr_target":22.0,"may_total":27,"may_target":26.0,"jun_total":30,"jun_target":44.0,"qtr_counting":66,"qtr_fleet":13,"qtr_total":79,"qtr_target":92,"to_go":13,"per_week":-13,"regs_v_target":0.8586956522},{"centre":"Huddersfield","apr_total":25,"apr_target":21.0,"may_total":38,"may_target":27.0,"jun_total":34,"jun_target":49.0,"qtr_counting":89,"qtr_fleet":8,"qtr_total":97,"qtr_target":97,"to_go":0,"per_week":0,"regs_v_target":1},{"centre":"Silsden","apr_total":6,"apr_target":6.0,"may_total":7,"may_target":9.0,"jun_total":17,"jun_target":13.0,"qtr_counting":30,"qtr_fleet":0,"qtr_total":30,"qtr_target":28,"to_go":-2,"per_week":2,"regs_v_target":1.071428571},{"centre":"WY CDA","apr_total":53,"apr_target":49,"may_total":72,"may_target":62,"jun_total":81,"jun_target":106,"qtr_counting":185,"qtr_fleet":21,"qtr_total":206,"qtr_target":217,"to_go":11,"per_week":-11,"regs_v_target":0.9493087558}];
 DATA.q2_used = [{"centre":"Bolton","apr_counting":68.0,"apr_target":59.0,"may_counting":57.0,"may_target":59.0,"jun_counting":56.0,"jun_target":62.0,"qtr_counting":181,"qtr_target":180},{"centre":"Bury","apr_counting":59.0,"apr_target":51.0,"may_counting":42.0,"may_target":51.0,"jun_counting":42.0,"jun_target":54.0,"qtr_counting":143,"qtr_target":156},{"centre":"Rochdale","apr_counting":49.0,"apr_target":47.0,"may_counting":47.0,"may_target":47.0,"jun_counting":45.0,"jun_target":50.0,"qtr_counting":141,"qtr_target":144},{"centre":"SQ","apr_counting":59.0,"apr_target":56.0,"may_counting":52.0,"may_target":56.0,"jun_counting":49.0,"jun_target":59.0,"qtr_counting":160,"qtr_target":171},{"centre":"NORTH CDA","apr_counting":235,"apr_target":213,"may_counting":198,"may_target":213,"jun_counting":192,"jun_target":225,"qtr_counting":625,"qtr_target":651},{"centre":"Altrincham","apr_counting":49.0,"apr_target":47.0,"may_counting":41.0,"may_target":47.0,"jun_counting":48.0,"jun_target":50.0,"qtr_counting":138,"qtr_target":144},{"centre":"Denton","apr_counting":41.0,"apr_target":42.0,"may_counting":42.0,"may_target":42.0,"jun_counting":39.0,"jun_target":44.0,"qtr_counting":122,"qtr_target":128},{"centre":"Macclesfield","apr_counting":44.0,"apr_target":44.0,"may_counting":44.0,"may_target":44.0,"jun_counting":49.0,"jun_target":46.0,"qtr_counting":137,"qtr_target":134},{"centre":"Stockport","apr_counting":94.0,"apr_target":85.0,"may_counting":79.0,"may_target":85.0,"jun_counting":98.0,"jun_target":89.0,"qtr_counting":271,"qtr_target":259},{"centre":"SOUTH CDA","apr_counting":228,"apr_target":218,"may_counting":206,"may_target":218,"jun_counting":234,"jun_target":229,"qtr_counting":668,"qtr_target":665},{"centre":"Bradford","apr_counting":40.0,"apr_target":34.0,"may_counting":37.0,"may_target":34.0,"jun_counting":40.0,"jun_target":36.0,"qtr_counting":117,"qtr_target":104},{"centre":"Huddersfield","apr_counting":32.0,"apr_target":44.0,"may_counting":52.0,"may_target":44.0,"jun_counting":35.0,"jun_target":46.0,"qtr_counting":119,"qtr_target":134},{"centre":"Silsden","apr_counting":20.0,"apr_target":20.0,"may_counting":20.0,"may_target":20.0,"jun_counting":31.0,"jun_target":21.0,"qtr_counting":71,"qtr_target":61},{"centre":"WY CDA","apr_counting":92,"apr_target":98,"may_counting":109,"may_target":98,"jun_counting":106,"jun_target":103,"qtr_counting":307,"qtr_target":299}];
+DATA.sales_activity_ly = [{"centre":"Altrincham","new_enquiries":88,"new_test_drives":32,"new_os":41,"new_orders":21,"used_enquiries":160,"used_test_drives":98,"used_os":101,"used_orders":67,"total_enquiries":248,"total_test_drives":130,"total_os":142,"total_orders":88,"lost_op_req":0,"confirmed_orders":0,"delivered":96,"lost_opportunities":150,"td_ratio":0.52,"orders_ratio":0.35,"os_ratio":0.57},{"centre":"Bolton","new_enquiries":169,"new_test_drives":76,"new_os":82,"new_orders":55,"used_enquiries":231,"used_test_drives":124,"used_os":138,"used_orders":92,"total_enquiries":400,"total_test_drives":200,"total_os":220,"total_orders":147,"lost_op_req":0,"confirmed_orders":0,"delivered":113,"lost_opportunities":249,"td_ratio":0.5,"orders_ratio":0.37,"os_ratio":0.55},{"centre":"Bradford","new_enquiries":128,"new_test_drives":56,"new_os":44,"new_orders":33,"used_enquiries":159,"used_test_drives":85,"used_os":87,"used_orders":57,"total_enquiries":287,"total_test_drives":141,"total_os":131,"total_orders":90,"lost_op_req":0,"confirmed_orders":0,"delivered":72,"lost_opportunities":173,"td_ratio":0.49,"orders_ratio":0.31,"os_ratio":0.46},{"centre":"Bury","new_enquiries":75,"new_test_drives":18,"new_os":44,"new_orders":25,"used_enquiries":147,"used_test_drives":57,"used_os":97,"used_orders":57,"total_enquiries":222,"total_test_drives":75,"total_os":141,"total_orders":82,"lost_op_req":0,"confirmed_orders":0,"delivered":85,"lost_opportunities":123,"td_ratio":0.34,"orders_ratio":0.37,"os_ratio":0.64},{"centre":"Denton","new_enquiries":107,"new_test_drives":42,"new_os":48,"new_orders":39,"used_enquiries":173,"used_test_drives":94,"used_os":111,"used_orders":86,"total_enquiries":280,"total_test_drives":136,"total_os":159,"total_orders":125,"lost_op_req":0,"confirmed_orders":0,"delivered":84,"lost_opportunities":149,"td_ratio":0.49,"orders_ratio":0.45,"os_ratio":0.57},{"centre":"Huddersfield","new_enquiries":183,"new_test_drives":55,"new_os":98,"new_orders":40,"used_enquiries":125,"used_test_drives":54,"used_os":82,"used_orders":78,"total_enquiries":308,"total_test_drives":109,"total_os":180,"total_orders":118,"lost_op_req":0,"confirmed_orders":0,"delivered":99,"lost_opportunities":189,"td_ratio":0.35,"orders_ratio":0.38,"os_ratio":0.58},{"centre":"Macclesfield","new_enquiries":170,"new_test_drives":66,"new_os":100,"new_orders":50,"used_enquiries":154,"used_test_drives":73,"used_os":77,"used_orders":70,"total_enquiries":324,"total_test_drives":139,"total_os":177,"total_orders":120,"lost_op_req":0,"confirmed_orders":0,"delivered":83,"lost_opportunities":214,"td_ratio":0.43,"orders_ratio":0.37,"os_ratio":0.55},{"centre":"Rochdale","new_enquiries":138,"new_test_drives":43,"new_os":65,"new_orders":36,"used_enquiries":153,"used_test_drives":78,"used_os":102,"used_orders":59,"total_enquiries":291,"total_test_drives":121,"total_os":167,"total_orders":95,"lost_op_req":0,"confirmed_orders":0,"delivered":96,"lost_opportunities":181,"td_ratio":0.42,"orders_ratio":0.33,"os_ratio":0.57},{"centre":"SQ","new_enquiries":178,"new_test_drives":25,"new_os":70,"new_orders":43,"used_enquiries":179,"used_test_drives":58,"used_os":103,"used_orders":76,"total_enquiries":357,"total_test_drives":83,"total_os":173,"total_orders":119,"lost_op_req":0,"confirmed_orders":0,"delivered":132,"lost_opportunities":224,"td_ratio":0.23,"orders_ratio":0.33,"os_ratio":0.48},{"centre":"Silsden","new_enquiries":25,"new_test_drives":6,"new_os":8,"new_orders":8,"used_enquiries":60,"used_test_drives":37,"used_os":36,"used_orders":29,"total_enquiries":85,"total_test_drives":43,"total_os":44,"total_orders":37,"lost_op_req":0,"confirmed_orders":0,"delivered":33,"lost_opportunities":38,"td_ratio":0.51,"orders_ratio":0.44,"os_ratio":0.52},{"centre":"Stockport","new_enquiries":222,"new_test_drives":62,"new_os":54,"new_orders":42,"used_enquiries":305,"used_test_drives":133,"used_os":145,"used_orders":112,"total_enquiries":527,"total_test_drives":195,"total_os":199,"total_orders":154,"lost_op_req":0,"confirmed_orders":0,"delivered":156,"lost_opportunities":539,"td_ratio":0.37,"orders_ratio":0.29,"os_ratio":0.38}];
+recomputeDashboardSets(DATA);
 
 
 const fmt=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n)};
@@ -117,6 +119,7 @@ const paceProgress=n=>`<div class="progress"><div class="bar ${paceStatusClass(n
 const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.9?'Watch':'Behind'}</span>`;
 const paceStatus=n=>`<span class="status ${paceStatusClass(n)}">${n>=1?'On pace':n>=.9?'Slightly behind':'Behind pace'}</span>`;
 const variance=n=>{const v=Number(n)||0;return `<span class="variance-cell ${v>=0?'positive':'negative'}">${v>0?'+':''}${fmt(v)}</span>`};
+const yoyPct=(ty,ly)=>{ty=Number(ty)||0;ly=Number(ly)||0;if(!ly)return '<span class="variance-cell">-</span>';const d=(ty-ly)/ly;return `<span class="variance-cell ${d>=0?'positive':'negative'}">${d>0?'+':''}${Math.round(d*100)}%</span>`};
 function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);if(col.format==='variance')return variance(v);return col.num?fmt(v):(v??'-')}
 
 const TABLE_SORT_STATE = {};
@@ -375,6 +378,23 @@ function renderEfficiencyTable(rows){
     {label:'Biggest Opportunity', key:'efficiency_opportunity'}
   ], valid);
 }
+function renderYoyBySite(ty, ly){
+  const el=document.getElementById('yoyBySite');
+  if(!el) return;
+  const centres=Array.from(new Set([...(ty||[]).map(r=>r.centre), ...(ly||[]).map(r=>r.centre)]));
+  const rows=centres.map(centre=>{
+    const tyRow=(ty||[]).find(r=>r.centre===centre);
+    const lyRow=(ly||[]).find(r=>r.centre===centre);
+    return { centre, tyVal:Number(tyRow&&tyRow.total_enquiries)||0, lyVal:Number(lyRow&&lyRow.total_enquiries)||0 };
+  }).filter(r=>r.tyVal||r.lyVal).sort((a,b)=>b.tyVal-a.tyVal);
+  const maxVal=Math.max(1, ...rows.map(r=>Math.max(r.tyVal,r.lyVal)));
+  el.innerHTML=rows.map(r=>{
+    const change=r.lyVal ? (r.tyVal-r.lyVal)/r.lyVal : null;
+    const pctText=change===null ? '-' : `${change>0?'+':''}${Math.round(change*100)}%`;
+    const pctClass=change===null ? '' : (change>=0?'positive':'negative');
+    return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-bars"><div class="yoy-bar-row"><span>TY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${r.tyVal/maxVal*100}%"></div></div><span class="yoy-bar-value">${fmt(r.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${r.lyVal/maxVal*100}%"></div></div><span class="yoy-bar-value">${fmt(r.lyVal)}</span></div></div><div class="yoy-pct ${pctClass}">${pctText}</div></div>`;
+  }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
+}
 
 function cdaOrderRows(){
   return CDA_TOTALS.map(g=>{
@@ -447,10 +467,17 @@ function build(){
  const usedOsRatio = usedEnquiries ? usedOS / usedEnquiries : 0;
  const newConvRatio = newEnquiries ? newOrders / newEnquiries : 0;
  const usedConvRatio = usedEnquiries ? usedOrders / usedEnquiries : 0;
+ const actLY = DATA.dashboard_activity_ly || [];
+ const newEnquiriesLY = sum(actLY,'new_enquiries');
+ const usedEnquiriesLY = sum(actLY,'used_enquiries');
+ const totalEnquiriesLY = sum(actLY,'total_enquiries');
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
  setText('usedEnquiries',fmt(usedEnquiries));
  setText('totalEnquiriesSplit',fmt(totalEnquiries));
+ document.getElementById('newEnquiriesLY').innerHTML=yoyPct(newEnquiries,newEnquiriesLY);
+ document.getElementById('usedEnquiriesLY').innerHTML=yoyPct(usedEnquiries,usedEnquiriesLY);
+ document.getElementById('totalEnquiriesLY').innerHTML=yoyPct(totalEnquiries,totalEnquiriesLY);
  document.getElementById('totalTdPct').textContent = pct(totalTdRatio);
  setText('newTdPct',pct(newTdRatio));
  setText('usedTdPct',pct(usedTdRatio));
@@ -499,6 +526,7 @@ function build(){
 ],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  makeTable('activityTable',[{label:'Rank',value:(r)=>((DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)).findIndex(x=>x.centre===r.centre)+1),num:true},{label:'Centre',key:'centre'},{label:'Enquiries',key:'total_enquiries',num:true},{label:'Test Drives',key:'total_test_drives',num:true},{label:'OS',key:'total_os',num:true},{label:'Orders',key:'total_orders',num:true},{label:'TD %',key:'td_ratio',format:'pct',num:true},{label:'Order %',key:'orders_ratio',format:'pct',num:true},{label:'OS %',key:'os_ratio',format:'pct',num:true},{label:'New Enq',key:'new_enquiries',num:true},{label:'New TD',key:'new_test_drives',num:true},{label:'New OS',key:'new_os',num:true},{label:'New Orders',key:'new_orders',num:true},{label:'Used Enq',key:'used_enquiries',num:true},{label:'Used TD',key:'used_test_drives',num:true},{label:'Used OS',key:'used_os',num:true},{label:'Used Orders',key:'used_orders',num:true},{label:'Delivered',key:'delivered',num:true},{label:'Lost Opp',key:'lost_opportunities',num:true}],(DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)));
  renderEfficiencyTable(DATA.dashboard_activity||[]);
+ renderYoyBySite(DATA.dashboard_activity||[], DATA.dashboard_activity_ly||[]);
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_total)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_total)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_total)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
  makeTable('q2UsedTable',[{label:'Centre',key:'centre'},{label:'Apr Used',key:'apr_counting',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_counting)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Used',key:'may_counting',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_counting)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Used',key:'jun_counting',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_counting)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q2_used);
 }
@@ -542,6 +570,7 @@ function recomputeDashboardSets(data){
   data.dashboard_regs = (data.q3_regs||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_used = (data.q3_used||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_activity = (data.sales_activity||data.dashboard_activity||[]).filter(r=>userSites.includes(r.centre));
+  data.dashboard_activity_ly = (data.sales_activity_ly||data.dashboard_activity_ly||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_orders = (data.order_bank||data.dashboard_orders||[]).filter(r=>userSites.includes(r.centre));
 }
 function parseWeeklyWorkbook(wb, data){
@@ -706,7 +735,7 @@ function parseOrderWorkbook(wb, data){
   return (data.dashboard_orders||[]).length;
 }
 
-function parseSalesRows(rows, data){
+function parseSalesRows(rows, data, targetKey='sales_activity'){
   const siteRows=[];
   for(const r of rows){
     if(!r || !r[0]) continue;
@@ -724,24 +753,24 @@ function parseSalesRows(rows, data){
     siteRows.push(row);
   }
   if(siteRows.length){
-    data.sales_activity = siteRows;
+    data[targetKey] = siteRows;
     recomputeDashboardSets(data);
   }
   return siteRows.length;
 }
-async function parseSalesActivityFile(file, data){
+async function parseSalesActivityFile(file, data, targetKey='sales_activity'){
   const buf = await readFileAsArrayBuffer(file);
   try{
     const wb = XLSX.read(buf,{type:'array'});
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false});
-    const count=parseSalesRows(rows,data);
+    const count=parseSalesRows(rows,data,targetKey);
     if(count) return count;
   }catch(e){ console.warn('SheetJS sales parse failed, trying HTML',e); }
   const text = await readFileAsText(file);
   const doc = new DOMParser().parseFromString(text,'text/html');
   const rows = Array.from(doc.querySelectorAll('tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.textContent.trim()));
-  return parseSalesRows(rows,data);
+  return parseSalesRows(rows,data,targetKey);
 }
 function renderAdminPreview(data){
   const rows=[];
@@ -762,6 +791,7 @@ async function previewImport(){
   const weekly=document.getElementById('weeklyFile')?.files?.[0];
   const activity=document.getElementById('activityFile')?.files?.[0];
   const order=document.getElementById('orderFile')?.files?.[0];
+  const activityLy=document.getElementById('activityLyFile')?.files?.[0];
   const status=document.getElementById('adminStatus');
   const data=cloneData();
   const messages=[];
@@ -782,6 +812,10 @@ async function previewImport(){
       const count=parseOrderWorkbook(wb,data);
       messages.push(`Order Bank imported (${count} rows)`);
     }
+    if(activityLy){
+      const count=await parseSalesActivityFile(activityLy,data,'sales_activity_ly');
+      messages.push(`Sales Activity LY imported (${count} centres)`);
+    }
     PENDING_DATA=data;
     renderAdminPreview(data);
     status.innerHTML = messages.length ? `<strong>Preview ready.</strong><br>${messages.join('<br>')}` : 'Choose at least one file to preview.';
@@ -794,12 +828,8 @@ function publishImport(){
   if(!PENDING_DATA){ document.getElementById('adminStatus').innerHTML='Preview an import first.'; return; }
   DATA=PENDING_DATA;
   const publishedMeta = saveDashboardMeta();
-  document.getElementById('previewImport')?.addEventListener('click', previewImport);
-document.getElementById('publishImport')?.addEventListener('click', publishImport);
-document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
-document.getElementById('resetData')?.addEventListener('click', resetSavedData);
-build();
-  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the three workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
+  build();
+  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
 }
 function downloadDataBackup(){
   const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
@@ -816,192 +846,6 @@ function resetSavedData(){
   location.reload();
 }
 
-function cloneData(){ return JSON.parse(JSON.stringify(DATA)); }
-function normCentreName(v){
-  const s=String(v||'').trim().replace(/^RRG Toyota\s+/i,'').replace(/^RRG\s+/i,'');
-  if(/salford quays/i.test(s)) return 'SQ';
-  return s;
-}
-function nval(v){
-  if(v===null||v===undefined||v==='') return 0;
-  if(typeof v==='number') return v;
-  const s=String(v).replace(/,/g,'').replace('%','').trim();
-  const num=Number(s);
-  return Number.isFinite(num)?num:0;
-}
-function pctval(v){
-  if(v===null||v===undefined||v==='') return 0;
-  if(typeof v==='number') return v>1? v/100 : v;
-  const s=String(v).trim();
-  const num=nval(s);
-  return s.includes('%') ? num/100 : (num>1?num/100:num);
-}
-async function readFileAsArrayBuffer(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsArrayBuffer(file);});}
-async function readFileAsText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsText(file);});}
-function updateRow(rows, centre, patch){
-  const row = ensureRow(rows, centre);
-  Object.assign(row, patch);
-}
-function totalsFor(rows, names, fields){
-  const result={centre:names.label};
-  fields.forEach(f=>result[f]=rows.filter(r=>names.items.includes(r.centre)).reduce((a,r)=>a+(Number(r[f])||0),0));
-  return result;
-}
-function recomputeDashboardSets(data){
-  ensureCdaTotals(data);
-  const userSites = ALL_DASHBOARD_SITES;
-  data.user_sites = userSites;
-  data.dashboard_regs = (data.q3_regs||[]).filter(r=>userSites.includes(r.centre));
-  data.dashboard_used = (data.q3_used||[]).filter(r=>userSites.includes(r.centre));
-  data.dashboard_activity = (data.sales_activity||data.dashboard_activity||[]).filter(r=>userSites.includes(r.centre));
-  data.dashboard_orders = (data.order_bank||data.dashboard_orders||[]).filter(r=>userSites.includes(r.centre));
-}
-function parseWeeklyWorkbook(wb, data){
-  const ws = wb.Sheets['2026 - Q3'] || wb.Sheets[wb.SheetNames[0]];
-  const a = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
-  const findSection = (txt)=>a.findIndex(r=>String(r && r[0] || '').toUpperCase().includes(txt));
-  const nextSection = (start)=>{
-    let next=a.length;
-    for(let i=start+1;i<a.length;i++){
-      const label=String(a[i] && a[i][0] || '').toUpperCase();
-      if(label.includes('REGISTRATIONS') || label.includes('USED COUNTING') || label.includes('CENTRE FLEET')){ next=i; break; }
-    }
-    return next;
-  };
-  const parseBetween = (start, handler)=>{
-    if(start<0) return;
-    const end=nextSection(start);
-    for(let i=start+1;i<end;i++){
-      const r=a[i]; if(!r || !r[0]) continue;
-      const centre=normCentreName(r[0]);
-      if(!isKnownCentreLabel(centre)) continue;
-      handler(r, centre);
-    }
-  };
-  parseBetween(findSection('REGISTRATIONS (COUNTING)'), (r, centre)=>{
-    const patch={
-      jul_counting:nval(r[1]), jul_clcp:nval(r[2]), jul_fleet:nval(r[3]), jul_total:nval(r[4]), jul_target:nval(r[5]),
-      aug_counting:nval(r[7]), aug_clcp:nval(r[8]), aug_fleet:nval(r[9]), aug_total:nval(r[10]), aug_target:nval(r[11]),
-      sep_counting:nval(r[13]), sep_clcp:nval(r[14]), sep_fleet:nval(r[15]), sep_total:nval(r[16]), sep_target:nval(r[17]),
-      qtr_counting:nval(r[19]), qtr_fleet:nval(r[20]), qtr_total:nval(r[21]), qtr_target:nval(r[22]),
-      to_go:nval(r[23]), per_week:nval(r[24]), qtr_regs:nval(r[25]), target:nval(r[26]), regs_v_target:pctval(r[27])
-    };
-    updateRow(data.q3_regs, centre, patch);
-  });
-  parseBetween(findSection('REGISTRATIONS (NON-COUNTING)'), (r, centre)=>{
-    const patch={jul_reg:nval(r[1]),jul_unreg:nval(r[2]),jul_total:nval(r[3]),jul_budget:nval(r[4]),aug_reg:nval(r[5]),aug_unreg:nval(r[6]),aug_total:nval(r[7]),aug_budget:nval(r[8]),sep_reg:nval(r[9]),sep_unreg:nval(r[10]),sep_total:nval(r[11]),sep_budget:nval(r[12]),qtr_reg:nval(r[14]),qtr_unreg:nval(r[15]),qtr_total:nval(r[16]),qtr_budget:nval(r[17])};
-    updateRow(data.q3_non, centre, patch);
-  });
-  parseBetween(findSection('USED COUNTING VOLUME'), (r, centre)=>{
-    const patch={jul_counting:nval(r[1]),jul_target:nval(r[2]),aug_counting:nval(r[4]),aug_target:nval(r[5]),sep_counting:nval(r[7]),sep_target:nval(r[8]),qtr_counting:nval(r[10]),qtr_target:nval(r[11])};
-    updateRow(data.q3_used, centre, patch);
-  });
-  parseBetween(findSection('CENTRE FLEET'), (r, centre)=>{
-    updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[5])});
-    updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[5])});
-  });
-  recomputeDashboardSets(data);
-}
-function parseSalesRows(rows, data){
-  const siteRows=[];
-  for(const r of rows){
-    if(!r || !r[0]) continue;
-    const label=String(r[0]);
-    if(!/^RRG Toyota/i.test(label)) continue;
-    const centre=normCentreName(label);
-    const row={
-      centre,
-      new_enquiries:nval(r[5]), new_test_drives:nval(r[6]), new_os:nval(r[7]), new_orders:nval(r[8]),
-      used_enquiries:nval(r[17]), used_test_drives:nval(r[18]), used_os:nval(r[19]), used_orders:nval(r[20]),
-      total_enquiries:nval(r[25]), total_test_drives:nval(r[26]), total_os:nval(r[27]), total_orders:nval(r[28]),
-      lost_op_req:nval(r[29]), confirmed_orders:nval(r[30]), delivered:nval(r[31]), lost_opportunities:nval(r[32]),
-      td_ratio:pctval(r[33]), orders_ratio:pctval(r[34]), os_ratio:pctval(r[35])
-    };
-    siteRows.push(row);
-  }
-  if(siteRows.length){
-    data.sales_activity = siteRows;
-    recomputeDashboardSets(data);
-  }
-  return siteRows.length;
-}
-async function parseSalesActivityFile(file, data){
-  const buf = await readFileAsArrayBuffer(file);
-  try{
-    const wb = XLSX.read(buf,{type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false});
-    const count=parseSalesRows(rows,data);
-    if(count) return count;
-  }catch(e){ console.warn('SheetJS sales parse failed, trying HTML',e); }
-  const text = await readFileAsText(file);
-  const doc = new DOMParser().parseFromString(text,'text/html');
-  const rows = Array.from(doc.querySelectorAll('tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.textContent.trim()));
-  return parseSalesRows(rows,data);
-}
-function renderAdminPreview(data){
-  const rows=[];
-  const regCurrent=(data.dashboard_regs||[]).reduce((a,r)=>a+(Number(r.qtr_total)||0),0);
-  const regTarget=(data.dashboard_regs||[]).reduce((a,r)=>a+(Number(r.qtr_target)||0),0);
-  const usedCurrent=(data.dashboard_used||[]).reduce((a,r)=>a+(Number(r.qtr_counting)||0),0);
-  const usedTarget=(data.dashboard_used||[]).reduce((a,r)=>a+(Number(r.qtr_target)||0),0);
-  const act=data.dashboard_activity||[];
-  rows.push({area:'New registrations',actual:regCurrent,target:regTarget,percent:regTarget?regCurrent/regTarget:0});
-  rows.push({area:'Used cars',actual:usedCurrent,target:usedTarget,percent:usedTarget?usedCurrent/usedTarget:0});
-  rows.push({area:'Sales enquiries',actual:act.reduce((a,r)=>a+(Number(r.total_enquiries)||0),0),target:'-',percent:null});
-  rows.push({area:'Orders',actual:act.reduce((a,r)=>a+(Number(r.total_orders)||0),0),target:'-',percent:null});
-  makeTable('adminPreviewTable',[{label:'Area',key:'area'},{label:'Actual',key:'actual',num:true},{label:'Target',key:'target',num:true},{label:'%',key:'percent',format:'pct',num:true}],rows);
-}
-async function previewImport(){
-  const weekly=document.getElementById('weeklyFile')?.files?.[0];
-  const activity=document.getElementById('activityFile')?.files?.[0];
-  const status=document.getElementById('adminStatus');
-  const data=cloneData();
-  const messages=[];
-  try{
-    if(weekly){
-      const buf=await readFileAsArrayBuffer(weekly);
-      const wb=XLSX.read(buf,{type:'array'});
-      parseWeeklyWorkbook(wb,data);
-      messages.push('Weekly Update imported');
-    }
-    if(activity){
-      const count=await parseSalesActivityFile(activity,data);
-      messages.push(`Sales Activity imported (${count} centres)`);
-    }
-    PENDING_DATA=data;
-    renderAdminPreview(data);
-    status.innerHTML = messages.length ? `<strong>Preview ready.</strong><br>${messages.join('<br>')}` : 'Choose at least one file to preview.';
-  }catch(e){
-    console.error(e);
-    status.innerHTML = `<strong>Import failed.</strong><br>${e.message || e}`;
-  }
-}
-function publishImport(){
-  if(!PENDING_DATA){ document.getElementById('adminStatus').innerHTML='Preview an import first.'; return; }
-  DATA=PENDING_DATA;
-  const publishedMeta = saveDashboardMeta();
-  document.getElementById('previewImport')?.addEventListener('click', previewImport);
-document.getElementById('publishImport')?.addEventListener('click', publishImport);
-document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
-document.getElementById('resetData')?.addEventListener('click', resetSavedData);
-build();
-  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the three workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
-}
-function downloadDataBackup(){
-  const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
-  const blob = new Blob([payload],{type:'application/javascript'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='data.js';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-function resetSavedData(){
-  localStorage.removeItem('rrgDashboardData_orderbank_v2');
-  localStorage.removeItem(DASHBOARD_META_KEY);
-  location.reload();
-}
 
 
 async function fetchWorkbook(path){
@@ -1020,12 +864,13 @@ async function loadGithubWorkbookData(){
   const data=cloneData();
   const messages=[];
   try{
-    // Fetch the three source files together. This avoids waiting for each
+    // Fetch the source files together. This avoids waiting for each
     // workbook to finish before starting the next one.
-    const [weeklyResult, activityResult, orderResult] = await Promise.allSettled([
+    const [weeklyResult, activityResult, orderResult, activityLyResult] = await Promise.allSettled([
       fetchWorkbook('./weekly-update.xlsx'),
       fetchRowsWorkbook('./sales-activity.xls', false),
-      fetchWorkbook('./order-bank.xlsx')
+      fetchWorkbook('./order-bank.xlsx'),
+      fetchRowsWorkbook('./sales-activity-ly.xls', false)
     ]);
 
     if(weeklyResult.status==='fulfilled'){
@@ -1042,6 +887,11 @@ async function loadGithubWorkbookData(){
       const count=parseOrderWorkbook(orderResult.value, data);
       messages.push('order-bank.xlsx loaded (' + count + ' rows)');
     }else messages.push('order-bank.xlsx not loaded: ' + orderResult.reason.message);
+
+    if(activityLyResult.status==='fulfilled'){
+      const count=parseSalesRows(activityLyResult.value, data, 'sales_activity_ly');
+      messages.push('sales-activity-ly.xls loaded (' + count + ' centres)');
+    }else messages.push('sales-activity-ly.xls not loaded: ' + activityLyResult.reason.message);
 
     DATA=data;
     build();
@@ -1151,7 +1001,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260809-pace-bars-2';
+    script.src='./pptxgen.bundle.js?v=20260809-ly-sales-funnel-1';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

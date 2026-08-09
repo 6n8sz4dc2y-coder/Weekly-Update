@@ -1,3 +1,10 @@
+## Last-year sales funnel (LY %) + by-site comparison
+- Added a fourth weekly workbook, `sales-activity-ly.xls`, alongside weekly-update.xlsx, sales-activity.xls and order-bank.xlsx. Same layout as sales-activity.xls, one year behind. Replace it each week like the other three.
+- Sales Funnel KPI card on the front dashboard gains an "LY %" column showing enquiry growth/decline vs the same period last year, for New, Used and Total.
+- Added an "Enquiries vs Last Year by Site" visual to the Sales Funnel tab: a two-bar (TY/LY) comparison per centre with a % change, sorted by this year's volume.
+- Admin Update tab gains a 4th upload card for the LY file, wired into both the live GitHub auto-load and the manual Preview Import flow.
+- Cleaned up a pre-existing bug: the entire admin-import section of app.js (helpers, parsers, preview/publish) was duplicated wholesale, and the later, incomplete copy was silently winning — Preview Import ignored the Order Bank Targets file and Publish re-registered its button listeners on every click. Removed the dead duplicate and fixed the listener bug while wiring in the new file.
+
 ## Pace-coloured progress bars in report tables
 - Extended the pace-based bar colouring (from the front dashboard) to the Progress column in Q3 Registrations, Used Cars, Fleet and Centre Fleet BCH tables. These bars previously coloured off raw progress-to-target, which could show red/amber even when the row's own Status badge said "On pace" — they now use the same pace ratio as that badge.
 
