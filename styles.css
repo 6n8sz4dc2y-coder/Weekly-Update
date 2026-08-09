@@ -28,20 +28,15 @@
 .mini-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;font-weight:900;margin-bottom:4px}
 .green-card .mini-label{color:#15803d}.purple-card .mini-label{color:#7e22ce}
 .kpi-progress-card .value{font-size:40px;line-height:1;font-weight:950;letter-spacing:-.05em;margin:4px 0 8px}
-.month-progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,2fr) minmax(0,1fr));gap:6px}
+.month-progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .month-progress-grid>div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px;text-align:center}
 .month-progress-grid span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:900}
 .month-progress-grid strong{display:block;font-size:22px;margin:4px 0 2px}
 .month-progress-grid small{display:block;color:#64748b;font-size:12px}
-.month-progress-grid .variance-box{padding:10px 3px}
-.month-progress-grid .variance-box span{font-size:9px;letter-spacing:.02em}
-.month-progress-grid .variance-box strong{font-size:14px}
-.month-progress-grid .variance-box strong.positive{color:var(--green)}
-.month-progress-grid .variance-box strong.negative{color:var(--red)}
 .kpi-footer-strip{margin:2px -20px -20px;padding:14px 20px;background:#f8fafc;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px;border-radius:0 0 18px 18px}
 .kpi-footer-strip span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:900}
 .kpi-footer-strip strong{font-size:20px;letter-spacing:-.03em}.blue-card .kpi-footer-strip strong{color:#1d4ed8}.green-card .kpi-footer-strip strong{color:#15803d}.purple-card .kpi-footer-strip strong{color:#7e22ce}
-@media(max-width:900px){.kpi-progress-card{min-height:auto}.kpi-split-main{grid-template-columns:1fr}.kpi-split-main>div:first-child{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:12px}.month-progress-grid{grid-template-columns:2fr 1fr}.kpi-footer-strip{grid-template-columns:1fr}}
+@media(max-width:900px){.kpi-progress-card{min-height:auto}.kpi-split-main{grid-template-columns:1fr}.kpi-split-main>div:first-child{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:12px}.month-progress-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi-footer-strip{grid-template-columns:1fr}}
 
 /* Fix: keep run rate value and '/ week' on one line with matching KPI font */
 .kpi-footer-strip strong span{
@@ -144,6 +139,11 @@ table{border-collapse:separate;border-spacing:0}
 .table-wrap th.col-actual{background:#dcfce7;color:#15803d}
 .table-wrap td.col-target{background:#eff6ff;color:#1d4ed8;font-weight:800}
 .table-wrap td.col-actual{background:#f0fdf4;color:#15803d;font-weight:800}
+
+/* Per-month variance columns (actual minus target/budget). */
+.variance-cell{font-weight:800}
+.variance-cell.positive{color:var(--green)}
+.variance-cell.negative{color:var(--red)}
 
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
