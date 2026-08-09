@@ -140,6 +140,11 @@ table{border-collapse:separate;border-spacing:0}
 .table-wrap td.col-target{background:#eff6ff;color:#1d4ed8;font-weight:800}
 .table-wrap td.col-actual{background:#f0fdf4;color:#15803d;font-weight:800}
 
+/* Per-month variance columns (actual minus target/budget). */
+.variance-cell{font-weight:800}
+.variance-cell.positive{color:var(--green)}
+.variance-cell.negative{color:var(--red)}
+
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
 .centre-name{font-weight:800}

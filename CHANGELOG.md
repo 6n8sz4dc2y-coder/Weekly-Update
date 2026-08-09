@@ -1,3 +1,8 @@
+## Cache-busting + per-month variance columns in report tables
+- Bumped the styles.css/app.js/pptxgen.bundle.js cache-busting version strings (were stuck on the 21 July release) and added no-cache meta tags to index.html, so browsers stop serving stale cached copies of the dashboard outside of incognito.
+- Added a Variance column beside each month's Total/Target (or Used/Target, Total/Budget) pair in the Q3 Registrations, Used Cars, Non-Counting Fleet and Q2 Reference tables, showing actual minus target for that month, coloured green when on/ahead and red when behind.
+- Coloured the existing H1/H2/monthly Diff columns in the Orders tables the same way, and added a July Variance column to the main Order Bank table.
+
 ## Colour-coded target vs actual table columns
 - Table columns ending in "Target" or "Budget" are now shaded blue, and their paired actual columns (Total/Used/Fleet/Regs/Orders/Done) shaded green, across all detail tables (Q3 Registrations, Used Cars, Fleet, Non-Counting Fleet, Orders, Q2 Reference) so they're easy to tell apart at a glance.
 - Tables with no target concept (Sales Funnel activity) are unaffected.
