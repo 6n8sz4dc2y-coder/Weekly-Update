@@ -112,11 +112,11 @@ function orderDoneFor(row, month){const v=row ? row[month+'_orders'] : null;retu
 function currentOrderMonth(){const m=new Date().getMonth();return ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][m] || 'jul';}
 const statusClass=n=> n>=1?'green':n>=.9?'amber':'red';
 const paceStatusClass=n=> n>=1?'green':n>=.9?'amber':'red';
-const progress=n=>`<div class="progress"><div class="bar ${statusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
+const progress=(n,p)=>`<div class="progress"><div class="bar ${paceStatusClass(p??n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
 const paceProgress=n=>`<div class="progress"><div class="bar ${paceStatusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
 const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.9?'Watch':'Behind'}</span>`;
 const paceStatus=n=>`<span class="status ${paceStatusClass(n)}">${n>=1?'On pace':n>=.9?'Slightly behind':'Behind pace'}</span>`;
-function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);return col.num?fmt(v):(v??'-')}
+function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);return col.num?fmt(v):(v??'-')}
 
 const TABLE_SORT_STATE = {};
 function rawCellValue(col,row){
@@ -182,7 +182,7 @@ function renderTable(id,cols,rows){
 }
 
 function makeTable(id,cols,rows){renderTable(id,cols,rows||[])}
-function leaderRows(rows, valueFn, subFn, barFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);const b=barFn?barFn(r):v;return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${barFn?paceProgress(b):progress(v)}</div>`}).join('')}
+function leaderRows(rows, valueFn, subFn, colorFn){return rows.slice().sort((a,b)=>valueFn(b)-valueFn(a)).map((r,i)=>{const v=valueFn(r);const c=colorFn?colorFn(r):v;return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">${subFn?subFn(r):''}</div></div><div class="pct">${pct(v)}</div>${progress(v,c)}</div>`}).join('')}
 function q3ElapsedRatio(){
  const now=new Date();
  const start=new Date(now.getFullYear(),6,1,0,0,0); // 1 July
@@ -446,9 +446,9 @@ function build(){
  setText('totalConvPctSplit',pct(totalConvRatio));
  document.getElementById('h2Period').innerHTML='<span class="period-pill muted">H1 closed</span><span class="period-pill active">H2 active · July onwards</span>';
  const north=DATA.q3_regs.find(r=>r.centre==='NORTH CDA'), wy=DATA.q3_regs.find(r=>r.centre==='WY CDA'), south=DATA.q3_regs.find(r=>r.centre==='SOUTH CDA');
- document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct)}</div>`}).join('');
- document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} <span class="dashboard-pace">${paceStatus(paceRatio(r.qtr_total,r.qtr_target))}</span>`);
- document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${usedForecastMini(r)} <span class="dashboard-pace">${paceStatus(usedForecastPct(r))}</span>`);
+ document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct,pace)}</div>`}).join('');
+ document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} <span class="dashboard-pace">${paceStatus(paceRatio(r.qtr_total,r.qtr_target))}</span>`,r=>paceRatio(r.qtr_total,r.qtr_target));
+ document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${usedForecastMini(r)} <span class="dashboard-pace">${paceStatus(usedForecastPct(r))}</span>`,r=>usedForecastPct(r));
  document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${fmt(r.qtr_total)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
