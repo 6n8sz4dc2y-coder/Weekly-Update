@@ -132,6 +132,13 @@ function sortableValue(col,row){
   if(String(v).trim()!=='' && !Number.isNaN(n)) return n;
   return String(v).toLowerCase();
 }
+function colKind(label,hasTargetCol){
+  if(!hasTargetCol) return '';
+  const l=String(label||'').trim();
+  if(/(target|budget)$/i.test(l)) return 'col-target';
+  if(/(total|used|fleet|regs|orders|done)$/i.test(l)) return 'col-actual';
+  return '';
+}
 function renderTable(id,cols,rows){
   const table=document.getElementById(id);if(!table)return;
 
@@ -142,6 +149,7 @@ function renderTable(id,cols,rows){
   const statusIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='status' && (c.format==='status' || c.format==='paceStatus'));
   const statusCol=statusIndex>=0 ? cols[statusIndex] : null;
   const displayCols=cols.filter((_,i)=>i!==statusIndex);
+  const hasTargetCol=displayCols.some(c=>/(target|budget)$/i.test(String(c.label||'').trim()));
 
   table.classList.remove('table-rank','table-centre');
   if(rankIndex>=0 && centreIndex>=0) table.classList.add('table-rank');
@@ -169,7 +177,7 @@ function renderTable(id,cols,rows){
     return cell(null,col,row);
   }
 
-  table.innerHTML=`<thead><tr>${displayCols.map((c,i)=>{const active=state.index===i;const arrow=active?(state.dir==='desc'?' ▼':' ▲'):'';return `<th data-sort-index="${i}" class="sortable ${c.num?'num':''} ${active?'sorted':''}" title="Click to sort">${c.label}${arrow}</th>`}).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${displayCols.map(c=>`<td class="${c.num?'num':''}">${renderBodyCell(c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  table.innerHTML=`<thead><tr>${displayCols.map((c,i)=>{const active=state.index===i;const arrow=active?(state.dir==='desc'?' ▼':' ▲'):'';return `<th data-sort-index="${i}" class="sortable ${c.num?'num':''} ${active?'sorted':''} ${colKind(c.label,hasTargetCol)}" title="Click to sort">${c.label}${arrow}</th>`}).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr class="${String(r.centre||'').includes('CDA')||r.centre==='TOTAL'?'group':''}">${displayCols.map(c=>`<td class="${c.num?'num':''} ${colKind(c.label,hasTargetCol)}">${renderBodyCell(c,r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
   table.querySelectorAll('th[data-sort-index]').forEach(th=>{
     th.addEventListener('click',()=>{
       const index=Number(th.dataset.sortIndex);
