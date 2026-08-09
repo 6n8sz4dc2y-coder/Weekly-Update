@@ -1,3 +1,7 @@
+## Sales Funnel enquiries + used car enquiry-efficiency forecast
+- Sales Funnel card now shows an Enquiries column alongside Test Drive/Offer Sheet/Conversion for New, Used and Total.
+- Q3 Used Cars card gains a second forecast line under "Group forecast": "Forecast based on enquiry efficiency", projecting the full quarter from the current period's used enquiry volume and conversion rate.
+
 ## Front dashboard layout update
 - Sales Funnel KPI card now shows New / Used / Total split for Test Drive, Offer Sheet and Conversion rates.
 - Renamed "Q3 CDA Summary" to "Q3 Registration CDA Summary".
