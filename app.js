@@ -314,6 +314,10 @@ function updateProgressKpi(prefix, rows, config){
    const cap=m.charAt(0).toUpperCase()+m.slice(1);
    setText(prefix+cap+'Pct', pct(mt ? mv/mt : 0));
    setText(prefix+cap+'Vol', `${fmt(mv)} / ${fmt(mt)}`);
+   const variance=mv-mt;
+   setText(prefix+cap+'Var', variance>0 ? '+'+fmt(variance) : fmt(variance));
+   const varEl=document.getElementById(prefix+cap+'Var');
+   if(varEl) varEl.className = variance>=0 ? 'positive' : 'negative';
  });
  setText(prefix+'Remaining', fmt(remaining));
  setText(prefix+'RunRate', fmt(Math.max(0, Math.ceil(remaining / weeks))));
@@ -1150,7 +1154,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260721-simple-ppt-1';
+    script.src='./pptxgen.bundle.js?v=20260809-month-variance-1';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

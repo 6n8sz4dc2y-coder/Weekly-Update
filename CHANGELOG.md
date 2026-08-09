@@ -1,3 +1,7 @@
+## Cache-busting + monthly variance boxes
+- Bumped the styles.css/app.js/pptxgen.bundle.js cache-busting version strings (were stuck on the 21 July release) and added no-cache meta tags to index.html, so browsers stop serving stale cached copies of the dashboard outside of incognito.
+- Added a Variance box beside each month (Jul/Aug/Sep) in the Q3 New Registrations, Q3 Used Cars and Non-Counting Fleet KPI cards, showing actual minus target/budget for that month, coloured green when on/ahead and red when behind.
+
 ## Colour-coded target vs actual table columns
 - Table columns ending in "Target" or "Budget" are now shaded blue, and their paired actual columns (Total/Used/Fleet/Regs/Orders/Done) shaded green, across all detail tables (Q3 Registrations, Used Cars, Fleet, Non-Counting Fleet, Orders, Q2 Reference) so they're easy to tell apart at a glance.
 - Tables with no target concept (Sales Funnel activity) are unaffected.
