@@ -147,9 +147,11 @@ table{border-collapse:separate;border-spacing:0}
 
 /* Enquiries vs Last Year by Site (Sales Funnel tab). */
 .yoy-grid{display:grid;gap:10px;margin-top:10px}
-.yoy-row{display:grid;grid-template-columns:130px 1fr 74px;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-row{display:grid;grid-template-columns:110px 1fr 90px;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .yoy-centre{font-weight:900}
-.yoy-bars{display:flex;flex-direction:column;gap:5px}
+.yoy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.yoy-metric{display:flex;flex-direction:column;gap:5px}
+.yoy-metric-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .yoy-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
 .yoy-bar-row span:first-child{width:20px}
 .yoy-bar-track{flex:1;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
@@ -157,10 +159,13 @@ table{border-collapse:separate;border-spacing:0}
 .yoy-bar-fill.ty{background:var(--blue)}
 .yoy-bar-fill.ly{background:#94a3b8}
 .yoy-bar-value{width:34px;text-align:right;color:var(--ink)}
-.yoy-pct{text-align:right;font-weight:900;font-size:15px}
+.yoy-pct{font-weight:900;font-size:12px}
 .yoy-pct.positive{color:var(--green)}
 .yoy-pct.negative{color:var(--red)}
-@media(max-width:900px){.yoy-row{grid-template-columns:1fr;text-align:left}.yoy-pct{text-align:left}}
+.yoy-orders{display:flex;flex-direction:column;align-items:flex-end;gap:2px;border-left:1px solid var(--line);padding-left:14px}
+.yoy-orders-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:900}
+.yoy-orders-value{font-size:20px;font-weight:900;color:var(--ink);letter-spacing:-.02em}
+@media(max-width:900px){.yoy-row{grid-template-columns:1fr}.yoy-metrics{grid-template-columns:1fr;gap:12px}.yoy-orders{flex-direction:row;align-items:baseline;justify-content:space-between;border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:10px}}
 
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}

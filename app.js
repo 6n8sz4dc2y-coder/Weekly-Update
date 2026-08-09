@@ -381,18 +381,37 @@ function renderEfficiencyTable(rows){
 function renderYoyBySite(ty, ly){
   const el=document.getElementById('yoyBySite');
   if(!el) return;
+  const metrics=[{key:'new_enquiries',label:'New'},{key:'used_enquiries',label:'Used'},{key:'total_enquiries',label:'Total'}];
+  const yoyChangeHtml=change=>{
+    const pctText=change===null ? '-' : `${change>0?'+':''}${Math.round(change*100)}%`;
+    const pctClass=change===null ? '' : (change>=0?'positive':'negative');
+    return { pctText, pctClass };
+  };
   const centres=Array.from(new Set([...(ty||[]).map(r=>r.centre), ...(ly||[]).map(r=>r.centre)]));
   const rows=centres.map(centre=>{
     const tyRow=(ty||[]).find(r=>r.centre===centre);
     const lyRow=(ly||[]).find(r=>r.centre===centre);
-    return { centre, tyVal:Number(tyRow&&tyRow.total_enquiries)||0, lyVal:Number(lyRow&&lyRow.total_enquiries)||0 };
-  }).filter(r=>r.tyVal||r.lyVal).sort((a,b)=>b.tyVal-a.tyVal);
-  const maxVal=Math.max(1, ...rows.map(r=>Math.max(r.tyVal,r.lyVal)));
+    const data=metrics.map(m=>{
+      const tyVal=Number(tyRow&&tyRow[m.key])||0;
+      const lyVal=Number(lyRow&&lyRow[m.key])||0;
+      return { label:m.label, tyVal, lyVal, change: lyVal ? (tyVal-lyVal)/lyVal : null };
+    });
+    const ordersTy=Number(tyRow&&tyRow.total_orders)||0;
+    const ordersLy=Number(lyRow&&lyRow.total_orders)||0;
+    const ordersChange=ordersLy ? (ordersTy-ordersLy)/ordersLy : null;
+    return { centre, data, ordersTy, ordersLy, ordersChange, totalChange:data[2].change, hasData: data.some(d=>d.tyVal||d.lyVal)||ordersTy||ordersLy };
+  }).filter(r=>r.hasData).sort((a,b)=>(b.totalChange===null?-Infinity:b.totalChange)-(a.totalChange===null?-Infinity:a.totalChange));
+  const maxByMetric={};
+  metrics.forEach(m=>{ maxByMetric[m.label]=Math.max(1, ...rows.map(r=>{const d=r.data.find(x=>x.label===m.label); return Math.max(d.tyVal,d.lyVal);})); });
   el.innerHTML=rows.map(r=>{
-    const change=r.lyVal ? (r.tyVal-r.lyVal)/r.lyVal : null;
-    const pctText=change===null ? '-' : `${change>0?'+':''}${Math.round(change*100)}%`;
-    const pctClass=change===null ? '' : (change>=0?'positive':'negative');
-    return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-bars"><div class="yoy-bar-row"><span>TY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${r.tyVal/maxVal*100}%"></div></div><span class="yoy-bar-value">${fmt(r.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${r.lyVal/maxVal*100}%"></div></div><span class="yoy-bar-value">${fmt(r.lyVal)}</span></div></div><div class="yoy-pct ${pctClass}">${pctText}</div></div>`;
+    const metricsHtml=r.data.map(d=>{
+      const max=maxByMetric[d.label];
+      const {pctText,pctClass}=yoyChangeHtml(d.change);
+      return `<div class="yoy-metric"><div class="yoy-metric-head"><span>${d.label}</span><span class="yoy-pct ${pctClass}">${pctText}</span></div><div class="yoy-bar-row"><span>TY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${d.tyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${d.lyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.lyVal)}</span></div></div>`;
+    }).join('');
+    const {pctText:ordersPctText,pctClass:ordersPctClass}=yoyChangeHtml(r.ordersChange);
+    const ordersHtml=`<div class="yoy-orders"><span class="yoy-orders-label">Orders</span><span class="yoy-orders-value">${fmt(r.ordersTy)}</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div>`;
+    return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-metrics">${metricsHtml}</div>${ordersHtml}</div>`;
   }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
 }
 
@@ -1001,7 +1020,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260809-ly-sales-funnel-1';
+    script.src='./pptxgen.bundle.js?v=20260809-yoy-bysite-2';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);
