@@ -147,7 +147,7 @@ table{border-collapse:separate;border-spacing:0}
 
 /* Enquiries vs Last Year by Site (Sales Funnel tab). */
 .yoy-grid{display:grid;gap:10px;margin-top:10px}
-.yoy-row{display:grid;grid-template-columns:110px 1fr 90px;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-row{display:grid;grid-template-columns:110px 1fr 120px;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .yoy-centre{font-weight:900}
 .yoy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .yoy-metric{display:flex;flex-direction:column;gap:5px}
@@ -162,10 +162,11 @@ table{border-collapse:separate;border-spacing:0}
 .yoy-pct{font-weight:900;font-size:12px}
 .yoy-pct.positive{color:var(--green)}
 .yoy-pct.negative{color:var(--red)}
-.yoy-orders{display:flex;flex-direction:column;align-items:flex-end;gap:2px;border-left:1px solid var(--line);padding-left:14px}
-.yoy-orders-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:900}
-.yoy-orders-value{font-size:20px;font-weight:900;color:var(--ink);letter-spacing:-.02em}
-@media(max-width:900px){.yoy-row{grid-template-columns:1fr}.yoy-metrics{grid-template-columns:1fr;gap:12px}.yoy-orders{flex-direction:row;align-items:baseline;justify-content:space-between;border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:10px}}
+.yoy-orders{display:flex;flex-direction:column;gap:5px;border-left:1px solid var(--line);padding-left:14px}
+.yoy-orders-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
+.yoy-orders-row span{width:20px}
+.yoy-orders-row strong{color:var(--ink);font-weight:900}
+@media(max-width:900px){.yoy-row{grid-template-columns:1fr}.yoy-metrics{grid-template-columns:1fr;gap:12px}.yoy-orders{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:10px}}
 
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
@@ -185,6 +186,8 @@ table{border-collapse:separate;border-spacing:0}
 .overview-caption{font-size:13px;color:var(--muted);font-weight:800}
 .overview-status{margin-left:auto}
 .overview-card .split-grid{margin-top:12px}
+.funnel-orders-stat{display:flex;align-items:baseline;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.funnel-orders-stat strong{font-size:20px;color:var(--ink);text-transform:none;letter-spacing:-.02em;margin-left:auto}
 .funnel-split-wrap{overflow-x:auto;margin-top:12px}
 .funnel-split{width:100%;border-collapse:collapse;font-size:12px}
 .funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
