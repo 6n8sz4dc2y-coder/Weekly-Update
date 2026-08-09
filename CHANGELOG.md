@@ -1,3 +1,6 @@
+## LY % column after Orders on the dashboard Sales Funnel card
+- Added a second "LY %" column after Orders in the front-dashboard Sales Funnel KPI card, showing New/Used/Total orders growth vs last year, matching the existing LY % column after Enquiries.
+
 ## Orders clarity: TY/LY shown explicitly, dashboard Orders stat
 - Sales Funnel tab's by-site Orders stat now shows both this year's and last year's order counts explicitly (TY/LY, same label pattern as the New/Used/Total bars), not just the TY number and a %.
 - Widened the Orders column so the count and % badge don't run together.
