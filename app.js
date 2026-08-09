@@ -438,7 +438,7 @@ function build(){
  const usedOsRatio = usedEnquiries ? usedOS / usedEnquiries : 0;
  const newConvRatio = newEnquiries ? newOrders / newEnquiries : 0;
  const usedConvRatio = usedEnquiries ? usedOrders / usedEnquiries : 0;
- const usedEnquiryForecast = Math.round(usedEnquiries * usedConvRatio * q3TotalWeeks());
+ const usedEnquiryForecast = Math.round(usedCurrent + usedEnquiries * usedConvRatio * q3WeeksRemaining());
  setForecastDisplay('usedEnquiryForecast','usedEnquiryForecastDelta', usedEnquiryForecast, usedTarget);
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
@@ -1123,7 +1123,7 @@ function addTableSlide(slide, title, rows, columns, subtitle){
 function efficiencyRows(){
   const acts = safeRows(DATA.dashboard_activity).filter(r=>r.centre && r.centre !== 'TOTAL');
   if(typeof funnelEfficiencyScore === 'function'){
-    return acts.map(r=>({ ...r, effScore:funnelEfficiencyScore(r), effGrade:efficiencyGrade(funnelEfficiencyScore(r)) })).sort((a,b)=>b.effScore-a.effScore);
+    return acts.map(r=>({ ...r, effScore:funnelEfficiencyScore(r), effGrade:funnelGrade(funnelEfficiencyScore(r)) })).sort((a,b)=>b.effScore-a.effScore);
   }
   return acts.map(r=>{
     const td=asNum(r.td_ratio), os=asNum(r.os_ratio), conv=asNum(r.orders_ratio);
