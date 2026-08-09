@@ -438,8 +438,6 @@ function build(){
  const usedOsRatio = usedEnquiries ? usedOS / usedEnquiries : 0;
  const newConvRatio = newEnquiries ? newOrders / newEnquiries : 0;
  const usedConvRatio = usedEnquiries ? usedOrders / usedEnquiries : 0;
- const usedEnquiryForecast = Math.round(usedCurrent + usedEnquiries * usedConvRatio * q3WeeksRemaining());
- setForecastDisplay('usedEnquiryForecast','usedEnquiryForecastDelta', usedEnquiryForecast, usedTarget);
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
  setText('usedEnquiries',fmt(usedEnquiries));

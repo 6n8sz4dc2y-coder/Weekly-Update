@@ -1,3 +1,6 @@
+## Removed enquiry-efficiency forecast
+- Removed the "Forecast based on enquiry efficiency" line from the Q3 Used Cars card. Group forecast remains.
+
 ## PowerPoint export fix + enquiry-efficiency forecast correction
 - Fixed Export PowerPoint button: it was crashing on every click due to a call to a non-existent `efficiencyGrade` function in the Sales Funnel Efficiency League slide builder (should have been `funnelGrade`).
 - Fixed the "Forecast based on enquiry efficiency" calculation on the Q3 Used Cars card: it now projects actual quarter-to-date used cars plus (current used enquiry volume × conversion rate × weeks remaining in Q3), giving a genuine "how many deals will we finish on" projection instead of a flat weekly-rate extrapolation.
