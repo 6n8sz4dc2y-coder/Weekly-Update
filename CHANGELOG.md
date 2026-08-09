@@ -1,3 +1,6 @@
+## Pace-coloured progress bars in report tables
+- Extended the pace-based bar colouring (from the front dashboard) to the Progress column in Q3 Registrations, Used Cars, Fleet and Centre Fleet BCH tables. These bars previously coloured off raw progress-to-target, which could show red/amber even when the row's own Status badge said "On pace" — they now use the same pace ratio as that badge.
+
 ## Cache-busting + per-month variance columns in report tables
 - Bumped the styles.css/app.js/pptxgen.bundle.js cache-busting version strings (were stuck on the 21 July release) and added no-cache meta tags to index.html, so browsers stop serving stale cached copies of the dashboard outside of incognito.
 - Added a Variance column beside each month's Total/Target (or Used/Target, Total/Budget) pair in the Q3 Registrations, Used Cars, Non-Counting Fleet and Q2 Reference tables, showing actual minus target for that month, coloured green when on/ahead and red when behind.
