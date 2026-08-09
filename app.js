@@ -490,14 +490,9 @@ function build(){
  const newEnquiriesLY = sum(actLY,'new_enquiries');
  const usedEnquiriesLY = sum(actLY,'used_enquiries');
  const totalEnquiriesLY = sum(actLY,'total_enquiries');
- const totalOrdersLY = sum(actLY,'total_orders');
+ setText('newOrdersStat',fmt(newOrders));
+ setText('usedOrdersStat',fmt(usedOrders));
  setText('totalOrdersStat',fmt(totalOrders));
- const totalOrdersChange = totalOrdersLY ? (totalOrders-totalOrdersLY)/totalOrdersLY : null;
- const totalOrdersLYEl = document.getElementById('totalOrdersLYPct');
- if(totalOrdersLYEl){
-   totalOrdersLYEl.textContent = totalOrdersChange===null ? '-' : `${totalOrdersChange>0?'+':''}${Math.round(totalOrdersChange*100)}%`;
-   totalOrdersLYEl.className = 'yoy-pct ' + (totalOrdersChange===null ? '' : (totalOrdersChange>=0?'positive':'negative'));
- }
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
  setText('usedEnquiries',fmt(usedEnquiries));
@@ -1028,7 +1023,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260809-orders-stat-3';
+    script.src='./pptxgen.bundle.js?v=20260809-orders-col-4';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

@@ -186,8 +186,6 @@ table{border-collapse:separate;border-spacing:0}
 .overview-caption{font-size:13px;color:var(--muted);font-weight:800}
 .overview-status{margin-left:auto}
 .overview-card .split-grid{margin-top:12px}
-.funnel-orders-stat{display:flex;align-items:baseline;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-.funnel-orders-stat strong{font-size:20px;color:var(--ink);text-transform:none;letter-spacing:-.02em;margin-left:auto}
 .funnel-split-wrap{overflow-x:auto;margin-top:12px}
 .funnel-split{width:100%;border-collapse:collapse;font-size:12px}
 .funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
