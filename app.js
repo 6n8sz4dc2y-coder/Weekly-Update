@@ -490,9 +490,15 @@ function build(){
  const newEnquiriesLY = sum(actLY,'new_enquiries');
  const usedEnquiriesLY = sum(actLY,'used_enquiries');
  const totalEnquiriesLY = sum(actLY,'total_enquiries');
+ const newOrdersLY = sum(actLY,'new_orders');
+ const usedOrdersLY = sum(actLY,'used_orders');
+ const totalOrdersLY = sum(actLY,'total_orders');
  setText('newOrdersStat',fmt(newOrders));
  setText('usedOrdersStat',fmt(usedOrders));
  setText('totalOrdersStat',fmt(totalOrders));
+ document.getElementById('newOrdersLY').innerHTML=yoyPct(newOrders,newOrdersLY);
+ document.getElementById('usedOrdersLY').innerHTML=yoyPct(usedOrders,usedOrdersLY);
+ document.getElementById('totalOrdersLY').innerHTML=yoyPct(totalOrders,totalOrdersLY);
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
  setText('usedEnquiries',fmt(usedEnquiries));
@@ -1023,7 +1029,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260809-orders-col-4';
+    script.src='./pptxgen.bundle.js?v=20260809-orders-ly-5';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);
