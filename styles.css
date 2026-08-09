@@ -152,6 +152,11 @@ table{border-collapse:separate;border-spacing:0}
 .overview-caption{font-size:13px;color:var(--muted);font-weight:800}
 .overview-status{margin-left:auto}
 .overview-card .split-grid{margin-top:12px}
+.funnel-split{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+.funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
+.funnel-split th:first-child,.funnel-split td:first-child{text-align:left;color:var(--muted);font-weight:800}
+.funnel-split td{padding:6px 2px;text-align:right;font-weight:800;border-top:1px solid var(--line)}
+.funnel-split tr.total-row td{font-weight:900;color:var(--ink)}
 .order-overview{border-top:4px solid #2563eb}
 .fleet-overview{border-top:4px solid #7e22ce}
 .enquiry-overview{border-top:4px solid #15803d}

@@ -1,3 +1,11 @@
+## Front dashboard layout update
+- Sales Funnel KPI card now shows New / Used / Total split for Test Drive, Offer Sheet and Conversion rates.
+- Renamed "Q3 CDA Summary" to "Q3 Registration CDA Summary".
+- Added a new "Q3 CDA Used Summary" box next to it, showing used car CDA totals.
+- Added a new "Q3 CDA Order Summary" box next to Non-Counting Fleet Snapshot, showing order bank CDA totals against Q3 target.
+- Hid the Executive Note card.
+- Moved Highlights to a full-width card at the bottom of the dashboard.
+
 ## Front dashboard bar colour matches pace
 - Centre Registration Targets, Used Car Snapshot and Q3 CDA Summary progress bars on the front dashboard now colour green/amber/red based on pace status, matching the "On pace / Slightly behind / Behind pace" badge shown next to them.
 - Bar length still reflects actual progress against the full target; only the colour source changed.
