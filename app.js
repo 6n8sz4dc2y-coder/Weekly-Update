@@ -410,7 +410,7 @@ function renderYoyBySite(ty, ly){
       return `<div class="yoy-metric"><div class="yoy-metric-head"><span>${d.label}</span><span class="yoy-pct ${pctClass}">${pctText}</span></div><div class="yoy-bar-row"><span>TY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${d.tyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${d.lyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.lyVal)}</span></div></div>`;
     }).join('');
     const {pctText:ordersPctText,pctClass:ordersPctClass}=yoyChangeHtml(r.ordersChange);
-    const ordersHtml=`<div class="yoy-orders"><span class="yoy-orders-label">Orders</span><span class="yoy-orders-value">${fmt(r.ordersTy)}</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div>`;
+    const ordersHtml=`<div class="yoy-orders"><div class="yoy-metric-head"><span>Orders</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div><div class="yoy-orders-row"><span>TY</span><strong>${fmt(r.ordersTy)}</strong></div><div class="yoy-orders-row"><span>LY</span><strong>${fmt(r.ordersLy)}</strong></div></div>`;
     return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-metrics">${metricsHtml}</div>${ordersHtml}</div>`;
   }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
 }
@@ -490,6 +490,9 @@ function build(){
  const newEnquiriesLY = sum(actLY,'new_enquiries');
  const usedEnquiriesLY = sum(actLY,'used_enquiries');
  const totalEnquiriesLY = sum(actLY,'total_enquiries');
+ setText('newOrdersStat',fmt(newOrders));
+ setText('usedOrdersStat',fmt(usedOrders));
+ setText('totalOrdersStat',fmt(totalOrders));
  document.getElementById('totalEnquiries').textContent = fmt(totalEnquiries);
  setText('newEnquiries',fmt(newEnquiries));
  setText('usedEnquiries',fmt(usedEnquiries));
@@ -1020,7 +1023,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260809-yoy-bysite-2';
+    script.src='./pptxgen.bundle.js?v=20260809-orders-col-4';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

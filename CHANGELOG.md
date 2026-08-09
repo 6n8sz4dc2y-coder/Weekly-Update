@@ -1,3 +1,8 @@
+## Orders clarity: TY/LY shown explicitly, dashboard Orders stat
+- Sales Funnel tab's by-site Orders stat now shows both this year's and last year's order counts explicitly (TY/LY, same label pattern as the New/Used/Total bars), not just the TY number and a %.
+- Widened the Orders column so the count and % badge don't run together.
+- Added an Orders column to the front-dashboard Sales Funnel KPI card's New/Used/Total table, after Conversion, giving the same New/Used split as the other columns.
+
 ## By-site YoY comparison: ranked, New/Used/Total bars, Orders stat
 - "Enquiries vs Last Year by Site" now ranks centres by Total enquiries YoY growth (best first) instead of raw TY volume.
 - Each centre row now shows three separate TY/LY bar pairs — New, Used and Total — instead of just Total.
