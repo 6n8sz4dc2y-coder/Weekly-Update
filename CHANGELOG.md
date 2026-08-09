@@ -1,3 +1,7 @@
+## Colour-coded target vs actual table columns
+- Table columns ending in "Target" or "Budget" are now shaded blue, and their paired actual columns (Total/Used/Fleet/Regs/Orders/Done) shaded green, across all detail tables (Q3 Registrations, Used Cars, Fleet, Non-Counting Fleet, Orders, Q2 Reference) so they're easy to tell apart at a glance.
+- Tables with no target concept (Sales Funnel activity) are unaffected.
+
 ## Removed enquiry-efficiency forecast
 - Removed the "Forecast based on enquiry efficiency" line from the Q3 Used Cars card. Group forecast remains.
 
