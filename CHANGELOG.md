@@ -1,3 +1,7 @@
+## CDA "Inc O/A" wording, revert Sales Funnel to 3-box layout
+- Renamed the CDA registration adjustment bar label from "+Adj" to "Inc O/A", and added the raw adjusted number (e.g. "Inc O/A 319 / 407") as a line under the existing QTR detail text.
+- Reverted the dashboard Sales Funnel card back to the original 3-card row (Order Bank / Centre Fleet BCH / Sales Funnel) instead of full-width. Shrank the funnel table's font and padding further so all columns still fit without scrolling at the narrower width, on both desktop and mobile.
+
 ## Revert Order Bank Jul/Aug/Sep boxes to isolated per-month figures
 - Reverted the cumulative carry-over calculation on the front-dashboard Order Bank KPI card's Jul/Aug/Sep boxes back to each month's own actual vs its own target, per feedback that the cumulative view read as wrong. Target/actual are read directly from the workbook per month; no carry-over applied here.
 - Removed the "running total" explanatory note that's no longer accurate.
