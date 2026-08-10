@@ -1,3 +1,6 @@
+## Order Bank Targets table now auto-rolls to the current month
+- The Order Bank Targets table's "July Target/Done/Variance/To Go/Progress/%" columns were hardcoded to July. They now read off whatever month it currently is (e.g. "Aug Target/Done/..." in August), same logic already used to sort the table - no manual update needed each month.
+
 ## Reorder dashboard: Non-Counting Fleet Snapshot next to Q3 CDA Used Summary
 - Non-Counting Fleet Snapshot now sits to the left of Q3 CDA Used Summary (Used moved right into its old spot).
 - Centre Registration Targets now sits directly under Non-Counting Fleet Snapshot, and Used Car Snapshot sits directly under Q3 CDA Used Summary.
