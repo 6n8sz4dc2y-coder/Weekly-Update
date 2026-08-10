@@ -1,3 +1,7 @@
+## Revert Order Bank Jul/Aug/Sep boxes to isolated per-month figures
+- Reverted the cumulative carry-over calculation on the front-dashboard Order Bank KPI card's Jul/Aug/Sep boxes back to each month's own actual vs its own target, per feedback that the cumulative view read as wrong. Target/actual are read directly from the workbook per month; no carry-over applied here.
+- Removed the "running total" explanatory note that's no longer accurate.
+
 ## Sales Funnel card: full width, no scroll needed
 - Made the dashboard Sales Funnel KPI card full-width so its New/Used/Total table is visible at a glance without scrolling. Order Bank and Centre Fleet BCH now share a row at half-width each instead of the previous three-card row.
 - Shortened column headers (Enq, TD, OS, Conv, Ord) so the table also fits without scrolling on mobile.

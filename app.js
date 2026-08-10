@@ -455,13 +455,12 @@ function build(){
  setText('orderBankPct',pct(orderRatio));
  const obStatus=document.getElementById('orderBankStatus');
  if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(paceRatio(orderDone,orderTarget))}">${paceLabel(paceRatio(orderDone,orderTarget))}</span>`;}
- let orderCumDone=0, orderCumTarget=0;
  ['jul','aug','sep'].forEach(m=>{
-   orderCumDone+=orderRows.reduce((a,r)=>a+orderDoneFor(r,m),0);
-   orderCumTarget+=sum(orderRows,m+'_target');
+   const mDone=orderRows.reduce((a,r)=>a+orderDoneFor(r,m),0);
+   const mTarget=sum(orderRows,m+'_target');
    const cap=m.charAt(0).toUpperCase()+m.slice(1);
-   setText('orderBank'+cap+'Pct', pct(orderCumTarget?orderCumDone/orderCumTarget:0));
-   setText('orderBank'+cap+'Vol', `${fmt(orderCumDone)} / ${fmt(orderCumTarget)}`);
+   setText('orderBank'+cap+'Pct', pct(mTarget?mDone/mTarget:0));
+   setText('orderBank'+cap+'Vol', `${fmt(mDone)} / ${fmt(mTarget)}`);
  });
 
  const fleetRows=(DATA.q3_fleet||[]).filter(r=>!String(r.centre||'').toUpperCase().includes('CDA'));
@@ -1050,7 +1049,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260810-funnel-fullwidth-3';
+    script.src='./pptxgen.bundle.js?v=20260810-orderbank-nocarry-4';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);
