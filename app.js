@@ -455,13 +455,12 @@ function build(){
  setText('orderBankPct',pct(orderRatio));
  const obStatus=document.getElementById('orderBankStatus');
  if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(paceRatio(orderDone,orderTarget))}">${paceLabel(paceRatio(orderDone,orderTarget))}</span>`;}
- let orderCumDone=0, orderCumTarget=0;
  ['jul','aug','sep'].forEach(m=>{
-   orderCumDone+=orderRows.reduce((a,r)=>a+orderDoneFor(r,m),0);
-   orderCumTarget+=sum(orderRows,m+'_target');
+   const mDone=orderRows.reduce((a,r)=>a+orderDoneFor(r,m),0);
+   const mTarget=sum(orderRows,m+'_target');
    const cap=m.charAt(0).toUpperCase()+m.slice(1);
-   setText('orderBank'+cap+'Pct', pct(orderCumTarget?orderCumDone/orderCumTarget:0));
-   setText('orderBank'+cap+'Vol', `${fmt(orderCumDone)} / ${fmt(orderCumTarget)}`);
+   setText('orderBank'+cap+'Pct', pct(mTarget?mDone/mTarget:0));
+   setText('orderBank'+cap+'Vol', `${fmt(mDone)} / ${fmt(mTarget)}`);
  });
 
  const fleetRows=(DATA.q3_fleet||[]).filter(r=>!String(r.centre||'').toUpperCase().includes('CDA'));
@@ -534,7 +533,7 @@ function build(){
  document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{
    const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target);
    const adj=CDA_REG_ADJUSTMENT[r.centre]||0; const adjActual=actual+adj; const adjPct=target?adjActual/target:0; const adjPace=paceRatio(adjActual,target);
-   return `<div class="leader-row cda-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="cda-bars"><div class="cda-bar-line"><span>Reg</span>${progress(qtrPct,pace)}<strong>${pct(qtrPct)}</strong></div><div class="cda-bar-line"><span>+Adj</span>${progress(adjPct,adjPace)}<strong>${pct(adjPct)}</strong></div></div></div>`;
+   return `<div class="leader-row cda-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div><div class="mini">Inc O/A ${fmt(adjActual)} / ${fmt(target)}</div></div><div class="cda-bars"><div class="cda-bar-line"><span>Reg</span>${progress(qtrPct,pace)}<strong>${pct(qtrPct)}</strong></div><div class="cda-bar-line"><span>Inc O/A</span>${progress(adjPct,adjPace)}<strong>${pct(adjPct)}</strong></div></div></div>`;
  }).join('');
  const northU=DATA.q3_used.find(r=>r.centre==='NORTH CDA'), wyU=DATA.q3_used.find(r=>r.centre==='WY CDA'), southU=DATA.q3_used.find(r=>r.centre==='SOUTH CDA');
  document.getElementById('cdaUsedSummary').innerHTML=[northU,wyU,southU].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_counting)||0))).map(r=>{const actual=Number(r.qtr_counting)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const forecastPct=usedForecastPct(r); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${forecastPct>=1?'On pace':forecastPct>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct,forecastPct)}</div>`}).join('');
@@ -1050,7 +1049,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260810-funnel-fullwidth-3';
+    script.src='./pptxgen.bundle.js?v=20260810-incoa-3box-5';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

@@ -4,13 +4,13 @@
 .hint{font-size:13px;color:var(--muted);margin:-4px 0 12px}.leader-row .progress{min-width:100px}
 
 /* CDA registration summary: separate Registrations-only vs incl.-Adjustment bars. */
-.leader-row.cda-row{grid-template-columns:40px 1fr 260px}
+.leader-row.cda-row{grid-template-columns:40px 1fr 290px}
 .cda-bars{display:flex;flex-direction:column;gap:6px}
 .cda-bar-line{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
-.cda-bar-line span{width:34px}
+.cda-bar-line span{width:52px}
 .cda-bar-line .progress{flex:1;min-width:70px}
 .cda-bar-line strong{width:40px;text-align:right;color:var(--ink);font-size:13px}
-@media(max-width:900px){.leader-row.cda-row{grid-template-columns:34px 1fr 100px}.cda-bar-line .progress{display:none}}
+@media(max-width:900px){.leader-row.cda-row{grid-template-columns:34px 1fr 110px}.cda-bar-line .progress{display:none}}
 
 .period-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.period-pill{display:inline-flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}.period-pill.active{background:#dcfce7;color:#166534;border-color:#86efac}.period-pill.muted{background:rgba(255,255,255,.08);color:#cbd5e1}
 
@@ -197,18 +197,15 @@ table{border-collapse:separate;border-spacing:0}
 .overview-card .split-grid{margin-top:12px}
 .funnel-split-wrap{overflow-x:auto;margin-top:12px;scrollbar-width:none;-ms-overflow-style:none}
 .funnel-split-wrap::-webkit-scrollbar{display:none}
-.funnel-split{width:100%;border-collapse:collapse;font-size:12px}
-.funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
+.funnel-split{width:100%;border-collapse:collapse;font-size:11px}
+.funnel-split th{font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:right;font-weight:800;padding:3px 1px}
 .funnel-split th:first-child,.funnel-split td:first-child{text-align:left;color:var(--muted);font-weight:800}
-.funnel-split td{padding:6px 2px;text-align:right;font-weight:800;border-top:1px solid var(--line)}
+.funnel-split td{padding:5px 1px;text-align:right;font-weight:800;border-top:1px solid var(--line)}
 .funnel-split tr.total-row td{font-weight:900;color:var(--ink)}
-.order-overview{border-top:4px solid #2563eb;grid-column:span 6}
-.fleet-overview{border-top:4px solid #7e22ce;grid-column:span 6}
-.enquiry-overview{border-top:4px solid #15803d;grid-column:span 12;min-height:auto}
-.enquiry-overview .funnel-split{font-size:14px}
-.enquiry-overview .funnel-split th{font-size:11px;padding:8px 10px}
-.enquiry-overview .funnel-split td{padding:10px 10px}
-@media(max-width:900px){.overview-card{grid-column:span 12}.enquiry-overview .funnel-split{font-size:12px}.enquiry-overview .funnel-split th{font-size:10px;padding:4px 2px}.enquiry-overview .funnel-split td{padding:6px 2px}}
+.order-overview{border-top:4px solid #2563eb}
+.fleet-overview{border-top:4px solid #7e22ce}
+.enquiry-overview{border-top:4px solid #15803d}
+@media(max-width:900px){.overview-card{grid-column:span 12}}
 
 /* Performance preview: two-item KPI footer after removing unreliable forecasts */
 .kpi-footer-strip.two-up{grid-template-columns:repeat(2,minmax(0,1fr));}
