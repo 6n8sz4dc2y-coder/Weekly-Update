@@ -1,3 +1,6 @@
+## Centre Fleet BCH card box size/font now matches Order Bank
+- Centre Fleet BCH's Target/Active orders/Expected achievement boxes now use the same box sizing and font sizes as the Order Bank card's Jul/Aug/Sep boxes (previously smaller, using the split-grid styling shared with other cards).
+
 ## Order Bank Targets table now auto-rolls to the current month
 - The Order Bank Targets table's "July Target/Done/Variance/To Go/Progress/%" columns were hardcoded to July. They now read off whatever month it currently is (e.g. "Aug Target/Done/..." in August), same logic already used to sort the table - no manual update needed each month.
 
