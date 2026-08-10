@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Dashboard</title>
-<link rel="stylesheet" href="./styles.css?v=20260810-cdaswap-9">
+<link rel="stylesheet" href="./styles.css?v=20260810-cdareorder2-11">
 </head>
 <body>
 <header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button></nav></header>
@@ -61,9 +61,8 @@
   </div>
 </div>
 <div class="card kpi overview-card fleet-overview">
-  <div class="label">Centre Fleet BCH</div>
-  <div class="overview-main"><div class="value" id="fleetBchRegs">-</div><div class="overview-status" id="fleetBchStatus">-</div></div>
-  <div class="split-grid"><div>Target<strong id="fleetBchTarget">-</strong></div><div>Active orders<strong id="fleetBchOrders">-</strong></div><div>Expected achievement<strong id="fleetBchExpected">-</strong></div></div>
+  <div class="overview-main"><div class="label" style="margin:0">Centre Fleet BCH</div><div class="overview-status" id="fleetBchStatus">-</div></div>
+  <div class="split-grid" style="margin-top:12px"><div>Target<strong id="fleetBchTarget">-</strong></div><div>Active orders<strong id="fleetBchOrders">-</strong></div><div>Expected achievement<strong id="fleetBchExpected">-</strong></div></div>
 </div>
 <div class="card kpi overview-card enquiry-overview">
   <div class="label">Sales Funnel</div>
@@ -73,7 +72,7 @@
     <tr><td>Used</td><td id="usedEnquiries">-</td><td id="usedEnquiriesLY">-</td><td id="usedTdPct">-</td><td id="usedOsPct">-</td><td id="usedConvPct">-</td><td id="usedOrdersStat">-</td><td id="usedOrdersLY">-</td></tr>
     <tr class="total-row"><td>Total</td><td id="totalEnquiriesSplit">-</td><td id="totalEnquiriesLY">-</td><td id="totalTdPct">-</td><td id="totalOsPct">-</td><td id="totalConvPct">-</td><td id="totalOrdersStat">-</td><td id="totalOrdersLY">-</td></tr>
   </tbody></table></div>
-</div><div class="card half"><h3>Q3 Registration CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Order Summary</h3><div id="cdaOrderSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Used Summary</h3><div id="cdaUsedSummary" class="leader"></div></div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card wide"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half" style="display:none"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
+</div><div class="card half"><h3>Q3 Registration CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Order Summary</h3><div id="cdaOrderSummary" class="leader"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Used Summary</h3><div id="cdaUsedSummary" class="leader"></div></div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card wide"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half" style="display:none"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
 <section id="q3regs" class="section"><div class="card wide"><div class="toolbar"><h2>Q3 Registrations</h2><input class="search" data-filter="q3Table" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3Table"></table></div></div></section>
 <section id="used" class="section"><div class="card wide"><div class="toolbar"><h2>Used Counting Volume</h2><input class="search" data-filter="usedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="usedTable"></table></div></div></section>
 <section id="fleet" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Centre Fleet BCH</h2><input class="search" data-filter="fleetTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="fleetTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Non-Counting Fleet</h2><input class="search" data-filter="nonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="nonTable"></table></div></div></div></section>
@@ -130,5 +129,5 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260810-cdaswap-9"></script>
+<script src="./app.js?v=20260810-cdareorder2-11"></script>
 </body></html>

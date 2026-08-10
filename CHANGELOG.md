@@ -1,3 +1,10 @@
+## Reorder dashboard: Non-Counting Fleet Snapshot next to Q3 CDA Used Summary
+- Non-Counting Fleet Snapshot now sits to the left of Q3 CDA Used Summary (Used moved right into its old spot).
+- Centre Registration Targets now sits directly under Non-Counting Fleet Snapshot, and Used Car Snapshot sits directly under Q3 CDA Used Summary.
+
+## Centre Fleet BCH card simplified
+- Centre Fleet BCH KPI card no longer shows the big Regs number in the top-left - just the label, status badge, and the Target/Active orders/Expected achievement row underneath, matching the Order Bank card's layout.
+
 ## Swapped Q3 CDA Order/Used Summary card order
 - Q3 CDA Order Summary now sits second (right after Q3 Registration CDA Summary), with Q3 CDA Used Summary moved down into its old spot.
 
