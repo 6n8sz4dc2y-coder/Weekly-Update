@@ -1,3 +1,7 @@
+## Order Bank Jul/Aug/Sep boxes now show cumulative carry-over
+- Added Jul/Aug/Sep boxes to the Order Bank KPI card, matching the box format used by the other primary cards.
+- Each month shows running cumulative done vs cumulative target (not each month in isolation), since over/under-achievement carries forward to the next month in the real order bank position. Added a note explaining this.
+
 ## LY % column after Orders on the dashboard Sales Funnel card
 - Added a second "LY %" column after Orders in the front-dashboard Sales Funnel KPI card, showing New/Used/Total orders growth vs last year, matching the existing LY % column after Enquiries.
 
