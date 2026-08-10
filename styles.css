@@ -202,10 +202,13 @@ table{border-collapse:separate;border-spacing:0}
 .funnel-split th:first-child,.funnel-split td:first-child{text-align:left;color:var(--muted);font-weight:800}
 .funnel-split td{padding:6px 2px;text-align:right;font-weight:800;border-top:1px solid var(--line)}
 .funnel-split tr.total-row td{font-weight:900;color:var(--ink)}
-.order-overview{border-top:4px solid #2563eb}
-.fleet-overview{border-top:4px solid #7e22ce}
-.enquiry-overview{border-top:4px solid #15803d}
-@media(max-width:900px){.overview-card{grid-column:span 12}}
+.order-overview{border-top:4px solid #2563eb;grid-column:span 6}
+.fleet-overview{border-top:4px solid #7e22ce;grid-column:span 6}
+.enquiry-overview{border-top:4px solid #15803d;grid-column:span 12;min-height:auto}
+.enquiry-overview .funnel-split{font-size:14px}
+.enquiry-overview .funnel-split th{font-size:11px;padding:8px 10px}
+.enquiry-overview .funnel-split td{padding:10px 10px}
+@media(max-width:900px){.overview-card{grid-column:span 12}.enquiry-overview .funnel-split{font-size:12px}.enquiry-overview .funnel-split th{font-size:10px;padding:4px 2px}.enquiry-overview .funnel-split td{padding:6px 2px}}
 
 /* Performance preview: two-item KPI footer after removing unreliable forecasts */
 .kpi-footer-strip.two-up{grid-template-columns:repeat(2,minmax(0,1fr));}

@@ -1,3 +1,7 @@
+## Sales Funnel card: full width, no scroll needed
+- Made the dashboard Sales Funnel KPI card full-width so its New/Used/Total table is visible at a glance without scrolling. Order Bank and Centre Fleet BCH now share a row at half-width each instead of the previous three-card row.
+- Shortened column headers (Enq, TD, OS, Conv, Ord) so the table also fits without scrolling on mobile.
+
 ## Fix Order Bank quarterly target bug, add CDA registration Adjustment bar
 - Fixed a real bug in parseOrderWorkbook: the Q1-Q4/CY26 target table parser scanned every row in the whole sheet for a valid centre name in column A, which also matches every row in the monthly "Orders after cancellations" tables further down. Since the last matching row wins, q3_target ended up overwritten with a stray monthly figure instead of the real quarterly target - this is what caused Q3 CDA Order Summary to show 400%+ "progress" (e.g. NORTH CDA target of 36 instead of 415). The parser now stops at the first monthly block.
 - Added a second "+Adj" bar to each CDA row in Q3 Registration CDA Summary, showing registrations plus the fixed Q1+Q2 over/under-achievement adjustment carried into Q3 (per the Toyota CDA SvO report), alongside the existing registrations-only bar.
