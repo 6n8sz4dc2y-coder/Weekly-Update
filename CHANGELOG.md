@@ -1,3 +1,6 @@
+## Moved CDA summary cards above the site-level cards
+- Reordered the front dashboard so Q3 Registration CDA Summary, Q3 CDA Used Summary and Q3 CDA Order Summary now appear above Centre Registration Targets, Used Car Snapshot and Non-Counting Fleet Snapshot, instead of being interleaved with them.
+
 ## Inc O/A bar added to Q3 CDA Order Summary
 - Added the same "Inc O/A" (registrations + over-achievement carry-over) treatment used on Q3 Registration CDA Summary to Q3 CDA Order Summary: each CDA row now shows a second bar alongside "Ord", plus the raw adjusted number as a text line, using the Previous Month Carry Over figures from the CDA SvO report (North 241, South 229, West Yorkshire 150).
 - Like the registration adjustment, these are fixed figures from a separate manual report, not the order-bank.xlsx workbook - update them when a new report lands.
