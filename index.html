@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Dashboard</title>
-<link rel="stylesheet" href="./styles.css?v=20260810-cda-adj-orderfix-2">
+<link rel="stylesheet" href="./styles.css?v=20260810-funnel-fullwidth-3">
 </head>
 <body>
 <header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button></nav></header>
@@ -71,7 +71,7 @@
 <div class="card kpi overview-card enquiry-overview">
   <div class="label">Sales Funnel</div>
   <div class="overview-main"><div class="value" id="totalEnquiries">-</div><div class="overview-caption">enquiries</div></div>
-  <div class="funnel-split-wrap"><table class="funnel-split"><thead><tr><th></th><th>Enquiries</th><th>LY %</th><th>Test Drive</th><th>Offer Sheet</th><th>Conversion</th><th>Orders</th><th>LY %</th></tr></thead><tbody>
+  <div class="funnel-split-wrap"><table class="funnel-split"><thead><tr><th></th><th>Enq</th><th>LY %</th><th>TD</th><th>OS</th><th>Conv</th><th>Ord</th><th>LY %</th></tr></thead><tbody>
     <tr><td>New</td><td id="newEnquiries">-</td><td id="newEnquiriesLY">-</td><td id="newTdPct">-</td><td id="newOsPct">-</td><td id="newConvPct">-</td><td id="newOrdersStat">-</td><td id="newOrdersLY">-</td></tr>
     <tr><td>Used</td><td id="usedEnquiries">-</td><td id="usedEnquiriesLY">-</td><td id="usedTdPct">-</td><td id="usedOsPct">-</td><td id="usedConvPct">-</td><td id="usedOrdersStat">-</td><td id="usedOrdersLY">-</td></tr>
     <tr class="total-row"><td>Total</td><td id="totalEnquiriesSplit">-</td><td id="totalEnquiriesLY">-</td><td id="totalTdPct">-</td><td id="totalOsPct">-</td><td id="totalConvPct">-</td><td id="totalOrdersStat">-</td><td id="totalOrdersLY">-</td></tr>
@@ -133,5 +133,5 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260810-cda-adj-orderfix-2"></script>
+<script src="./app.js?v=20260810-funnel-fullwidth-3"></script>
 </body></html>
