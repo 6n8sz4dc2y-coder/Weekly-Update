@@ -49,6 +49,10 @@ const CDA_TOTALS = [
 // Fixed Q1+Q2 registration carry-over adjustment per CDA, per the Toyota CDA SvO
 // report. Static for the rest of Q3 - update only if Toyota reissues the figures.
 const CDA_REG_ADJUSTMENT = { 'NORTH CDA':42, 'WY CDA':0, 'SOUTH CDA':10 };
+// Order bank over-achievement carried in from the start of Q3, per the CDA SvO
+// report (Previous Month Carry Over row). Comes from a separate manual report,
+// not the order-bank.xlsx workbook - update these figures when a new report lands.
+const CDA_ORDER_ADJUSTMENT = { 'NORTH CDA':241, 'WY CDA':150, 'SOUTH CDA':229 };
 function hasAnyValues(row, fields){ return fields.some(f => Number(row && row[f]) || 0); }
 function isKnownCentreLabel(label){
   const c = normCentreName(label);
@@ -553,7 +557,11 @@ function build(){
  document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} <span class="dashboard-pace">${paceStatus(paceRatio(r.qtr_total,r.qtr_target))}</span>`,r=>paceRatio(r.qtr_total,r.qtr_target));
  document.getElementById('usedSummary').innerHTML=leaderRows(used,r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_counting)} / ${fmt(r.qtr_target)} · To go ${fmt((r.qtr_target||0)-(r.qtr_counting||0))} · ${usedForecastMini(r)} <span class="dashboard-pace">${paceStatus(usedForecastPct(r))}</span>`,r=>usedForecastPct(r));
  document.getElementById('nonFleetSummary').innerHTML=non.filter(r=>['Salford','Bradford','Denton'].includes(r.centre)).sort((a,b)=>(b.qtr_total||0)-(a.qtr_total||0)).map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${siteLabel(r.centre)}<div class="mini">QTR ${fmt(r.qtr_total)} · Budget ${fmt(r.qtr_budget)}</div></div><div class="pct">${fmt(r.qtr_total)}</div>${progress(r.qtr_budget?r.qtr_total/r.qtr_budget:0)}</div>`).join('');
- document.getElementById('cdaOrderSummary').innerHTML=cdaOrderRows().map(r=>{const qtrPct=r.target?r.actual/r.target:0; const pace=paceRatio(r.actual,r.target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(r.actual)} / ${fmt(r.target)} · To go ${fmt((r.target||0)-(r.actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct,pace)}</div>`}).join('');
+ document.getElementById('cdaOrderSummary').innerHTML=cdaOrderRows().map(r=>{
+   const qtrPct=r.target?r.actual/r.target:0; const pace=paceRatio(r.actual,r.target);
+   const adj=CDA_ORDER_ADJUSTMENT[r.centre]||0; const adjActual=r.actual+adj; const adjPct=r.target?adjActual/r.target:0; const adjPace=paceRatio(adjActual,r.target);
+   return `<div class="leader-row cda-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(r.actual)} / ${fmt(r.target)} · To go ${fmt((r.target||0)-(r.actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div><div class="mini">Inc O/A ${fmt(adjActual)} / ${fmt(r.target)}</div></div><div class="cda-bars"><div class="cda-bar-line"><span>Ord</span>${progress(qtrPct,pace)}<strong>${pct(qtrPct)}</strong></div><div class="cda-bar-line"><span>Inc O/A</span>${progress(adjPct,adjPace)}<strong>${pct(adjPct)}</strong></div></div></div>`;
+ }).join('');
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
  makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_total)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_total)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_total)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress',colorValue:r=>paceRatio(r.qtr_total,r.qtr_target)},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
@@ -1062,7 +1070,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260810-obpace-6';
+    script.src='./pptxgen.bundle.js?v=20260810-cdaoa-7';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

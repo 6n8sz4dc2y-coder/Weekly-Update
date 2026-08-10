@@ -1,3 +1,7 @@
+## Inc O/A bar added to Q3 CDA Order Summary
+- Added the same "Inc O/A" (registrations + over-achievement carry-over) treatment used on Q3 Registration CDA Summary to Q3 CDA Order Summary: each CDA row now shows a second bar alongside "Ord", plus the raw adjusted number as a text line, using the Previous Month Carry Over figures from the CDA SvO report (North 241, South 229, West Yorkshire 150).
+- Like the registration adjustment, these are fixed figures from a separate manual report, not the order-bank.xlsx workbook - update them when a new report lands.
+
 ## Order Bank card simplified, fixed pace calc to use the month not the quarter
 - Order Bank KPI card no longer shows the big total number or the Monthly target/To go/Progress row - just the "Behind pace"-style status badge next to the title and the Jul/Aug/Sep boxes underneath.
 - Fixed the status badge's pace calculation: it was comparing the current month's actual vs target against how far through the *whole quarter* we were, which made it read far more "behind" than it really was. It now compares against how far through that *specific month* we are. For example, 9 days into a 31-day month, ~29% of the month has elapsed, not ~44% of the quarter - the badge will now sit closer to (and sometimes reach) amber earlier in a month than it did before.
