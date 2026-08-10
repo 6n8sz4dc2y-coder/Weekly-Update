@@ -243,6 +243,19 @@ function paceRatio(actual,target){
  if(!expected) return 0;
  return (Number(actual)||0)/expected;
 }
+function monthElapsedRatio(){
+ const now=new Date();
+ const start=new Date(now.getFullYear(),now.getMonth(),1,0,0,0);
+ const end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59);
+ if(now<=start) return 0;
+ if(now>=end) return 1;
+ return Math.max(0, Math.min(1, (now-start)/(end-start)));
+}
+function monthPaceRatio(actual,target){
+ const expected=(Number(target)||0)*monthElapsedRatio();
+ if(!expected) return 0;
+ return (Number(actual)||0)/expected;
+}
 function paceMini(actual,target){
  const expected=(Number(target)||0)*q3ElapsedRatio();
  return `QTR ${fmt(actual)} / ${fmt(target)} · Expected MTD ${fmt(expected)}`;
@@ -454,7 +467,7 @@ function build(){
  setText('orderBankToGo',fmt(Math.max(0,orderTarget-orderDone)));
  setText('orderBankPct',pct(orderRatio));
  const obStatus=document.getElementById('orderBankStatus');
- if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(paceRatio(orderDone,orderTarget))}">${paceLabel(paceRatio(orderDone,orderTarget))}</span>`;}
+ if(obStatus){obStatus.innerHTML=`<span class="status ${paceClass(monthPaceRatio(orderDone,orderTarget))}">${paceLabel(monthPaceRatio(orderDone,orderTarget))}</span>`;}
  ['jul','aug','sep'].forEach(m=>{
    const mDone=orderRows.reduce((a,r)=>a+orderDoneFor(r,m),0);
    const mTarget=sum(orderRows,m+'_target');
@@ -1049,7 +1062,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260810-incoa-3box-5';
+    script.src='./pptxgen.bundle.js?v=20260810-obpace-6';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

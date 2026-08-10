@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Dashboard</title>
-<link rel="stylesheet" href="./styles.css?v=20260810-incoa-3box-5">
+<link rel="stylesheet" href="./styles.css?v=20260810-obpace-6">
 </head>
 <body>
 <header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button></nav></header>
@@ -53,10 +53,8 @@
   <div class="kpi-footer-strip two-up"><div><span>Remaining / over</span><strong id="nonFleetRemaining">-</strong></div><div><span>Budget run rate</span><strong><span id="nonFleetRunRate">-</span> / week</strong></div></div>
 </div>
 <div class="card kpi overview-card order-overview">
-  <div class="label">Order Bank</div>
-  <div class="overview-main"><div class="value" id="orderBankDone">-</div><div class="overview-status" id="orderBankStatus">-</div></div>
-  <div class="split-grid"><div>Monthly target<strong id="orderBankTarget">-</strong></div><div>To go<strong id="orderBankToGo">-</strong></div><div>Progress<strong id="orderBankPct">-</strong></div></div>
-  <div class="month-progress-grid">
+  <div class="overview-main"><div class="label" style="margin:0">Order Bank</div><div class="overview-status" id="orderBankStatus">-</div></div>
+  <div class="month-progress-grid" style="margin-top:12px">
     <div><span>Jul</span><strong id="orderBankJulPct">-</strong><small id="orderBankJulVol">-</small></div>
     <div><span>Aug</span><strong id="orderBankAugPct">-</strong><small id="orderBankAugVol">-</small></div>
     <div><span>Sep</span><strong id="orderBankSepPct">-</strong><small id="orderBankSepVol">-</small></div>
@@ -132,5 +130,5 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260810-incoa-3box-5"></script>
+<script src="./app.js?v=20260810-obpace-6"></script>
 </body></html>
