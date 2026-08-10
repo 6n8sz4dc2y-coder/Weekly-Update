@@ -1,3 +1,8 @@
+## Fix Order Bank quarterly target bug, add CDA registration Adjustment bar
+- Fixed a real bug in parseOrderWorkbook: the Q1-Q4/CY26 target table parser scanned every row in the whole sheet for a valid centre name in column A, which also matches every row in the monthly "Orders after cancellations" tables further down. Since the last matching row wins, q3_target ended up overwritten with a stray monthly figure instead of the real quarterly target - this is what caused Q3 CDA Order Summary to show 400%+ "progress" (e.g. NORTH CDA target of 36 instead of 415). The parser now stops at the first monthly block.
+- Added a second "+Adj" bar to each CDA row in Q3 Registration CDA Summary, showing registrations plus the fixed Q1+Q2 over/under-achievement adjustment carried into Q3 (per the Toyota CDA SvO report), alongside the existing registrations-only bar.
+- Hid the visible scrollbar on the dashboard Sales Funnel card's table (still scrolls, just no bar UI).
+
 ## Order Bank Jul/Aug/Sep boxes now show cumulative carry-over
 - Added Jul/Aug/Sep boxes to the Order Bank KPI card, matching the box format used by the other primary cards.
 - Each month shows running cumulative done vs cumulative target (not each month in isolation), since over/under-achievement carries forward to the next month in the real order bank position. Added a note explaining this.

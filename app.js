@@ -46,6 +46,9 @@ const CDA_TOTALS = [
   { label:'WY CDA', items:WY_SITES },
   { label:'SOUTH CDA', items:SOUTH_SITES }
 ];
+// Fixed Q1+Q2 registration carry-over adjustment per CDA, per the Toyota CDA SvO
+// report. Static for the rest of Q3 - update only if Toyota reissues the figures.
+const CDA_REG_ADJUSTMENT = { 'NORTH CDA':42, 'WY CDA':0, 'SOUTH CDA':10 };
 function hasAnyValues(row, fields){ return fields.some(f => Number(row && row[f]) || 0); }
 function isKnownCentreLabel(label){
   const c = normCentreName(label);
@@ -528,7 +531,11 @@ function build(){
  setText('totalConvPctSplit',pct(totalConvRatio));
  document.getElementById('h2Period').innerHTML='<span class="period-pill muted">H1 closed</span><span class="period-pill active">H2 active · July onwards</span>';
  const north=DATA.q3_regs.find(r=>r.centre==='NORTH CDA'), wy=DATA.q3_regs.find(r=>r.centre==='WY CDA'), south=DATA.q3_regs.find(r=>r.centre==='SOUTH CDA');
- document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct,pace)}</div>`}).join('');
+ document.getElementById('cdaSummary').innerHTML=[north,wy,south].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_total)||0))).map(r=>{
+   const actual=Number(r.qtr_total)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const pace=paceRatio(actual,target);
+   const adj=CDA_REG_ADJUSTMENT[r.centre]||0; const adjActual=actual+adj; const adjPct=target?adjActual/target:0; const adjPace=paceRatio(adjActual,target);
+   return `<div class="leader-row cda-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${pace>=1?'On pace':pace>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="cda-bars"><div class="cda-bar-line"><span>Reg</span>${progress(qtrPct,pace)}<strong>${pct(qtrPct)}</strong></div><div class="cda-bar-line"><span>+Adj</span>${progress(adjPct,adjPace)}<strong>${pct(adjPct)}</strong></div></div></div>`;
+ }).join('');
  const northU=DATA.q3_used.find(r=>r.centre==='NORTH CDA'), wyU=DATA.q3_used.find(r=>r.centre==='WY CDA'), southU=DATA.q3_used.find(r=>r.centre==='SOUTH CDA');
  document.getElementById('cdaUsedSummary').innerHTML=[northU,wyU,southU].filter(r=>r && ((Number(r.qtr_target)||0) || (Number(r.qtr_counting)||0))).map(r=>{const actual=Number(r.qtr_counting)||0; const target=Number(r.qtr_target)||0; const qtrPct=target?actual/target:0; const forecastPct=usedForecastPct(r); return `<div class="leader-row"><div class="rank">●</div><div class="centre">${r.centre}<div class="mini">QTR ${fmt(actual)} / ${fmt(target)} · To go ${fmt((target||0)-(actual||0))} · ${forecastPct>=1?'On pace':forecastPct>=.9?'Slightly behind pace':'Behind pace'}</div></div><div class="pct">${pct(qtrPct)}</div>${progress(qtrPct,forecastPct)}</div>`}).join('');
  document.getElementById('leaderboard').innerHTML=leaderRows(regs,r=>r.qtr_target?r.qtr_total/r.qtr_target:0,r=>`QTR ${fmt(r.qtr_total)} / ${fmt(r.qtr_target)} · To go ${fmt(r.to_go)} <span class="dashboard-pace">${paceStatus(paceRatio(r.qtr_total,r.qtr_target))}</span>`,r=>paceRatio(r.qtr_total,r.qtr_target));
@@ -687,8 +694,14 @@ function parseOrderWorkbook(wb, data){
   };
   const blankOrder = v => v===null || v===undefined || v==='';
 
-  // Read the top annual/quarter target table dynamically.
-  for(const r of rows){
+  // Read the top annual/quarter target table dynamically. Stop at the first
+  // "Orders after cancellations" block - centre rows further down that table
+  // also start with a valid centre name in column A, and would otherwise
+  // overwrite q1-q4/CY26 targets with stray monthly order figures from
+  // whichever block happens to appear last in the sheet.
+  const firstBlockIndex = rows.findIndex(r => String(r && r[0] || '').trim().toLowerCase().includes('orders after cancellations'));
+  const topTableRows = firstBlockIndex >= 0 ? rows.slice(0, firstBlockIndex) : rows;
+  for(const r of topTableRows){
     if(!r || !isCentre(r[0])) continue;
     const centre = normCentreName(r[0]);
     // The top table has ASO in column B and Q1-Q4/CY26 in D-I.
@@ -1037,7 +1050,7 @@ function ensurePptxLibrary(){
   if(pptxLibraryPromise) return pptxLibraryPromise;
   pptxLibraryPromise=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='./pptxgen.bundle.js?v=20260810-orderbank-carryover-1';
+    script.src='./pptxgen.bundle.js?v=20260810-cda-adj-orderfix-2';
     script.onload=()=>getPptxConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
     script.onerror=()=>reject(new Error('PowerPoint library failed to load'));
     document.head.appendChild(script);

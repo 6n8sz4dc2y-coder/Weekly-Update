@@ -3,6 +3,15 @@
 
 .hint{font-size:13px;color:var(--muted);margin:-4px 0 12px}.leader-row .progress{min-width:100px}
 
+/* CDA registration summary: separate Registrations-only vs incl.-Adjustment bars. */
+.leader-row.cda-row{grid-template-columns:40px 1fr 260px}
+.cda-bars{display:flex;flex-direction:column;gap:6px}
+.cda-bar-line{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
+.cda-bar-line span{width:34px}
+.cda-bar-line .progress{flex:1;min-width:70px}
+.cda-bar-line strong{width:40px;text-align:right;color:var(--ink);font-size:13px}
+@media(max-width:900px){.leader-row.cda-row{grid-template-columns:34px 1fr 100px}.cda-bar-line .progress{display:none}}
+
 .period-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.period-pill{display:inline-flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}.period-pill.active{background:#dcfce7;color:#166534;border-color:#86efac}.period-pill.muted{background:rgba(255,255,255,.08);color:#cbd5e1}
 
 .kpi.primary{grid-column:span 4;min-height:140px}.kpi.secondary{grid-column:span 3;min-height:116px}.kpi.primary .value{font-size:42px}.kpi strong{color:#111827}@media(max-width:900px){.kpi.primary,.kpi.secondary{grid-column:span 12}}
@@ -186,7 +195,8 @@ table{border-collapse:separate;border-spacing:0}
 .overview-caption{font-size:13px;color:var(--muted);font-weight:800}
 .overview-status{margin-left:auto}
 .overview-card .split-grid{margin-top:12px}
-.funnel-split-wrap{overflow-x:auto;margin-top:12px}
+.funnel-split-wrap{overflow-x:auto;margin-top:12px;scrollbar-width:none;-ms-overflow-style:none}
+.funnel-split-wrap::-webkit-scrollbar{display:none}
 .funnel-split{width:100%;border-collapse:collapse;font-size:12px}
 .funnel-split th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;font-weight:800;padding:4px 2px}
 .funnel-split th:first-child,.funnel-split td:first-child{text-align:left;color:var(--muted);font-weight:800}
