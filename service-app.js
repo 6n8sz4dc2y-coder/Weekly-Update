@@ -12,9 +12,10 @@
 // lives in the header (sticky, so it's reachable from every tab) and
 // switches all of it together. Three tabs cover the three data sources:
 // VCF (pillar cards, Rankings, CDA Rankings, Centre Detail), Trade Parts
-// (Group-level only, no centre/CDA breakdown) and WRR (its own per-centre
-// Rankings/CDA Rankings/Detail, parsed from two flat workbooks rather than
-// the VCF pillar-group shape).
+// (a Group-level card/table plus a CDA + Lexus breakdown ranking, each its
+// own per-CDA export) and WRR (its own per-centre Rankings/CDA
+// Rankings/Detail, parsed from two flat workbooks rather than the VCF
+// pillar-group shape).
 
 const SERVICE_BUILD_VERSION = '2026.08.28.2';
 const SERVICE_META_KEY = 'rrgServiceDashboardMeta_v1';
@@ -143,9 +144,11 @@ function parseVcfWorkbook(wb){
 
 // Group Trade Parts (SMROE) export: a flat quarterly table (Period, Working
 // Days, Days to Date, Sales Out to Date/Forecast, Target, Achieved %,
-// Reward % and Reward Payable) - Group-level only, no centre/CDA
-// breakdown, so it doesn't fit the pillar-group shape above. Same
-// stop-at-the-filters-row rule applies.
+// Reward % and Reward Payable). The same export shape is used both
+// Group-level (one file, no filter) and per-CDA (one file per CDA, filtered
+// in Toyota's tool), so this parser also captures the "Applied filters"
+// footer text - extractCdaName() below reads the CDA name out of it for the
+// per-CDA case. Same stop-at-the-filters-row rule applies either way.
 function parseTradePartsWorkbook(wb){
   const sheetName = wb.SheetNames.find(n=>/export/i.test(n)) || wb.SheetNames[0];
   const ws = wb.Sheets[sheetName];
@@ -154,17 +157,29 @@ function parseTradePartsWorkbook(wb){
   if(rows.length < 2) throw new Error('Expected a header row and at least one data row');
   const header = rows[0].map(h=>h===null||h===undefined ? null : String(h).trim());
   const dataRows = [];
+  let filtersText = null;
   for(let i=1;i<rows.length;i++){
     const r = rows[i];
     if(r[0]===null || r[0]===undefined || String(r[0]).trim()==='') continue;
     const anyNumeric = r.slice(1).some(v=>typeof v==='number');
-    if(!anyNumeric) break; // hit the free-text "Applied filters" row - stop here
+    if(!anyNumeric){ filtersText = String(r[0]); break; } // hit the free-text "Applied filters" row - stop here, keep its text
     const obj = {};
     header.forEach((h,idx)=>{ if(h) obj[h] = r[idx]; });
     dataRows.push(obj);
   }
   if(!dataRows.length) throw new Error('Could not find any data rows in the "' + sheetName + '" sheet');
-  return { header: header.filter(Boolean), rows: dataRows, sheet: sheetName, importedAt: new Date().toISOString() };
+  return { header: header.filter(Boolean), rows: dataRows, sheet: sheetName, importedAt: new Date().toISOString(), filtersText };
+}
+// Reads the CDA name out of a Trade Parts export's "Applied filters" footer,
+// e.g. "...+ West Yorkshire (CDA)\n..." -> "West Yorkshire". Falls back to
+// the source filename so an export whose filter text doesn't match this
+// pattern still gets a usable label instead of failing the import.
+function extractCdaName(filtersText, fallback){
+  if(filtersText){
+    const m = filtersText.match(/\+\s*([^()\n]+?)\s*\(CDA\)/i);
+    if(m) return m[1].trim();
+  }
+  return fallback;
 }
 
 // WRR export: one flat row per centre (CPUS Unique, Target, Centre %
@@ -327,14 +342,22 @@ function renderTradeParts(data){
   el.classList.add('table-tight');
   el.innerHTML = `<thead><tr>${TRADE_PARTS_COLS.map(c=>`<th class="${c.key==='Period'?'':'num'}">${c.label}</th>`).join('')}<th>Status</th></tr></thead><tbody>${data.rows.map(row=>{
     const isTotal = String(row.Period||'').toLowerCase()==='total';
-    const achieved = row['Target % Achieved (Forecast)*'];
-    return `<tr class="${isTotal?'group':''}">${TRADE_PARTS_COLS.map(c=>`<td class="${c.key==='Period'?'':'num'}">${tradePartsCellText(c.key,row)}</td>`).join('')}<td>${achieved===null||achieved===undefined?'-':statusPill(achieved)}</td></tr>`;
+    const forecast = row['SMROE Sales Out (Forecast)*'];
+    const target = row['SMROE Target'];
+    return `<tr class="${isTotal?'group':''}">${TRADE_PARTS_COLS.map(c=>`<td class="${c.key==='Period'?'':'num'}">${tradePartsCellText(c.key,row)}</td>`).join('')}<td>${tradePartsStatusPill(forecast,target)}</td></tr>`;
   }).join('')}</tbody>`;
 }
 
 function tradePartsRow(data, period){
   if(!data || !data.rows) return null;
   return data.rows.find(r => String(r.Period||'').toLowerCase()===period.toLowerCase()) || null;
+}
+// Group Trade Parts is forecast-driven, not a hedged run-rate estimate, so
+// its status is a plain "Tracking ahead"/"Tracking behind" call off the
+// forecast vs target - no cautious "Watch" middle state.
+function tradePartsStatusPill(forecast, target){
+  if(forecast===null||forecast===undefined||target===null||target===undefined) return '<span class="status">No data</span>';
+  return forecast>=target ? '<span class="status green">Tracking ahead</span>' : '<span class="status red">Tracking behind</span>';
 }
 // "£X behind"/"£X over" against target, same convention as gapLabel() but
 // always currency (gapLabel's currency detection keys off a pillar name,
@@ -365,7 +388,7 @@ function renderTradePartsCard(containerId, data){
       value: pct(achieved),
       note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`,
       gap: tradePartsGapLabel(forecast, target),
-      statusHtml: achieved===null||achieved===undefined ? '<span class="status">No data</span>' : statusPill(achieved),
+      statusHtml: tradePartsStatusPill(forecast, target),
     };
   };
   const q3Cell = cell(q3), totalCell = cell(total);
@@ -377,6 +400,25 @@ function renderTradePartsCard(containerId, data){
     </div>
     <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
   </div>`;
+}
+// CDA + Lexus breakdown of Group Trade Parts - each entry is its own
+// per-CDA (or Lexus) export, same Period-row shape as the Group workbook.
+// Ranked on the row matching the active period (Q3 row for "q3", Total row
+// for "ytd" - the group card already uses "Full Year" as the YTD-equivalent
+// framing since Trade Parts has no separate YTD workbook).
+function renderTradePartsCdaRanking(containerId, cdaList){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  if(!cdaList || !cdaList.length){ el.innerHTML = ''; return; }
+  const periodLabel = ACTIVE_PERIOD==='q3' ? 'Q3' : 'Total';
+  const ranked = cdaList.map(c=>{
+    const row = tradePartsRow(c, periodLabel);
+    const forecast = row ? row['SMROE Sales Out (Forecast)*'] : null;
+    const target = row ? row['SMROE Target'] : null;
+    const achieved = row ? row['Target % Achieved (Forecast)*'] : null;
+    return { name: c.cda, forecast, target, achieved };
+  }).sort((a,b)=>(b.achieved??-Infinity)-(a.achieved??-Infinity));
+  el.innerHTML = ranked.map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.name}<div class="mini">${fmtGbp(r.forecast)} / ${fmtGbp(r.target)} · ${tradePartsGapLabel(r.forecast,r.target)}</div></div><div class="pct ${svoClass(r.achieved)}">${pct(r.achieved)}</div>${progressBar(r.achieved)}</div>`).join('');
 }
 
 // WRR: two separate workbooks (Q3, YTD), each a flat per-centre row with a
@@ -474,6 +516,7 @@ function build(){
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');
   // Trade Parts tab
   renderTradePartsCard('tradePartsCard', DATA.tradeParts);
+  renderTradePartsCdaRanking('tradePartsCdaLeaderboard', DATA.tradePartsCda);
   renderTradeParts(DATA.tradeParts);
   // WRR tab
   renderWrrCard('wrrCard', DATA.wrr.q3, DATA.wrr.ytd);
@@ -489,6 +532,7 @@ let DATA = {
   cda: { q3: window.SERVICE_DATA_CDA_Q3 || null, ytd: window.SERVICE_DATA_CDA_YTD || null },
   wrr: { q3: window.SERVICE_DATA_WRR_Q3 || null, ytd: window.SERVICE_DATA_WRR_YTD || null },
   tradeParts: window.SERVICE_DATA_TRADE_PARTS || null,
+  tradePartsCda: window.SERVICE_DATA_TRADE_PARTS_CDA || null,
 };
 try{
   const saved = localStorage.getItem(SERVICE_DATA_KEY);
@@ -563,6 +607,29 @@ async function previewImport(){
       block.innerHTML = `<div class="hint" style="margin-top:12px">Group Trade Parts preview</div><div class="table-wrap" style="max-height:280px">${tradePartsPreviewHtml(parsed)}</div>`;
       container.appendChild(block);
     }
+    const tradePartsCdaFiles = document.getElementById('tradePartsCdaFile')?.files;
+    const tradePartsLexusFile = document.getElementById('tradePartsLexusFile')?.files?.[0];
+    if((tradePartsCdaFiles && tradePartsCdaFiles.length) || tradePartsLexusFile){
+      const cdaList = [];
+      for(const file of (tradePartsCdaFiles || [])){
+        const buf = await readFileAsArrayBuffer(file);
+        const wb = XLSX.read(buf,{type:'array'});
+        const parsed = parseTradePartsWorkbook(wb);
+        const cda = extractCdaName(parsed.filtersText, file.name.replace(/\.[^.]+$/,''));
+        cdaList.push(Object.assign({ cda }, parsed));
+      }
+      if(tradePartsLexusFile){
+        const buf = await readFileAsArrayBuffer(tradePartsLexusFile);
+        const wb = XLSX.read(buf,{type:'array'});
+        const parsed = parseTradePartsWorkbook(wb);
+        cdaList.push(Object.assign({ cda:'Lexus' }, parsed));
+      }
+      data.tradePartsCda = cdaList;
+      messages.push(`Group Trade Parts breakdown imported (${cdaList.map(c=>c.cda).join(', ')})`);
+      const block = document.createElement('div');
+      block.innerHTML = `<div class="hint" style="margin-top:12px">Group Trade Parts breakdown preview</div>` + cdaList.map(c=>`<div class="hint" style="margin-top:8px"><strong>${c.cda}</strong></div><div class="table-wrap" style="max-height:220px">${tradePartsPreviewHtml(c)}</div>`).join('');
+      container.appendChild(block);
+    }
     for(const slot of WRR_SLOTS){
       const file = document.getElementById(slot.fileId)?.files?.[0];
       if(!file) continue;
@@ -607,6 +674,7 @@ function downloadDataBackup(){
   downloadOne('service-cda-data.js', 'SERVICE_DATA_CDA_Q3', DATA.cda.q3);
   downloadOne('service-cda-data-ytd.js', 'SERVICE_DATA_CDA_YTD', DATA.cda.ytd);
   downloadOne('service-trade-parts-data.js', 'SERVICE_DATA_TRADE_PARTS', DATA.tradeParts);
+  downloadOne('service-trade-parts-cda-data.js', 'SERVICE_DATA_TRADE_PARTS_CDA', DATA.tradePartsCda);
   downloadOne('service-wrr-data.js', 'SERVICE_DATA_WRR_Q3', DATA.wrr.q3);
   downloadOne('service-wrr-data-ytd.js', 'SERVICE_DATA_WRR_YTD', DATA.wrr.ytd);
 }
