@@ -137,6 +137,32 @@ function parseVcfWorkbook(wb){
   };
 }
 
+// Group Trade Parts (SMROE) export: a flat quarterly table (Period, Working
+// Days, Days to Date, Sales Out to Date/Forecast, Target, Achieved %,
+// Reward % and Reward Payable) - Group-level only, no centre/CDA
+// breakdown, so it doesn't fit the pillar-group shape above. Same
+// stop-at-the-filters-row rule applies.
+function parseTradePartsWorkbook(wb){
+  const sheetName = wb.SheetNames.find(n=>/export/i.test(n)) || wb.SheetNames[0];
+  const ws = wb.Sheets[sheetName];
+  if(!ws) throw new Error('No sheets found in workbook');
+  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+  if(rows.length < 2) throw new Error('Expected a header row and at least one data row');
+  const header = rows[0].map(h=>h===null||h===undefined ? null : String(h).trim());
+  const dataRows = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(r[0]===null || r[0]===undefined || String(r[0]).trim()==='') continue;
+    const anyNumeric = r.slice(1).some(v=>typeof v==='number');
+    if(!anyNumeric) break; // hit the free-text "Applied filters" row - stop here
+    const obj = {};
+    header.forEach((h,idx)=>{ if(h) obj[h] = r[idx]; });
+    dataRows.push(obj);
+  }
+  if(!dataRows.length) throw new Error('Could not find any data rows in the "' + sheetName + '" sheet');
+  return { header: header.filter(Boolean), rows: dataRows, sheet: sheetName, importedAt: new Date().toISOString() };
+}
+
 // --- Aggregation ------------------------------------------------------------
 function pillarTotals(data, pillarName){
   if(!data) return { actual:null, target:null, svo:null };
@@ -189,12 +215,14 @@ function renderPillarCards(q3Data, ytdData, containerId){
   }).join('');
 }
 
-// "£12,345 to go" when short of target, "£12,345 over" when past it.
+// "£12,345 behind" when short of target, "£12,345 over" when past it. These
+// figures are run-rate projections rather than a literal countdown, so
+// "behind"/"over" reads more honestly than "to go".
 function gapLabel(name, actual, target){
   if(actual===null||actual===undefined||target===null||target===undefined) return '';
   const gap = actual - target;
   const cls = gap>=0 ? 'positive' : 'negative';
-  const text = gap>=0 ? `${displayVal(name,gap)} over` : `${displayVal(name,Math.abs(gap))} to go`;
+  const text = gap>=0 ? `${displayVal(name,gap)} over` : `${displayVal(name,Math.abs(gap))} behind`;
   return `<span class="variance-cell ${cls}">${text}</span>`;
 }
 function renderLeaderboards(data, containerId){
@@ -260,6 +288,39 @@ function renderGroupTable(data, tableId, firstColLabel){
   });
 }
 
+// Group Trade Parts: a small quarterly table (Q1-Q4 + Total), Group-level
+// only. Q4 is all null until the quarter starts, so those cells just show
+// "-" with no status pill.
+const TRADE_PARTS_COLS = [
+  { key:'Period', label:'Period' },
+  { key:'__days', label:'Days Elapsed' },
+  { key:'SMROE Sales Out To Date*', label:'Sales Out to Date' },
+  { key:'SMROE Sales Out (Forecast)*', label:'Sales Out (Forecast)' },
+  { key:'SMROE Target', label:'Target' },
+  { key:'Target % Achieved (Forecast)*', label:'Achieved %' },
+  { key:'Target Reward %*', label:'Reward %' },
+  { key:'Reward Payable*', label:'Reward Payable' },
+];
+function tradePartsCellText(key, row){
+  if(key==='Period') return row.Period;
+  if(key==='__days') return row['Days to Date']==null ? '-' : `${fmt(row['Days to Date'])} / ${fmt(row['Working Days'])}`;
+  const v = row[key];
+  if(v===null||v===undefined) return '-';
+  if(/%/.test(key)) return pct(v);
+  return fmtGbp(v);
+}
+function renderTradeParts(data){
+  const el = document.getElementById('tradePartsTable');
+  if(!el) return;
+  if(!data || !data.rows || !data.rows.length){ el.innerHTML = ''; return; }
+  el.classList.add('table-tight');
+  el.innerHTML = `<thead><tr>${TRADE_PARTS_COLS.map(c=>`<th class="${c.key==='Period'?'':'num'}">${c.label}</th>`).join('')}<th>Status</th></tr></thead><tbody>${data.rows.map(row=>{
+    const isTotal = String(row.Period||'').toLowerCase()==='total';
+    const achieved = row['Target % Achieved (Forecast)*'];
+    return `<tr class="${isTotal?'group':''}">${TRADE_PARTS_COLS.map(c=>`<td class="${c.key==='Period'?'':'num'}">${tradePartsCellText(c.key,row)}</td>`).join('')}<td>${achieved===null||achieved===undefined?'-':statusPill(achieved)}</td></tr>`;
+  }).join('')}</tbody>`;
+}
+
 function renderPeriodToggle(){
   // Multiple instances share the same state (Dashboard above Rankings,
   // Centre Detail) so the period can be switched from whichever tab is
@@ -278,6 +339,7 @@ function build(){
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD], 'pillarLeaderboards');
   renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');
+  renderTradeParts(DATA.tradeParts);
   updateVersionDisplays();
 }
 
@@ -285,6 +347,7 @@ function build(){
 let DATA = {
   centre: { q3: window.SERVICE_DATA_CENTRE_Q3 || null, ytd: window.SERVICE_DATA_CENTRE_YTD || null },
   cda: { q3: window.SERVICE_DATA_CDA_Q3 || null, ytd: window.SERVICE_DATA_CDA_YTD || null },
+  tradeParts: window.SERVICE_DATA_TRADE_PARTS || null,
 };
 try{
   const saved = localStorage.getItem(SERVICE_DATA_KEY);
@@ -318,6 +381,9 @@ function previewTableHtml(data){
     return `<td class="num">${displayVal(p,v.actual)}</td><td class="num">${displayVal(p,v.target)}</td><td class="num">${pct(v.svo)}</td>`;
   }).join('')}</tr>` : ''}</tbody></table>`;
 }
+function tradePartsPreviewHtml(data){
+  return `<table><thead><tr>${TRADE_PARTS_COLS.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${data.rows.map(row=>`<tr class="${String(row.Period||'').toLowerCase()==='total'?'group':''}">${TRADE_PARTS_COLS.map(c=>`<td class="num">${tradePartsCellText(c.key,row)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
 async function previewImport(){
   const status = document.getElementById('adminStatus');
   const container = document.getElementById('adminPreviewContainer');
@@ -335,6 +401,17 @@ async function previewImport(){
       messages.push(`${slot.label} imported (${parsed.rows.length} rows, ${parsed.pillars.length} pillars)`);
       const block = document.createElement('div');
       block.innerHTML = `<div class="hint" style="margin-top:12px">${slot.label} preview</div><div class="table-wrap" style="max-height:280px">${previewTableHtml(parsed)}</div>`;
+      container.appendChild(block);
+    }
+    const tradePartsFile = document.getElementById('tradePartsFile')?.files?.[0];
+    if(tradePartsFile){
+      const buf = await readFileAsArrayBuffer(tradePartsFile);
+      const wb = XLSX.read(buf,{type:'array'});
+      const parsed = parseTradePartsWorkbook(wb);
+      data.tradeParts = parsed;
+      messages.push(`Group Trade Parts imported (${parsed.rows.length} periods)`);
+      const block = document.createElement('div');
+      block.innerHTML = `<div class="hint" style="margin-top:12px">Group Trade Parts preview</div><div class="table-wrap" style="max-height:280px">${tradePartsPreviewHtml(parsed)}</div>`;
       container.appendChild(block);
     }
     PENDING_DATA = data;
@@ -368,6 +445,7 @@ function downloadDataBackup(){
   downloadOne('service-data-ytd.js', 'SERVICE_DATA_CENTRE_YTD', DATA.centre.ytd);
   downloadOne('service-cda-data.js', 'SERVICE_DATA_CDA_Q3', DATA.cda.q3);
   downloadOne('service-cda-data-ytd.js', 'SERVICE_DATA_CDA_YTD', DATA.cda.ytd);
+  downloadOne('service-trade-parts-data.js', 'SERVICE_DATA_TRADE_PARTS', DATA.tradeParts);
 }
 function resetSavedData(){
   localStorage.removeItem(SERVICE_DATA_KEY);
