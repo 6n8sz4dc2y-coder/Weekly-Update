@@ -96,6 +96,11 @@ th.sortable{cursor:pointer;user-select:none}
 th.sortable:hover{background:#eef2ff;color:#1e3a8a}
 th.sorted{background:#e0e7ff;color:#1e3a8a}
 
+/* Tight tables: smaller font/padding so a wide table (many centres/months)
+   fits in one pane without horizontal scrolling. */
+.table-tight table{font-size:12px}
+.table-tight th,.table-tight td{padding:8px 8px;white-space:nowrap}
+
 
 /* Smart frozen columns: centre only, or rank + centre when both exist. */
 .table-wrap{overflow-x:auto!important;overflow-y:visible!important;max-height:none!important}
