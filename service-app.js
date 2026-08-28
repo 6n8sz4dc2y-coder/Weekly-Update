@@ -66,7 +66,7 @@ const isActualPillar = name => /service plan/i.test(String(name||''));
 const pillarBasis = name => isActualPillar(name) ? 'Actual' : 'Run-rate';
 const displayVal = (pillarName, n) => isCurrencyPillar(pillarName) ? fmtGbp(n) : fmt(n);
 const svoClass = n => n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red');
-const svoLabel = n => n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Watch':'Behind');
+const svoLabel = n => n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Slightly behind':'Behind');
 const progressBar = n => `<div class="progress"><div class="bar ${svoClass(n)}" style="width:${Math.min(Math.max((n||0)*100,0),120)}%"></div></div>`;
 const statusPill = n => `<span class="status ${svoClass(n)}">${svoLabel(n)}</span>`;
 // Confirmed-actual pillars (Service Plans Plus) don't get the cautious
