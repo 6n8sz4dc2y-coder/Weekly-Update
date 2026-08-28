@@ -222,8 +222,14 @@ table{border-collapse:separate;border-spacing:0}
 nav .hub-link-btn{margin-left:auto}
 @media(max-width:900px){nav .hub-link-btn{margin-left:0}}
 
-/* Programmes Hub: reporting-period toggle */
-#periodToggle{display:flex;gap:8px;flex-wrap:wrap}
-#periodToggle button{font-size:14px;padding:11px 18px}
+/* Programmes Hub: reporting-period toggle, styled as a segmented switch
+   (grey track, buttons flush inside it) so it visibly reads as something
+   you flip between rather than two disconnected labels. */
+.periodToggle{display:inline-flex;gap:2px;flex-wrap:wrap;background:#eef1f6;border:1px solid var(--line);border-radius:999px;padding:3px}
+.periodToggle button{font-size:14px;padding:10px 17px;margin:0;border:none;background:transparent;color:#475569;box-shadow:none;transition:background .15s ease,color .15s ease,transform .1s ease}
+.periodToggle button:hover{background:#e2e8f0;color:var(--ink)}
+.periodToggle button:active{transform:scale(.97)}
+.periodToggle button.primary-btn{background:var(--head);color:#fff;box-shadow:0 1px 4px rgba(15,23,42,.3)}
+.periodToggle button.primary-btn:hover{background:var(--head)}
 .period-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
-@media print{.hub-link-btn,#periodToggle{display:none!important}}
+@media print{.hub-link-btn,.periodToggle{display:none!important}}
