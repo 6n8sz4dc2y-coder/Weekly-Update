@@ -185,6 +185,14 @@ function renderPillarCards(q3Data, ytdData, containerId){
   }).join('');
 }
 
+// "£12,345 to go" when short of target, "£12,345 over" when past it.
+function gapLabel(name, actual, target){
+  if(actual===null||actual===undefined||target===null||target===undefined) return '';
+  const gap = actual - target;
+  const cls = gap>=0 ? 'positive' : 'negative';
+  const text = gap>=0 ? `${displayVal(name,gap)} over` : `${displayVal(name,Math.abs(gap))} to go`;
+  return `<span class="variance-cell ${cls}">${text}</span>`;
+}
 function renderLeaderboards(data){
   const el = document.getElementById('pillarLeaderboards');
   if(!el) return;
@@ -193,7 +201,8 @@ function renderLeaderboards(data){
     const sorted = data.rows.slice().sort((a,b)=>(centreSvo(b,name)??-Infinity)-(centreSvo(a,name)??-Infinity));
     const rows = sorted.map((r,i)=>{
       const v = centreSvo(r,name);
-      return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.centre}<div class="mini">${displayVal(name,r.values[name]?.actual)} / ${displayVal(name,r.values[name]?.target)}</div></div><div class="pct">${pct(v)}</div>${progressBar(v)}</div>`;
+      const values = r.values[name] || {};
+      return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.centre}<div class="mini">${displayVal(name,values.actual)} / ${displayVal(name,values.target)} · ${gapLabel(name,values.actual,values.target)}</div></div><div class="pct">${pct(v)}</div>${progressBar(v)}</div>`;
     }).join('');
     return `<div class="card half"><h3>${name}</h3><div class="leader">${rows || '<div class="hint">No centre data.</div>'}</div></div>`;
   }).join('');
@@ -313,11 +322,14 @@ function renderCompactTable(data, tableId, firstColLabel){
 }
 
 function renderPeriodToggle(){
-  const el = document.getElementById('periodToggle');
-  if(!el) return;
-  el.innerHTML = PERIODS.map(p=>`<button class="admin-btn ${p===ACTIVE_PERIOD?'primary-btn':''}" data-period="${p}" type="button">${PERIOD_LABEL[p]}</button>`).join('');
-  el.querySelectorAll('button[data-period]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ ACTIVE_PERIOD = btn.dataset.period; build(); });
+  // Multiple instances share the same state (Dashboard above Rankings,
+  // Centre Detail, CDA Summary) so the period can be switched from
+  // whichever tab is open.
+  document.querySelectorAll('.periodToggle').forEach(el=>{
+    el.innerHTML = PERIODS.map(p=>`<button class="admin-btn ${p===ACTIVE_PERIOD?'primary-btn':''}" data-period="${p}" type="button">${PERIOD_LABEL[p]}</button>`).join('');
+    el.querySelectorAll('button[data-period]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ ACTIVE_PERIOD = btn.dataset.period; build(); });
+    });
   });
 }
 
