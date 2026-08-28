@@ -20,6 +20,8 @@
 <section id="tradeParts" class="section"><div class="grid">
 <div id="tradePartsCard" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 <div id="tradePartsCdaCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
+<div class="card half"><h3>Site League &middot; Q3</h3><div id="tradePartsSitesQ3" class="leader"></div></div>
+<div class="card half"><h3>Site League &middot; Year to Date</h3><div id="tradePartsSitesYtd" class="leader"></div></div>
 <div class="card wide"><h3>Group Trade Parts</h3><div class="hint">SMROE sales out by quarter, Group-level. Q3 is in progress - Forecast projects the full quarter from days elapsed; To Date is the confirmed total so far. Status is based on the forecast.</div><div class="table-wrap"><table id="tradePartsTable"></table></div></div>
 </div></section>
 <section id="wrr" class="section"><div class="grid">
@@ -31,7 +33,7 @@
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
     <h2>Admin Update</h2>
-    <div class="hint">This hub reads workbooks uploaded to GitHub, each with an "Export" sheet: four VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date and Q3; one Group Trade Parts export (a flat quarterly table, Group-level); a Group Trade Parts CDA breakdown (one file per CDA - select all of them at once, the CDA name is read automatically from each file); one Group Trade Parts Lexus export (same shape, reported separately from the geographic CDAs); and two WRR exports (a flat per-centre table, Q3 and Year to Date). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
+    <div class="hint">This hub reads workbooks uploaded to GitHub, each with an "Export" sheet: four VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date and Q3; one Group Trade Parts export (a flat quarterly table, Group-level); a Group Trade Parts CDA breakdown (one file per CDA - select all of them at once, the CDA name is read automatically from each file); one Group Trade Parts Lexus export (same shape, reported separately from the geographic CDAs); a Group Trade Parts site breakdown (one file per site - select all of them at once, the site name is read automatically from each file, feeds the Q3 and Year to Date site leagues); and two WRR exports (a flat per-centre table, Q3 and Year to Date). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
   </div>
   <div class="card wide version-card">
     <div><strong>Current Live Version</strong><br><span id="adminLiveVersion">-</span></div>
@@ -74,12 +76,17 @@
     <div class="hint">SMROE breakdown for Lexus, reported separately from the geographic CDAs but included in the Group total.</div>
   </div>
   <div class="card third">
-    <h3>8. WRR - Q3.xlsx</h3>
+    <h3>8. Group Trade Parts - Sites.xlsx</h3>
+    <input id="tradePartsSitesFile" type="file" accept=".xlsx,.xls" class="search" multiple>
+    <div class="hint">Per-site SMROE breakdown - select all site export files at once, the site name is read from each file automatically.</div>
+  </div>
+  <div class="card third">
+    <h3>9. WRR - Q3.xlsx</h3>
     <input id="wrrQ3File" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Current-quarter CPUS Unique vs Target by centre.</div>
   </div>
   <div class="card third">
-    <h3>9. WRR - YTD.xlsx</h3>
+    <h3>10. WRR - YTD.xlsx</h3>
     <input id="wrrYtdFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Year-to-date CPUS Unique vs Target by centre.</div>
   </div>
@@ -106,7 +113,8 @@
 <script src="./service-cda-data-ytd.js?v=3"></script>
 <script src="./service-trade-parts-data.js?v=2"></script>
 <script src="./service-trade-parts-cda-data.js?v=2"></script>
+<script src="./service-trade-parts-sites-data.js?v=1"></script>
 <script src="./service-wrr-data.js?v=1"></script>
 <script src="./service-wrr-data-ytd.js?v=1"></script>
-<script src="./service-app.js?v=19"></script>
+<script src="./service-app.js?v=20"></script>
 </body></html>
