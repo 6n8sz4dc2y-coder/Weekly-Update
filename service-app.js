@@ -394,12 +394,16 @@ function tradePartsYtdThroughQ3(data){
     'Target Reward %*': rewardBandFor(achieved),
   };
 }
-// Group Trade Parts is forecast-driven, not a hedged run-rate estimate, so
-// its status is a plain "Tracking ahead"/"Tracking behind" call off the
-// forecast vs target - no cautious "Watch" middle state.
+// Same green/amber/red thresholds as svoClass elsewhere in the hub (>=100%
+// ahead, >=90% slightly behind, below that behind) - previously this was a
+// straight binary split at 100%, so a forecast a few hundred pounds under
+// target (still rounding to "100%" on screen) showed full red "Tracking
+// behind" with no middle ground.
 function tradePartsStatusPill(forecast, target){
   if(forecast===null||forecast===undefined||target===null||target===undefined) return '<span class="status">No data</span>';
-  return forecast>=target ? '<span class="status green">Tracking ahead</span>' : '<span class="status red">Tracking behind</span>';
+  const ratio = target ? forecast/target : null;
+  if(ratio===null) return '<span class="status">No data</span>';
+  return ratio>=1 ? '<span class="status green">Tracking ahead</span>' : ratio>=0.9 ? '<span class="status amber">Tracking slightly behind</span>' : '<span class="status red">Tracking behind</span>';
 }
 // "£X behind"/"£X over" against target, same convention as gapLabel() but
 // always currency (gapLabel's currency detection keys off a pillar name,
