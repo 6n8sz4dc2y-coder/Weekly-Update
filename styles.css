@@ -247,8 +247,8 @@ nav .hub-link-btn{margin-left:auto}
 /* Programmes Hub: reporting-period toggle, styled as a segmented switch
    (grey track, buttons flush inside it) so it visibly reads as something
    you flip between rather than two disconnected labels. */
-.periodToggle{display:inline-flex;gap:2px;flex-wrap:wrap;background:#eef1f6;border:1px solid var(--line);border-radius:999px;padding:3px}
-.periodToggle button{font-size:14px;padding:10px 17px;margin:0;border:none;background:transparent;color:#475569;box-shadow:none;transition:background .15s ease,color .15s ease,transform .1s ease}
+.periodToggle{display:inline-flex;gap:2px;flex-wrap:wrap;background:#eef1f6;border:1px solid var(--line);border-radius:999px;padding:2px}
+.periodToggle button{font-size:12px;padding:6px 12px;margin:0;border:none;background:transparent;color:#475569;box-shadow:none;transition:background .15s ease,color .15s ease,transform .1s ease}
 .periodToggle button:hover{background:#e2e8f0;color:var(--ink)}
 .periodToggle button:active{transform:scale(.97)}
 .periodToggle button.primary-btn{background:var(--head);color:#fff;box-shadow:0 1px 4px rgba(15,23,42,.3)}
@@ -256,9 +256,9 @@ nav .hub-link-btn{margin-left:auto}
 /* Reporting period lives inside <header> now (was its own card on the
    Dashboard tab) so it scrolls and sticks together with the rest of the
    header on every tab, instead of scrolling out of view. */
-.header-period-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14)}
-.header-period-label{color:#cbd5e1;font-weight:800;font-size:13px}
-.header-period-label small{display:block;font-weight:600;color:#94a3b8;font-size:11px;margin-top:2px}
+.header-period-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.14)}
+.header-period-label{color:#cbd5e1;font-weight:800;font-size:11px}
+.header-period-label small{display:inline;font-weight:600;color:#94a3b8;font-size:10px;margin-left:4px}
 header .periodToggle{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
 header .periodToggle button{color:#e2e8f0}
 header .periodToggle button:hover{background:rgba(255,255,255,.18);color:#fff}
