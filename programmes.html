@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>RRG Group Programmes Hub</title>
+<link rel="stylesheet" href="./styles.css?v=20260828-programmes-1">
+</head>
+<body>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a><br><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="centres">Centre Detail</button><button data-target="cdaSummary">CDA Summary</button><button data-target="admin">Admin Update</button></nav></header>
+<main>
+<div class="card wide period-card" style="margin-bottom:16px">
+  <div><strong>Reporting period</strong><div class="hint" style="margin:2px 0 0">This is an annual programme - switch between the full Year to Date figures and the current quarter. Applies to Dashboard, Centre Detail and CDA Summary.</div></div>
+  <div id="periodToggle"></div>
+</div>
+<div class="card wide" style="margin-bottom:16px;border-left:4px solid #b45309"><strong>Data basis:</strong> Part Purchases, Accessory Purchases and Used Vehicles actuals are <strong>run-rate</strong> figures (projected from cars sold), not confirmed transaction totals. Service Plans Plus actuals are true, confirmed figures. Target and SvO are accurate to date for every pillar.</div>
+<section id="dashboard" class="section active"><div class="grid">
+<div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
+<div class="card wide"><h3>Rankings · SvO (Actual &divide; Target)</h3><div id="pillarLeaderboards" class="grid" style="padding:0"></div></div>
+</div></section>
+<section id="centres" class="section"><div class="card wide"><div class="toolbar"><h2>Centre Detail</h2><input class="search" data-filter="centreTable" placeholder="Search centre..."></div><div class="hint">SvO = Sales vs Objective (Actual &divide; Target). Green = at or above target, amber = within 90%, red = below 90%. Actuals for Part Purchases, Accessory Purchases and Used Vehicles are run-rate estimates; Service Plans Plus actuals are confirmed. Click a column heading to rank by it.</div><div class="table-wrap"><table id="centreTable"></table></div></div></section>
+<section id="cdaSummary" class="section"><div class="grid">
+<div id="cdaPillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
+<div class="card wide"><div class="toolbar"><h2>CDA Detail</h2></div><div class="hint">Rolled up by CDA (North Manchester, South Manchester, West Yorkshire). Same run-rate basis as Centre Detail. Click a column heading to rank by it.</div><div class="table-wrap"><table id="cdaTable"></table></div></div>
+</div></section>
+<section id="admin" class="section"><div class="grid">
+  <div class="card wide">
+    <h2>Admin Update</h2>
+    <div class="hint">This hub reads up to four workbooks uploaded to GitHub, each with an "Export" sheet (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns): Centre and CDA level, each for Year to Date and Q3. Replace whichever file(s) changed each period, commit, and refresh the dashboard. The parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
+  </div>
+  <div class="card wide version-card">
+    <div><strong>Current Live Version</strong><br><span id="adminLiveVersion">-</span></div>
+    <div><strong>Published</strong><br><span id="adminPublishedAt">-</span></div>
+    <div><strong>Cache status</strong><br><span>Versioned assets active</span></div>
+  </div>
+  <div class="card third">
+    <h3>1. Centre - Q3.xlsx</h3>
+    <input id="centreQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Current-quarter figures by centre.</div>
+  </div>
+  <div class="card third">
+    <h3>2. Centre - YTD.xlsx</h3>
+    <input id="centreYtdFile" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Year-to-date figures by centre.</div>
+  </div>
+  <div class="card third">
+    <h3>3. CDA - Q3.xlsx</h3>
+    <input id="cdaQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Current-quarter figures rolled up by CDA.</div>
+  </div>
+  <div class="card third">
+    <h3>4. CDA - YTD.xlsx</h3>
+    <input id="cdaYtdFile" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Year-to-date figures rolled up by CDA.</div>
+  </div>
+  <div class="card wide">
+    <div class="toolbar">
+      <h3>Preview</h3>
+      <div>
+        <button class="admin-btn" id="previewImport">Preview Import</button>
+        <button class="admin-btn primary-btn" id="publishImport">Publish</button>
+        <button class="admin-btn" id="downloadData">Download data backup</button>
+        <button class="admin-btn primary-btn" id="exportPdf" type="button">Export PDF</button>
+        <button class="admin-btn danger-btn" id="resetData">Reset saved data</button>
+      </div>
+    </div>
+    <div id="adminStatus" class="note-box">No files loaded yet.</div>
+    <div id="adminPreviewContainer"></div>
+  </div>
+</div></section>
+<div class="footer-note">RRG Group Programmes Hub · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="./service-data.js?v=2"></script>
+<script src="./service-data-ytd.js?v=2"></script>
+<script src="./service-cda-data.js?v=2"></script>
+<script src="./service-cda-data-ytd.js?v=2"></script>
+<script src="./service-app.js?v=2"></script>
+</body></html>
