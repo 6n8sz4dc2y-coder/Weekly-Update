@@ -181,6 +181,16 @@ function extractCdaName(filtersText, fallback){
   }
   return fallback;
 }
+// Same idea, but for an individual-site Trade Parts export, e.g.
+// "...+ RRG Macclesfield (006928) (Dealer Name Code)\n..." -> "RRG
+// Macclesfield" (the dealer code in the middle is dropped).
+function extractSiteName(filtersText, fallback){
+  if(filtersText){
+    const m = filtersText.match(/\+\s*([^()\n]+?)\s*\([^()\n]*\)\s*\(Dealer Name Code\)/i);
+    if(m) return m[1].trim();
+  }
+  return fallback;
+}
 
 // WRR export: one flat row per centre (CPUS Unique, Target, Centre %
 // Achieved, plus a "WRR Group" column that is the same CDA grouping used
@@ -474,6 +484,24 @@ function renderTradePartsCdaCards(containerId, cdaList){
     </div>`;
   }).join('');
 }
+// Individual-site Trade Parts league - one ranked list per period (Q3
+// forecast, Year to Date = Q1+Q2+Q3) rather than a single toggled list, so
+// both are visible together. Sites are ranked by achieved %, same
+// leader-row style as the WRR/VCF rankings; unlike the fixed CDA card
+// order, a league is meant to be sorted by performance.
+function renderTradePartsSiteLeague(containerId, sitesList, periodRow){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  if(!sitesList || !sitesList.length){ el.innerHTML = '<div class="hint">No site data loaded yet.</div>'; return; }
+  const ranked = sitesList.map(s=>{
+    const row = periodRow(s);
+    const forecast = row ? row['SMROE Sales Out (Forecast)*'] : null;
+    const target = row ? row['SMROE Target'] : null;
+    const achieved = row ? row['Target % Achieved (Forecast)*'] : null;
+    return { site: s.site, forecast, target, achieved };
+  }).sort((a,b)=>(b.achieved??-Infinity)-(a.achieved??-Infinity));
+  el.innerHTML = ranked.map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.site}<div class="mini">${fmtGbp(r.forecast)} / ${fmtGbp(r.target)} · ${tradePartsGapLabel(r.forecast,r.target)}</div></div><div class="pct ${svoClass(r.achieved)}">${pct(r.achieved)}</div>${progressBar(r.achieved)}</div>`).join('');
+}
 
 // WRR: two separate workbooks (Q3, YTD), each a flat per-centre row with a
 // Total row already computed - same "This Quarter / Year to Date" framing
@@ -571,6 +599,8 @@ function build(){
   // Trade Parts tab
   renderTradePartsCard('tradePartsCard', DATA.tradeParts);
   renderTradePartsCdaCards('tradePartsCdaCards', DATA.tradePartsCda);
+  renderTradePartsSiteLeague('tradePartsSitesQ3', DATA.tradePartsSites, s=>tradePartsRow(s,'Q3'));
+  renderTradePartsSiteLeague('tradePartsSitesYtd', DATA.tradePartsSites, s=>tradePartsYtdThroughQ3(s));
   renderTradeParts(DATA.tradeParts);
   // WRR tab
   renderWrrCard('wrrCard', DATA.wrr.q3, DATA.wrr.ytd);
@@ -587,6 +617,7 @@ let DATA = {
   wrr: { q3: window.SERVICE_DATA_WRR_Q3 || null, ytd: window.SERVICE_DATA_WRR_YTD || null },
   tradeParts: window.SERVICE_DATA_TRADE_PARTS || null,
   tradePartsCda: window.SERVICE_DATA_TRADE_PARTS_CDA || null,
+  tradePartsSites: window.SERVICE_DATA_TRADE_PARTS_SITES || null,
 };
 try{
   const saved = localStorage.getItem(SERVICE_DATA_KEY);
@@ -684,6 +715,22 @@ async function previewImport(){
       block.innerHTML = `<div class="hint" style="margin-top:12px">Group Trade Parts breakdown preview</div>` + cdaList.map(c=>`<div class="hint" style="margin-top:8px"><strong>${c.cda}</strong></div><div class="table-wrap" style="max-height:220px">${tradePartsPreviewHtml(c)}</div>`).join('');
       container.appendChild(block);
     }
+    const tradePartsSitesFiles = document.getElementById('tradePartsSitesFile')?.files;
+    if(tradePartsSitesFiles && tradePartsSitesFiles.length){
+      const sitesList = [];
+      for(const file of tradePartsSitesFiles){
+        const buf = await readFileAsArrayBuffer(file);
+        const wb = XLSX.read(buf,{type:'array'});
+        const parsed = parseTradePartsWorkbook(wb);
+        const site = extractSiteName(parsed.filtersText, file.name.replace(/\.[^.]+$/,''));
+        sitesList.push(Object.assign({ site }, parsed));
+      }
+      data.tradePartsSites = sitesList;
+      messages.push(`Trade Parts sites imported (${sitesList.map(s=>s.site).join(', ')})`);
+      const block = document.createElement('div');
+      block.innerHTML = `<div class="hint" style="margin-top:12px">Trade Parts sites preview</div>` + sitesList.map(s=>`<div class="hint" style="margin-top:8px"><strong>${s.site}</strong></div><div class="table-wrap" style="max-height:220px">${tradePartsPreviewHtml(s)}</div>`).join('');
+      container.appendChild(block);
+    }
     for(const slot of WRR_SLOTS){
       const file = document.getElementById(slot.fileId)?.files?.[0];
       if(!file) continue;
@@ -729,6 +776,7 @@ function downloadDataBackup(){
   downloadOne('service-cda-data-ytd.js', 'SERVICE_DATA_CDA_YTD', DATA.cda.ytd);
   downloadOne('service-trade-parts-data.js', 'SERVICE_DATA_TRADE_PARTS', DATA.tradeParts);
   downloadOne('service-trade-parts-cda-data.js', 'SERVICE_DATA_TRADE_PARTS_CDA', DATA.tradePartsCda);
+  downloadOne('service-trade-parts-sites-data.js', 'SERVICE_DATA_TRADE_PARTS_SITES', DATA.tradePartsSites);
   downloadOne('service-wrr-data.js', 'SERVICE_DATA_WRR_Q3', DATA.wrr.q3);
   downloadOne('service-wrr-data-ytd.js', 'SERVICE_DATA_WRR_YTD', DATA.wrr.ytd);
 }
