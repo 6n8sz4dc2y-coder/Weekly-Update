@@ -617,6 +617,18 @@ function resetSavedData(){
 }
 
 // --- Wiring ---------------------------------------------------------------
+(function(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('admin')==='1'){
+    localStorage.setItem('rrg_admin_unlocked','1');
+    params.delete('admin');
+    const qs=params.toString();
+    history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash);
+  }
+  if(localStorage.getItem('rrg_admin_unlocked')!=='1'){
+    document.querySelectorAll('nav button[data-target="admin"]').forEach(b=>b.style.display='none');
+  }
+})();
 document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('click',()=>{
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
