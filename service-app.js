@@ -401,24 +401,44 @@ function renderTradePartsCard(containerId, data){
     <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
   </div>`;
 }
-// CDA + Lexus breakdown of Group Trade Parts - each entry is its own
-// per-CDA (or Lexus) export, same Period-row shape as the Group workbook.
-// Ranked on the row matching the active period (Q3 row for "q3", Total row
-// for "ytd" - the group card already uses "Full Year" as the YTD-equivalent
-// framing since Trade Parts has no separate YTD workbook).
-function renderTradePartsCdaRanking(containerId, cdaList){
+// CDA + Lexus breakdown of Group Trade Parts, one box per CDA laid out like
+// the VCF pillar cards rather than a ranked list - This Quarter always
+// reads the forecast (the export's own headline metric for an in-progress
+// quarter, not the partial to-date actual), Full Year reads the Total row,
+// which is already Q1 + Q2 actual plus the Q3 forecast (Q4 hasn't started
+// yet). Each column also shows the reward band (5/9/12%) that forecast is
+// currently tracking to earn.
+function renderTradePartsCdaCards(containerId, cdaList){
   const el = document.getElementById(containerId);
   if(!el) return;
-  if(!cdaList || !cdaList.length){ el.innerHTML = ''; return; }
-  const periodLabel = ACTIVE_PERIOD==='q3' ? 'Q3' : 'Total';
-  const ranked = cdaList.map(c=>{
-    const row = tradePartsRow(c, periodLabel);
-    const forecast = row ? row['SMROE Sales Out (Forecast)*'] : null;
-    const target = row ? row['SMROE Target'] : null;
-    const achieved = row ? row['Target % Achieved (Forecast)*'] : null;
-    return { name: c.cda, forecast, target, achieved };
-  }).sort((a,b)=>(b.achieved??-Infinity)-(a.achieved??-Infinity));
-  el.innerHTML = ranked.map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.name}<div class="mini">${fmtGbp(r.forecast)} / ${fmtGbp(r.target)} · ${tradePartsGapLabel(r.forecast,r.target)}</div></div><div class="pct ${svoClass(r.achieved)}">${pct(r.achieved)}</div>${progressBar(r.achieved)}</div>`).join('');
+  if(!cdaList || !cdaList.length){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+  const cell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', reward:'-', statusHtml:'<span class="status">No data</span>' };
+    const forecast = row['SMROE Sales Out (Forecast)*'];
+    const target = row['SMROE Target'];
+    const achieved = row['Target % Achieved (Forecast)*'];
+    const reward = row['Target Reward %*'];
+    return {
+      value: pct(achieved),
+      note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`,
+      gap: tradePartsGapLabel(forecast, target),
+      reward: reward===null||reward===undefined ? '-' : pct(reward),
+      statusHtml: tradePartsStatusPill(forecast, target),
+    };
+  };
+  el.innerHTML = cdaList.map((c,i)=>{
+    const q3Cell = cell(tradePartsRow(c, 'Q3'));
+    const totalCell = cell(tradePartsRow(c, 'Total'));
+    const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
+    return `<div class="card kpi kpi-progress-card ${accent}">
+      <div class="label">${c.cda}</div>
+      <div class="kpi-split-main">
+        <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div><div class="note">Reward band <strong>${q3Cell.reward}</strong></div></div>
+        <div><div class="mini-label">Full Year</div><div class="value">${totalCell.value}</div><div class="note note-target">${totalCell.note}</div><div class="note">${totalCell.gap}</div><div class="note">Reward band <strong>${totalCell.reward}</strong></div></div>
+      </div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
+    </div>`;
+  }).join('');
 }
 
 // WRR: two separate workbooks (Q3, YTD), each a flat per-centre row with a
@@ -516,7 +536,7 @@ function build(){
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');
   // Trade Parts tab
   renderTradePartsCard('tradePartsCard', DATA.tradeParts);
-  renderTradePartsCdaRanking('tradePartsCdaLeaderboard', DATA.tradePartsCda);
+  renderTradePartsCdaCards('tradePartsCdaCards', DATA.tradePartsCda);
   renderTradeParts(DATA.tradeParts);
   // WRR tab
   renderWrrCard('wrrCard', DATA.wrr.q3, DATA.wrr.ytd);
