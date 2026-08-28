@@ -31,7 +31,7 @@
 
 /* Headline KPI month / quarter progress cards */
 .kpi-progress-card{padding:20px;min-height:260px;display:flex;flex-direction:column;gap:14px}
-.kpi-progress-card .label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#64748b}
+.kpi-progress-card .label{font-size:13px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#64748b;min-height:38px}
 .kpi-split-main{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .kpi-split-main>div:first-child{border-right:1px solid var(--line);padding-right:16px}
 .mini-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;font-weight:900;margin-bottom:4px}
@@ -266,7 +266,9 @@ header .periodToggle button.primary-btn{background:#fff;color:var(--head);box-sh
 header .periodToggle button.primary-btn:hover{background:#fff}
 @media print{.hub-link-btn,.periodToggle,.header-period-row{display:none!important}}
 
-/* #pillarCards gets an inline grid-template-columns override (set in JS,
-   one column per card) so its variable card count always fits one line on
-   desktop - revert to the standard 12-col/span-12 stack on narrow screens. */
-@media(max-width:900px){#pillarCards{grid-template-columns:repeat(12,1fr)!important}}
+/* Reserve height for the actual/target line in each kpi-split-main column
+   so cards stay level even when one shows a long currency string that
+   wraps to two lines (Part/Accessory Purchases) and another a short count
+   that fits on one (Used Vehicles, Service Plans Plus, WRR) - otherwise
+   the footer strip sits at a different height across cards. */
+.note-target{min-height:36px}
