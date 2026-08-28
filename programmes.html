@@ -20,12 +20,13 @@
 </div>
 <div class="card wide"><h3>Rankings</h3><div id="pillarLeaderboards" class="grid" style="padding:0"></div></div>
 <div class="card wide"><h3>CDA Rankings</h3><div id="cdaLeaderboards" class="grid" style="padding:0"></div></div>
+<div class="card wide"><h3>Group Trade Parts</h3><div class="hint">SMROE sales out by quarter, Group-level. Q3 is in progress - Forecast projects the full quarter from days elapsed; To Date is the confirmed total so far. Status is based on the forecast.</div><div class="table-wrap"><table id="tradePartsTable"></table></div></div>
 </div></section>
 <section id="centres" class="section"><div class="card wide"><div class="toolbar"><h2>Centre Detail</h2><input class="search" data-filter="centreTable" placeholder="Search centre..."></div><div class="hint" style="margin-bottom:4px">Click to change period</div><div class="periodToggle" style="margin-bottom:12px"></div><div class="hint">Green = at or above target, amber = within 90%, red = below 90%. Click a column heading to rank by it.</div><div class="table-wrap"><table id="centreTable"></table></div></div></section>
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
     <h2>Admin Update</h2>
-    <div class="hint">This hub reads up to four workbooks uploaded to GitHub, each with an "Export" sheet (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns): Centre and CDA level, each for Year to Date and Q3. Replace whichever file(s) changed each period, commit, and refresh the dashboard. The parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
+    <div class="hint">This hub reads up to five workbooks uploaded to GitHub, each with an "Export" sheet: four VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date and Q3; plus one Group Trade Parts export (a flat quarterly table, Group-level only). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
   </div>
   <div class="card wide version-card">
     <div><strong>Current Live Version</strong><br><span id="adminLiveVersion">-</span></div>
@@ -52,6 +53,11 @@
     <input id="cdaYtdFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Year-to-date figures rolled up by CDA.</div>
   </div>
+  <div class="card third">
+    <h3>5. Group Trade Parts.xlsx</h3>
+    <input id="tradePartsFile" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Quarterly SMROE sales out, target and reward - Group-level only.</div>
+  </div>
   <div class="card wide">
     <div class="toolbar">
       <h3>Preview</h3>
@@ -73,5 +79,6 @@
 <script src="./service-data-ytd.js?v=3"></script>
 <script src="./service-cda-data.js?v=3"></script>
 <script src="./service-cda-data-ytd.js?v=3"></script>
-<script src="./service-app.js?v=8"></script>
+<script src="./service-trade-parts-data.js?v=1"></script>
+<script src="./service-app.js?v=9"></script>
 </body></html>
