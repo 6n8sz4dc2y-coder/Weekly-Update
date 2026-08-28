@@ -321,6 +321,54 @@ function renderTradeParts(data){
   }).join('')}</tbody>`;
 }
 
+function tradePartsRow(data, period){
+  if(!data || !data.rows) return null;
+  return data.rows.find(r => String(r.Period||'').toLowerCase()===period.toLowerCase()) || null;
+}
+// "£X behind"/"£X over" against target, same convention as gapLabel() but
+// always currency (gapLabel's currency detection keys off a pillar name,
+// which doesn't apply here).
+function tradePartsGapLabel(forecast, target){
+  if(forecast===null||forecast===undefined||target===null||target===undefined) return '';
+  const gap = forecast - target;
+  const cls = gap>=0 ? 'positive' : 'negative';
+  const text = gap>=0 ? `${fmtGbp(gap)} over` : `${fmtGbp(Math.abs(gap))} behind`;
+  return `<span class="variance-cell ${cls}">${text}</span>`;
+}
+// Appends a 5th summary card into the same top grid as the 4 VCF pillar
+// cards - This Quarter (Q3 row) and Full Year (Total row), both read off
+// the forecast (the headline metric the source export itself uses for an
+// in-progress quarter) rather than the partial to-date actual.
+function renderTradePartsCard(containerId, data){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const q3 = tradePartsRow(data, 'Q3');
+  const total = tradePartsRow(data, 'Total');
+  if(!q3 && !total) return;
+  const cell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
+    const forecast = row['SMROE Sales Out (Forecast)*'];
+    const target = row['SMROE Target'];
+    const achieved = row['Target % Achieved (Forecast)*'];
+    return {
+      value: pct(achieved),
+      note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`,
+      gap: tradePartsGapLabel(forecast, target),
+      statusHtml: achieved===null||achieved===undefined ? '<span class="status">No data</span>' : statusPill(achieved),
+    };
+  };
+  const q3Cell = cell(q3), totalCell = cell(total);
+  const accent = CARD_ACCENTS[4 % CARD_ACCENTS.length];
+  el.innerHTML += `<div class="card kpi kpi-progress-card ${accent}">
+    <div class="label">Group Trade Parts<span class="status blue" style="margin-left:8px;vertical-align:middle">Group</span></div>
+    <div class="kpi-split-main">
+      <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
+      <div><div class="mini-label">Full Year</div><div class="value">${totalCell.value}</div><div class="note">${totalCell.note}</div><div class="note">${totalCell.gap}</div></div>
+    </div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
+  </div>`;
+}
+
 function renderPeriodToggle(){
   // Multiple instances share the same state (Dashboard above Rankings,
   // Centre Detail) so the period can be switched from whichever tab is
@@ -336,6 +384,7 @@ function renderPeriodToggle(){
 function build(){
   renderPeriodToggle();
   renderPillarCards(groupData('q3'), groupData('ytd'), 'pillarCards');
+  renderTradePartsCard('pillarCards', DATA.tradeParts);
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD], 'pillarLeaderboards');
   renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');
