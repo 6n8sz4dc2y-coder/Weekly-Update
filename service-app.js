@@ -275,6 +275,13 @@ function pillarBadge(name){
   const basis = pillarBasis(name);
   return `<span class="status ${basis==='Actual'?'green':'blue'}" style="margin-left:8px;vertical-align:middle">${basis}</span>`;
 }
+// Every hero card on this hub (VCF pillars, Trade Parts Group, WRR) shows a
+// company-wide Group total, not a single centre/CDA - label it explicitly
+// rather than leaving that implicit, matching the badge already used on the
+// Trade Parts Group card.
+function groupBadge(){
+  return `<span class="status blue" style="margin-left:8px;vertical-align:middle">Group</span>`;
+}
 const CARD_ACCENTS = ['blue-card','green-card','purple-card','amber-card'];
 // Q3 (the opener) on the left, Year to Date on the right - one card per
 // pillar, mirroring the Weekly Update dashboard's Month-to-date / Total
@@ -289,7 +296,7 @@ function renderPillarCards(q3Data, ytdData, containerId){
     const ytd = pillarTotals(ytdData, name);
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
-      <div class="label">${name}${pillarBadge(name)}</div>
+      <div class="label">${name}${groupBadge()}${pillarBadge(name)}</div>
       <div class="kpi-split-main">
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3.svo)}</div><div class="note note-target"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div><div class="note">${gapLabel(name,q3.actual,q3.target)}</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note note-target"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div><div class="note">${gapLabel(name,ytd.actual,ytd.target)}</div></div>
@@ -525,7 +532,7 @@ function renderWrrCard(containerId, q3Data, ytdData){
   };
   const q3Cell = cell(q3), ytdCell = cell(ytd);
   el.innerHTML = `<div class="card half kpi-progress-card blue-card">
-    <div class="label">WRR<span class="status green" style="margin-left:8px;vertical-align:middle">Actual</span></div>
+    <div class="label">WRR${groupBadge()}<span class="status green" style="margin-left:8px;vertical-align:middle">Actual</span></div>
     <div class="kpi-split-main">
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
       <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
