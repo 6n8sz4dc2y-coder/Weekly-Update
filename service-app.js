@@ -236,7 +236,7 @@ function renderLeaderboards(data, containerId){
       const values = r.values[name] || {};
       return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.centre}<div class="mini">${displayVal(name,values.actual)} / ${displayVal(name,values.target)} · ${gapLabel(name,values.actual,values.target)}</div></div><div class="pct">${pct(v)}</div>${progressBar(v)}</div>`;
     }).join('');
-    return `<div class="card half"><h3>${name}</h3><div class="leader">${rows || '<div class="hint">No centre data.</div>'}</div></div>`;
+    return `<div class="card quarter leader-quarter"><h3>${name}</h3><div class="leader">${rows || '<div class="hint">No centre data.</div>'}</div></div>`;
   }).join('');
 }
 
