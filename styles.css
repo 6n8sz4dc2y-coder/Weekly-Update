@@ -35,7 +35,7 @@
 .kpi-split-main{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .kpi-split-main>div:first-child{border-right:1px solid var(--line);padding-right:16px}
 .mini-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;font-weight:900;margin-bottom:4px}
-.green-card .mini-label{color:#15803d}.purple-card .mini-label{color:#7e22ce}
+.green-card .mini-label{color:#15803d}.purple-card .mini-label{color:#7e22ce}.amber-card .mini-label{color:#b45309}
 .kpi-progress-card .value{font-size:40px;line-height:1;font-weight:950;letter-spacing:-.05em;margin:4px 0 8px}
 .month-progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .month-progress-grid>div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px;text-align:center}
@@ -44,11 +44,13 @@
 .month-progress-grid small{display:block;color:#64748b;font-size:12px}
 .kpi-footer-strip{margin:2px -20px -20px;padding:14px 20px;background:#f8fafc;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px;border-radius:0 0 18px 18px}
 .kpi-footer-strip span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:900}
-.kpi-footer-strip strong{font-size:20px;letter-spacing:-.03em}.blue-card .kpi-footer-strip strong{color:#1d4ed8}.green-card .kpi-footer-strip strong{color:#15803d}.purple-card .kpi-footer-strip strong{color:#7e22ce}
+.kpi-footer-strip strong{font-size:20px;letter-spacing:-.03em}.blue-card .kpi-footer-strip strong{color:#1d4ed8}.green-card .kpi-footer-strip strong{color:#15803d}.purple-card .kpi-footer-strip strong{color:#7e22ce}.amber-card .kpi-footer-strip strong{color:#b45309}
 @media(max-width:900px){.kpi-progress-card{min-height:auto}.kpi-split-main{grid-template-columns:1fr}.kpi-split-main>div:first-child{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:12px}.month-progress-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi-footer-strip{grid-template-columns:1fr}}
 
-/* Fix: keep run rate value and '/ week' on one line with matching KPI font */
-.kpi-footer-strip strong span{
+/* Fix: keep run rate value and '/ week' on one line with matching KPI font.
+   Excludes .status pills so their red/amber/green meaning isn't overridden
+   by the card's accent color. */
+.kpi-footer-strip strong span:not(.status){
   display:inline !important;
   font-size:inherit !important;
   text-transform:none !important;
@@ -215,8 +217,10 @@ table{border-collapse:separate;border-spacing:0}
 .dashboard-pace .status{padding:4px 8px;font-size:11px;line-height:1;letter-spacing:.01em}
 
 /* Cross-hub navigation button (Weekly Update <-> Programmes Hub) */
-.hub-link-btn{display:inline-block;background:#2563eb;color:#fff!important;border:1px solid #2563eb;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;text-decoration:none;margin-bottom:8px}
+.hub-link-btn{display:inline-block;background:#2563eb;color:#fff!important;border:1px solid #2563eb;border-radius:999px;padding:9px 13px;font-weight:800;font-size:13px;text-decoration:none}
 .hub-link-btn:hover{background:#1d4ed8}
+nav .hub-link-btn{margin-left:auto}
+@media(max-width:900px){nav .hub-link-btn{margin-left:0}}
 
 /* Programmes Hub: reporting-period toggle */
 #periodToggle{display:flex;gap:8px;flex-wrap:wrap}
