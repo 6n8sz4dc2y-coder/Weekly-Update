@@ -352,6 +352,31 @@ function tradePartsRow(data, period){
   if(!data || !data.rows) return null;
   return data.rows.find(r => String(r.Period||'').toLowerCase()===period.toLowerCase()) || null;
 }
+// Reward band thresholds mirror svoClass (green/amber/red -> 12/9/5%) -
+// holds for every period in every export: achieved >=100% earns 12%,
+// >=90% earns 9%, below that earns 5%.
+function rewardBandFor(achieved){
+  if(achieved===null||achieved===undefined) return null;
+  return achieved>=1 ? 0.12 : achieved>=0.9 ? 0.09 : 0.05;
+}
+// Toyota's own "Total" row annualises to the full year - its Target
+// includes Q4's target, and its Forecast extrapolates the whole year's
+// run rate past Q3 - but Q4 hasn't started and doesn't count yet, so
+// "year to date" here means literally Q1 + Q2 + Q3 (built directly from
+// those rows rather than trusting the export's own Total row).
+function tradePartsYtdThroughQ3(data){
+  const quarters = ['Q1','Q2','Q3'].map(p=>tradePartsRow(data,p)).filter(Boolean);
+  if(!quarters.length) return null;
+  const forecast = quarters.reduce((a,r)=>a+(Number(r['SMROE Sales Out (Forecast)*'])||0),0);
+  const target = quarters.reduce((a,r)=>a+(Number(r['SMROE Target'])||0),0);
+  const achieved = target ? forecast/target : null;
+  return {
+    'SMROE Sales Out (Forecast)*': forecast,
+    'SMROE Target': target,
+    'Target % Achieved (Forecast)*': achieved,
+    'Target Reward %*': rewardBandFor(achieved),
+  };
+}
 // Group Trade Parts is forecast-driven, not a hedged run-rate estimate, so
 // its status is a plain "Tracking ahead"/"Tracking behind" call off the
 // forecast vs target - no cautious "Watch" middle state.
@@ -370,15 +395,16 @@ function tradePartsGapLabel(forecast, target){
   return `<span class="variance-cell ${cls}">${text}</span>`;
 }
 // Appends a 5th summary card into the same top grid as the 4 VCF pillar
-// cards - This Quarter (Q3 row) and Full Year (Total row), both read off
-// the forecast (the headline metric the source export itself uses for an
-// in-progress quarter) rather than the partial to-date actual.
+// cards - This Quarter (Q3 row) and Year to Date (Q1+Q2+Q3, see
+// tradePartsYtdThroughQ3), both read off the forecast (the headline metric
+// the source export itself uses for an in-progress quarter) rather than
+// the partial to-date actual.
 function renderTradePartsCard(containerId, data){
   const el = document.getElementById(containerId);
   if(!el) return;
   const q3 = tradePartsRow(data, 'Q3');
-  const total = tradePartsRow(data, 'Total');
-  if(!q3 && !total){ el.innerHTML = ''; return; }
+  const ytd = tradePartsYtdThroughQ3(data);
+  if(!q3 && !ytd){ el.innerHTML = ''; return; }
   const cell = (row) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
     const forecast = row['SMROE Sales Out (Forecast)*'];
@@ -391,22 +417,22 @@ function renderTradePartsCard(containerId, data){
       statusHtml: tradePartsStatusPill(forecast, target),
     };
   };
-  const q3Cell = cell(q3), totalCell = cell(total);
+  const q3Cell = cell(q3), ytdCell = cell(ytd);
   el.innerHTML = `<div class="card half kpi-progress-card green-card">
     <div class="label">Group Trade Parts<span class="status blue" style="margin-left:8px;vertical-align:middle">Group</span></div>
     <div class="kpi-split-main">
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
-      <div><div class="mini-label">Full Year</div><div class="value">${totalCell.value}</div><div class="note note-target">${totalCell.note}</div><div class="note">${totalCell.gap}</div></div>
+      <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
     </div>
-    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
   </div>`;
 }
 // CDA + Lexus breakdown of Group Trade Parts, one box per CDA laid out like
 // the VCF pillar cards rather than a ranked list - This Quarter always
 // reads the forecast (the export's own headline metric for an in-progress
-// quarter, not the partial to-date actual), Full Year reads the Total row,
-// which is already Q1 + Q2 actual plus the Q3 forecast (Q4 hasn't started
-// yet). Each column also shows the reward band (5/9/12%) that forecast is
+// quarter, not the partial to-date actual), Year to Date is Q1+Q2+Q3 only
+// (see tradePartsYtdThroughQ3 - Q4 hasn't started and doesn't count yet).
+// Each column also shows the reward band (5/9/12%) that forecast is
 // currently tracking to earn.
 // Fixed display order rather than upload order (multi-file selection order
 // isn't guaranteed) - anything not in this list (a future new CDA) is
@@ -436,15 +462,15 @@ function renderTradePartsCdaCards(containerId, cdaList){
   };
   el.innerHTML = cdaList.map((c,i)=>{
     const q3Cell = cell(tradePartsRow(c, 'Q3'));
-    const totalCell = cell(tradePartsRow(c, 'Total'));
+    const ytdCell = cell(tradePartsYtdThroughQ3(c));
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
       <div class="label">${c.cda}</div>
       <div class="kpi-split-main">
         <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div><div class="note">Reward band <strong>${q3Cell.reward}</strong></div></div>
-        <div><div class="mini-label">Full Year</div><div class="value">${totalCell.value}</div><div class="note note-target">${totalCell.note}</div><div class="note">${totalCell.gap}</div><div class="note">Reward band <strong>${totalCell.reward}</strong></div></div>
+        <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div><div class="note">Reward band <strong>${ytdCell.reward}</strong></div></div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (Full Year)</span><strong>${totalCell.statusHtml}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
     </div>`;
   }).join('');
 }
