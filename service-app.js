@@ -64,6 +64,14 @@ const svoClass = n => n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber'
 const svoLabel = n => n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Watch':'Behind');
 const progressBar = n => `<div class="progress"><div class="bar ${svoClass(n)}" style="width:${Math.min(Math.max((n||0)*100,0),120)}%"></div></div>`;
 const statusPill = n => `<span class="status ${svoClass(n)}">${svoLabel(n)}</span>`;
+// Confirmed-actual pillars (Service Plans Plus) don't get the cautious
+// "Watch" middle state that run-rate pillars use to hedge an estimate -
+// the number is exact, so it's a plain Ahead/Behind call.
+const statusPillFor = (name, n) => {
+  if(!isActualPillar(name)) return statusPill(n);
+  if(n===null||n===undefined) return '<span class="status">No data</span>';
+  return n>=1 ? '<span class="status green">Ahead</span>' : '<span class="status red">Behind</span>';
+};
 
 // --- Parsing --------------------------------------------------------------
 // Sheet shape: row0 = pillar names (first cell of each group, rest blank -
@@ -176,7 +184,7 @@ function renderPillarCards(q3Data, ytdData, containerId){
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3.svo)}</div><div class="note"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div></div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPill(q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPill(ytd.svo)}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name, q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name, ytd.svo)}</strong></div></div>
     </div>`;
   }).join('');
 }
