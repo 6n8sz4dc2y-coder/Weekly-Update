@@ -234,7 +234,7 @@ function renderLeaderboards(data, containerId){
     const rows = sorted.map((r,i)=>{
       const v = centreSvo(r,name);
       const values = r.values[name] || {};
-      return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.centre}<div class="mini">${displayVal(name,values.actual)} / ${displayVal(name,values.target)} · ${gapLabel(name,values.actual,values.target)}</div></div><div class="pct">${pct(v)}</div>${progressBar(v)}</div>`;
+      return `<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.centre}<div class="mini">${displayVal(name,values.actual)} / ${displayVal(name,values.target)} · ${gapLabel(name,values.actual,values.target)}</div></div><div class="pct ${svoClass(v)}">${pct(v)}</div>${progressBar(v)}</div>`;
     }).join('');
     return `<div class="card quarter leader-quarter"><h3>${name}</h3><div class="leader">${rows || '<div class="hint">No centre data.</div>'}</div></div>`;
   }).join('');
@@ -381,10 +381,26 @@ function renderPeriodToggle(){
   });
 }
 
+// The top card row's child count varies (however many VCF pillars the
+// export has, plus the Trade Parts card), so it can't rely on the fixed
+// 12-column grid + span-3 cards fitting neatly. Overrides the container to
+// exactly N equal columns so every card in it sits on one line.
+function fitCardsOneRow(containerId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const count = el.children.length;
+  el.style.gridTemplateColumns = count > 0 ? `repeat(${count}, 1fr)` : '';
+  // Each card's own .kpi class still carries "grid-column: span 3", which
+  // would fight the new N-column template - pin every card to exactly one
+  // column instead.
+  Array.from(el.children).forEach(child => { child.style.gridColumn = 'span 1'; });
+}
+
 function build(){
   renderPeriodToggle();
   renderPillarCards(groupData('q3'), groupData('ytd'), 'pillarCards');
   renderTradePartsCard('pillarCards', DATA.tradeParts);
+  fitCardsOneRow('pillarCards');
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD], 'pillarLeaderboards');
   renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');

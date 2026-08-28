@@ -238,6 +238,11 @@ nav .hub-link-btn{margin-left:auto}
 .leader-quarter .centre{font-size:13px}
 .leader-quarter .mini{font-size:11px}
 .leader-quarter .pct{font-size:13px}
+/* Colour the rank % itself to match achievement, since the leader-quarter
+   variant has no progress bar to carry that signal. */
+.pct.green{color:var(--green)}
+.pct.amber{color:var(--amber)}
+.pct.red{color:var(--red)}
 
 /* Programmes Hub: reporting-period toggle, styled as a segmented switch
    (grey track, buttons flush inside it) so it visibly reads as something
@@ -250,3 +255,8 @@ nav .hub-link-btn{margin-left:auto}
 .periodToggle button.primary-btn:hover{background:var(--head)}
 .period-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
 @media print{.hub-link-btn,.periodToggle{display:none!important}}
+
+/* #pillarCards gets an inline grid-template-columns override (set in JS,
+   one column per card) so its variable card count always fits one line on
+   desktop - revert to the standard 12-col/span-12 stack on narrow screens. */
+@media(max-width:900px){#pillarCards{grid-template-columns:repeat(12,1fr)!important}}
