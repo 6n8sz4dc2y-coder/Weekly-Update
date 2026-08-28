@@ -1,14 +1,23 @@
 // RRG Group Service Figures (VCF) dashboard.
 // Mirrors the Weekly Update hub's look, persistence and admin-upload pattern,
-// but parses a single "Export" workbook of Centre + repeating pillar groups
+// but parses "Export" workbooks of Centre/CDA + repeating pillar groups
 // (each group is however many sub-columns the export has, typically
 // Actual / Target / SvO). The parser is dynamic so new pillars, renamed
 // pillars, or extra sub-columns in a future export are picked up without
 // code changes.
+//
+// This is an annual programme, so figures come in two periods (Year to
+// Date and the current quarter) and two rollup levels (by Centre and by
+// CDA); the Total row at either level is the Group total. A period toggle
+// switches Dashboard, Centre Detail and CDA Summary together.
 
-const SERVICE_BUILD_VERSION = '2026.08.28.1';
+const SERVICE_BUILD_VERSION = '2026.08.28.2';
 const SERVICE_META_KEY = 'rrgServiceDashboardMeta_v1';
-const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v1';
+const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v2';
+
+const PERIODS = ['ytd','q3'];
+const PERIOD_LABEL = { ytd: 'Year to Date', q3: 'Q3 (Current Quarter)' };
+let ACTIVE_PERIOD = 'ytd';
 
 function formatPublishedAt(iso){
   if(!iso) return '-';
@@ -34,18 +43,21 @@ function saveServiceMeta(){
 }
 function updateVersionDisplays(){
   const meta = getServiceMeta();
-  const versionText = 'Version ' + meta.version;
-  const publishedText = 'Published ' + formatPublishedAt(meta.publishedAt);
-  ['liveVersionHeader','footerVersion','adminLiveVersion'].forEach(id=>setText(id, id==='adminLiveVersion' ? meta.version : versionText));
-  ['livePublishedHeader','footerPublished','adminPublishedAt'].forEach(id=>setText(id, id==='adminPublishedAt' ? formatPublishedAt(meta.publishedAt) : publishedText));
+  setText('liveVersionHeader', 'Version ' + meta.version);
+  setText('footerVersion', 'Version ' + meta.version);
+  setText('adminLiveVersion', meta.version);
+  setText('livePublishedHeader', 'Published ' + formatPublishedAt(meta.publishedAt));
+  setText('footerPublished', 'Published ' + formatPublishedAt(meta.publishedAt));
+  setText('adminPublishedAt', formatPublishedAt(meta.publishedAt));
 }
-
 function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
 
 const fmt=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n)};
 const fmtGbp=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)};
 const pct=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return Math.round(n*100)+"%"};
 const isCurrencyPillar = name => /purchase|£|value|revenue|spend/i.test(String(name||''));
+const isActualPillar = name => /service plan/i.test(String(name||''));
+const pillarBasis = name => isActualPillar(name) ? 'Actual' : 'Run-rate';
 const displayVal = (pillarName, n) => isCurrencyPillar(pillarName) ? fmtGbp(n) : fmt(n);
 const svoClass = n => n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red');
 const svoLabel = n => n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Watch':'Behind');
@@ -56,7 +68,7 @@ const statusPill = n => `<span class="status ${svoClass(n)}">${svoLabel(n)}</spa
 // Sheet shape: row0 = pillar names (first cell of each group, rest blank -
 // i.e. what Excel shows for merged header cells), row1 = sub-column labels
 // per pillar (Actual / Target / SvO, but read whatever is actually there),
-// then one data row per centre, a Total row, and finally a free-text
+// then one data row per centre/CDA, a Total row, and finally a free-text
 // "Applied filters" row which has no numeric values - parsing stops there.
 function parseVcfWorkbook(wb){
   const sheetName = wb.SheetNames.find(n=>/export/i.test(n)) || wb.SheetNames[0];
@@ -88,9 +100,9 @@ function parseVcfWorkbook(wb){
   let total = null;
   for(let i=2;i<rows.length;i++){
     const r = rows[i];
-    const centreRaw = r[0];
-    if(centreRaw===null || centreRaw===undefined || String(centreRaw).trim()==='') continue;
-    const centre = String(centreRaw).trim();
+    const groupRaw = r[0];
+    if(groupRaw===null || groupRaw===undefined || String(groupRaw).trim()==='') continue;
+    const centre = String(groupRaw).trim();
     const anyNumeric = groups.some(g=>g.cols.some(c=>typeof r[c.idx]==='number'));
     if(!anyNumeric) break; // hit the free-text "Applied filters" row - stop here
     const values = {};
@@ -118,6 +130,7 @@ function parseVcfWorkbook(wb){
 
 // --- Aggregation ------------------------------------------------------------
 function pillarTotals(data, pillarName){
+  if(!data) return { actual:null, target:null, svo:null };
   if(data.total && data.total.values[pillarName]){
     const v = data.total.values[pillarName];
     return { actual: v.actual ?? null, target: v.target ?? null, svo: v.svo ?? (v.target ? (v.actual||0)/v.target : null) };
@@ -132,20 +145,30 @@ function centreSvo(row, pillarName){
   if(v.svo!==null && v.svo!==undefined) return v.svo;
   return v.target ? (v.actual||0)/v.target : null;
 }
+// Group (whole company) total for a pillar - Centre and CDA exports carry
+// the same Total row, so prefer whichever level has data for this period.
+function groupData(period){
+  return DATA.centre[period] || DATA.cda[period] || null;
+}
 
 // --- Rendering ----------------------------------------------------------
-function renderPillarCards(data){
-  const el = document.getElementById('pillarCards');
+function pillarBadge(name){
+  const basis = pillarBasis(name);
+  return `<span class="status ${basis==='Actual'?'green':'blue'}" style="margin-left:8px;vertical-align:middle">${basis}</span>`;
+}
+function renderPillarCards(data, containerId){
+  const el = document.getElementById(containerId);
   if(!el) return;
+  if(!data){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded for this period yet. Use Admin Update to upload the workbook.</div></div>'; return; }
   const span = data.pillars.length<=2 ? 'half' : data.pillars.length===3 ? 'third' : 'half';
   el.innerHTML = data.pillars.map(name=>{
     const t = pillarTotals(data, name);
     return `<div class="card kpi ${span} kpi-progress-card">
-      <div class="label">${name}</div>
+      <div class="label">${name}${pillarBadge(name)}</div>
       <div class="value">${pct(t.svo)}</div>
       <div class="note"><strong>${displayVal(name,t.actual)}</strong> / <strong>${displayVal(name,t.target)}</strong> target</div>
       ${progressBar(t.svo)}
-      <div class="kpi-footer-strip two-up"><div><span>Status</span><strong>${statusPill(t.svo)}</strong></div><div><span>Centres reporting</span><strong>${data.rows.length}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status</span><strong>${statusPill(t.svo)}</strong></div><div><span>${data.rows.length} rows reporting</span><strong>${PERIOD_LABEL[ACTIVE_PERIOD]}</strong></div></div>
     </div>`;
   }).join('');
 }
@@ -153,6 +176,7 @@ function renderPillarCards(data){
 function renderLeaderboards(data){
   const el = document.getElementById('pillarLeaderboards');
   if(!el) return;
+  if(!data){ el.innerHTML = ''; return; }
   el.innerHTML = data.pillars.map(name=>{
     const sorted = data.rows.slice().sort((a,b)=>(centreSvo(b,name)??-Infinity)-(centreSvo(a,name)??-Infinity));
     const rows = sorted.map((r,i)=>{
@@ -163,18 +187,19 @@ function renderLeaderboards(data){
   }).join('');
 }
 
-const CENTRE_TABLE_SORT = {};
-function renderCentreTable(data){
-  const table = document.getElementById('centreTable');
+const TABLE_SORT = {};
+function renderGroupTable(data, tableId, firstColLabel){
+  const table = document.getElementById(tableId);
   if(!table) return;
-  const cols = [{label:'Centre', key:'centre'}];
+  if(!data){ table.innerHTML = ''; return; }
+  const cols = [{label:firstColLabel || 'Centre', key:'centre'}];
   data.pillarGroups.forEach(g=>{
     g.cols.forEach(c=>{
-      cols.push({ label: `${g.name} ${c.label}`, pillar: g.name, subKey: c.key, num: c.key!=='svo' || true, isSvo: c.key==='svo' });
+      cols.push({ label: `${g.name} ${c.label}`, pillar: g.name, subKey: c.key, isSvo: c.key==='svo' });
     });
   });
   const rows = data.rows;
-  const state = CENTRE_TABLE_SORT.centreTable || {};
+  const state = TABLE_SORT[tableId] || {};
   const sorted = rows.slice();
   if(state.index!==undefined){
     const col = cols[state.index];
@@ -202,33 +227,38 @@ function renderCentreTable(data){
   table.querySelectorAll('th[data-sort-index]').forEach(th=>{
     th.addEventListener('click',()=>{
       const index = Number(th.dataset.sortIndex);
-      const cur = CENTRE_TABLE_SORT.centreTable || {};
+      const cur = TABLE_SORT[tableId] || {};
       const dir = cur.index===index && cur.dir==='desc' ? 'asc' : 'desc';
-      CENTRE_TABLE_SORT.centreTable = { index, dir };
-      renderCentreTable(data);
+      TABLE_SORT[tableId] = { index, dir };
+      renderGroupTable(data, tableId, firstColLabel);
     });
   });
 }
 
-function renderEmptyState(){
-  const el = document.getElementById('pillarCards');
-  if(el) el.innerHTML = '<div class="card wide"><div class="note-box">No service figures loaded yet. Go to <strong>Admin Update</strong> and upload the VCF export workbook.</div></div>';
-  const lb = document.getElementById('pillarLeaderboards');
-  if(lb) lb.innerHTML = '';
-  const table = document.getElementById('centreTable');
-  if(table) table.innerHTML = '';
+function renderPeriodToggle(){
+  const el = document.getElementById('periodToggle');
+  if(!el) return;
+  el.innerHTML = PERIODS.map(p=>`<button class="admin-btn ${p===ACTIVE_PERIOD?'primary-btn':''}" data-period="${p}" type="button">${PERIOD_LABEL[p]}</button>`).join('');
+  el.querySelectorAll('button[data-period]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ ACTIVE_PERIOD = btn.dataset.period; build(); });
+  });
 }
 
 function build(){
-  if(!DATA || !DATA.rows || !DATA.pillars){ renderEmptyState(); updateVersionDisplays(); return; }
-  renderPillarCards(DATA);
-  renderLeaderboards(DATA);
-  renderCentreTable(DATA);
+  renderPeriodToggle();
+  renderPillarCards(groupData(ACTIVE_PERIOD), 'pillarCards');
+  renderLeaderboards(DATA.centre[ACTIVE_PERIOD]);
+  renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
+  renderPillarCards(DATA.cda[ACTIVE_PERIOD], 'cdaPillarCards');
+  renderGroupTable(DATA.cda[ACTIVE_PERIOD], 'cdaTable', 'CDA');
   updateVersionDisplays();
 }
 
 // --- Data bootstrap -------------------------------------------------------
-let DATA = window.SERVICE_DASHBOARD_DATA || null;
+let DATA = {
+  centre: { q3: window.SERVICE_DATA_CENTRE_Q3 || null, ytd: window.SERVICE_DATA_CENTRE_YTD || null },
+  cda: { q3: window.SERVICE_DATA_CDA_Q3 || null, ytd: window.SERVICE_DATA_CDA_YTD || null },
+};
 try{
   const saved = localStorage.getItem(SERVICE_DATA_KEY);
   if(saved) DATA = JSON.parse(saved);
@@ -236,6 +266,12 @@ try{
 let PENDING_DATA = null;
 
 // --- Admin: import / publish / backup / reset -----------------------------
+const IMPORT_SLOTS = [
+  { level:'centre', period:'q3', fileId:'centreQ3File', label:'Centre - Q3' },
+  { level:'centre', period:'ytd', fileId:'centreYtdFile', label:'Centre - YTD' },
+  { level:'cda', period:'q3', fileId:'cdaQ3File', label:'CDA - Q3' },
+  { level:'cda', period:'ytd', fileId:'cdaYtdFile', label:'CDA - YTD' },
+];
 function readFileAsArrayBuffer(file){
   return new Promise((resolve,reject)=>{
     const reader = new FileReader();
@@ -244,29 +280,38 @@ function readFileAsArrayBuffer(file){
     reader.readAsArrayBuffer(file);
   });
 }
-function renderAdminPreview(data){
-  const table = document.getElementById('adminPreviewTable');
-  if(!table) return;
+function cloneData(){ return JSON.parse(JSON.stringify(DATA)); }
+function previewTableHtml(data){
   const cols = [{label:'Centre'}].concat(data.pillars.flatMap(p=>[`${p} Actual`,`${p} Target`,`${p} SvO`].map(l=>({label:l}))));
-  table.innerHTML = `<thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${data.rows.map(r=>`<tr><td>${r.centre}</td>${data.pillars.map(p=>{
+  return `<table>` + `<thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${data.rows.map(r=>`<tr><td>${r.centre}</td>${data.pillars.map(p=>{
     const v = r.values[p]||{};
     return `<td class="num">${displayVal(p,v.actual)}</td><td class="num">${displayVal(p,v.target)}</td><td class="num">${pct(v.svo)}</td>`;
   }).join('')}</tr>`).join('')}${data.total ? `<tr class="group"><td>Total</td>${data.pillars.map(p=>{
     const v=data.total.values[p]||{};
     return `<td class="num">${displayVal(p,v.actual)}</td><td class="num">${displayVal(p,v.target)}</td><td class="num">${pct(v.svo)}</td>`;
-  }).join('')}</tr>` : ''}</tbody>`;
+  }).join('')}</tr>` : ''}</tbody></table>`;
 }
 async function previewImport(){
-  const file = document.getElementById('vcfFile')?.files?.[0];
   const status = document.getElementById('adminStatus');
-  if(!file){ status.innerHTML = 'Choose a VCF export file first.'; return; }
+  const container = document.getElementById('adminPreviewContainer');
+  const data = cloneData();
+  const messages = [];
+  container.innerHTML = '';
   try{
-    const buf = await readFileAsArrayBuffer(file);
-    const wb = XLSX.read(buf,{type:'array'});
-    const parsed = parseVcfWorkbook(wb);
-    PENDING_DATA = parsed;
-    renderAdminPreview(parsed);
-    status.innerHTML = `<strong>Preview ready.</strong><br>VCF export imported (${parsed.rows.length} centres, ${parsed.pillars.length} pillars: ${parsed.pillars.join(', ')}).`;
+    for(const slot of IMPORT_SLOTS){
+      const file = document.getElementById(slot.fileId)?.files?.[0];
+      if(!file) continue;
+      const buf = await readFileAsArrayBuffer(file);
+      const wb = XLSX.read(buf,{type:'array'});
+      const parsed = parseVcfWorkbook(wb);
+      data[slot.level][slot.period] = parsed;
+      messages.push(`${slot.label} imported (${parsed.rows.length} rows, ${parsed.pillars.length} pillars)`);
+      const block = document.createElement('div');
+      block.innerHTML = `<div class="hint" style="margin-top:12px">${slot.label} preview</div><div class="table-wrap" style="max-height:280px">${previewTableHtml(parsed)}</div>`;
+      container.appendChild(block);
+    }
+    PENDING_DATA = data;
+    status.innerHTML = messages.length ? `<strong>Preview ready.</strong><br>${messages.join('<br>')}` : 'Choose at least one file to preview.';
   }catch(e){
     console.error(e);
     status.innerHTML = `<strong>Import failed.</strong><br>${e.message || e}`;
@@ -279,17 +324,23 @@ function publishImport(){
   try{ localStorage.setItem(SERVICE_DATA_KEY, JSON.stringify(DATA)); }catch(e){ console.warn(e); }
   const meta = saveServiceMeta();
   build();
-  status.innerHTML = `<strong>Published.</strong><br>Preview published in this browser. For the live site, replace vcf-export.xlsx in GitHub and re-download the data backup below to update service-data.js.<br>Version ${meta.version}<br>Published ${formatPublishedAt(meta.publishedAt)}`;
+  status.innerHTML = `<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the relevant workbook(s) in GitHub and re-download the data backups below.<br>Version ${meta.version}<br>Published ${formatPublishedAt(meta.publishedAt)}`;
 }
-function downloadDataBackup(){
-  if(!DATA){ return; }
-  const payload = '// Live Service Figures (VCF) data source.\n// After using Admin Update > Publish, download and replace this file in GitHub.\nwindow.SERVICE_DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
+function downloadOne(filename, varName, data){
+  if(!data) return;
+  const payload = `// Live Service Figures (VCF) data source.\n// After using Admin Update > Publish, download and replace this file in GitHub.\nwindow.${varName} = ${JSON.stringify(data, null, 2)};\n`;
   const blob = new Blob([payload],{type:'application/javascript'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'service-data.js';
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+function downloadDataBackup(){
+  downloadOne('service-data.js', 'SERVICE_DATA_CENTRE_Q3', DATA.centre.q3);
+  downloadOne('service-data-ytd.js', 'SERVICE_DATA_CENTRE_YTD', DATA.centre.ytd);
+  downloadOne('service-cda-data.js', 'SERVICE_DATA_CDA_Q3', DATA.cda.q3);
+  downloadOne('service-cda-data-ytd.js', 'SERVICE_DATA_CDA_YTD', DATA.cda.ytd);
 }
 function resetSavedData(){
   localStorage.removeItem(SERVICE_DATA_KEY);
