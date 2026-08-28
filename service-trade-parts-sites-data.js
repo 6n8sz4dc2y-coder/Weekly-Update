@@ -315,5 +315,383 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
     "sheet": "Export",
     "importedAt": "2026-08-28T00:00:00.000Z",
     "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + West Yorkshire (CDA) + RRG Silsden (006968) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Bolton",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 93304.42930000005,
+        "SMROE Sales Out (Forecast)*": 93304.42930000002,
+        "SMROE Target": 96325.208,
+        "Target % Achieved (Forecast)*": 0.9686397905312597,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 8397.398637000002
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 88717.65009999998,
+        "SMROE Sales Out (Forecast)*": 88717.6501,
+        "SMROE Target": 86057.98610000001,
+        "Target % Achieved (Forecast)*": 1.030905487340936,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 10646.118011999999
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 62179.14179999998,
+        "SMROE Sales Out (Forecast)*": 93087.96102105264,
+        "SMROE Target": 94085.0868,
+        "Target % Achieved (Forecast)*": 0.9894018721472088,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 8377.916491894737
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 244201.22119999994,
+        "SMROE Sales Out (Forecast)*": 275110.04042105237,
+        "SMROE Target": 276468.28089999995,
+        "Target % Achieved (Forecast)*": 0.9950871742880375,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 27421.43314089474
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + North Manchester (CDA) + RRG Bolton (002745) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Bury",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 32287.85159999999,
+        "SMROE Sales Out (Forecast)*": 32287.85159999999,
+        "SMROE Target": 32075.615899999997,
+        "Target % Achieved (Forecast)*": 1.00661673031195,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 3874.542191999999
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 25921.977599999995,
+        "SMROE Sales Out (Forecast)*": 25921.97759999998,
+        "SMROE Target": 28656.703299999997,
+        "Target % Achieved (Forecast)*": 0.9045694240760759,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 2332.9779839999983
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 19486.587600000003,
+        "SMROE Sales Out (Forecast)*": 28724.742905263152,
+        "SMROE Target": 31329.671299999998,
+        "Target % Achieved (Forecast)*": 0.9168542698774869,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 2585.2268614736845
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 77696.4168,
+        "SMROE Sales Out (Forecast)*": 86934.57210526316,
+        "SMROE Target": 92061.99049999999,
+        "Target % Achieved (Forecast)*": 0.9443047193864788,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 8792.74703747368
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + North Manchester (CDA) + RRG Bury (003223) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Rochdale",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 72193.15349999999,
+        "SMROE Sales Out (Forecast)*": 72193.15350000003,
+        "SMROE Target": 75623.4847,
+        "Target % Achieved (Forecast)*": 0.9546393397023667,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 6497.383815000002
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 69496.56910000002,
+        "SMROE Sales Out (Forecast)*": 69496.5691,
+        "SMROE Target": 67562.8419,
+        "Target % Achieved (Forecast)*": 1.0286211643207979,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 8339.588291999999
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 45205.74130000001,
+        "SMROE Sales Out (Forecast)*": 65758.38417368422,
+        "SMROE Target": 73864.7989,
+        "Target % Achieved (Forecast)*": 0.89025334331052,
+        "Target Reward %*": 0.05,
+        "Reward Payable*": 3287.919208684211
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 186895.46389999986,
+        "SMROE Sales Out (Forecast)*": 207448.10677368427,
+        "SMROE Target": 217051.12550000002,
+        "Target % Achieved (Forecast)*": 0.9557568812223655,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 18124.89131568421
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + North Manchester (CDA) + RRG Rochdale (002752) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Salford Quays",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 161731.2322,
+        "SMROE Sales Out (Forecast)*": 161731.23220000003,
+        "SMROE Target": 152456.02870000002,
+        "Target % Achieved (Forecast)*": 1.0608385485250411,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 19407.747864
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 145162.26549999998,
+        "SMROE Sales Out (Forecast)*": 145162.26550000004,
+        "SMROE Target": 136205.87060000002,
+        "Target % Achieved (Forecast)*": 1.065756305954701,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 17419.471860000005
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 97173.61279999999,
+        "SMROE Sales Out (Forecast)*": 145574.10137368413,
+        "SMROE Target": 148910.53960000002,
+        "Target % Achieved (Forecast)*": 0.9775943446630564,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 13101.669123631571
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 404067.1105000001,
+        "SMROE Sales Out (Forecast)*": 452467.5990736841,
+        "SMROE Target": 437572.4389,
+        "Target % Achieved (Forecast)*": 1.0340404441630935,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 49928.88884763158
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + North Manchester (CDA) + RRG Salford Quays (003292) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Altrincham",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 21789.355699999996,
+        "SMROE Sales Out (Forecast)*": 21789.3557,
+        "SMROE Target": 20608.9117,
+        "Target % Achieved (Forecast)*": 1.057278327802239,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 2614.722684
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 20069.366700000006,
+        "SMROE Sales Out (Forecast)*": 20069.366700000002,
+        "SMROE Target": 18412.2253,
+        "Target % Achieved (Forecast)*": 1.0900022334616992,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 2408.324004
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 12646.669099999997,
+        "SMROE Sales Out (Forecast)*": 18264.10714736842,
+        "SMROE Target": 20129.6346,
+        "Target % Achieved (Forecast)*": 0.9073243260644394,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 1643.7696432631578
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 54505.391500000005,
+        "SMROE Sales Out (Forecast)*": 60122.82954736843,
+        "SMROE Target": 59150.7716,
+        "Target % Achieved (Forecast)*": 1.0164335632667965,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 6666.816331263158
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + South Manchester (CDA) + RRG Altrincham (006612) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
+  },
+  {
+    "site": "RRG Denton",
+    "header": [
+      "Period",
+      "Working Days",
+      "Days to Date",
+      "SMROE Sales Out To Date*",
+      "SMROE Sales Out (Forecast)*",
+      "SMROE Target",
+      "Target % Achieved (Forecast)*",
+      "Target Reward %*",
+      "Reward Payable*"
+    ],
+    "rows": [
+      {
+        "Period": "Q1",
+        "Working Days": 63,
+        "Days to Date": 63,
+        "SMROE Sales Out To Date*": 81084.86769999999,
+        "SMROE Sales Out (Forecast)*": 81084.86769999997,
+        "SMROE Target": 81302.6256,
+        "Target % Achieved (Forecast)*": 0.9973216375437692,
+        "Target Reward %*": 0.09,
+        "Reward Payable*": 7297.638092999998
+      },
+      {
+        "Period": "Q2",
+        "Working Days": 61,
+        "Days to Date": 61,
+        "SMROE Sales Out To Date*": 80865.7229,
+        "SMROE Sales Out (Forecast)*": 80865.72289999998,
+        "SMROE Target": 72636.648,
+        "Target % Achieved (Forecast)*": 1.1132909505956274,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 9703.886747999997
+      },
+      {
+        "Period": "Q3",
+        "Working Days": 65,
+        "Days to Date": 42,
+        "SMROE Sales Out To Date*": 50504.8692,
+        "SMROE Sales Out (Forecast)*": 79619.14332105264,
+        "SMROE Target": 79411.8668,
+        "Target % Achieved (Forecast)*": 1.0026101454279455,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 9554.297198526316
+      },
+      {
+        "Period": "Total",
+        "Working Days": 189,
+        "Days to Date": 166,
+        "SMROE Sales Out To Date*": 212455.45980000016,
+        "SMROE Sales Out (Forecast)*": 241569.7339210526,
+        "SMROE Target": 233351.1404,
+        "Target % Achieved (Forecast)*": 1.035219855823137,
+        "Target Reward %*": 0.12,
+        "Reward Payable*": 26555.822039526312
+      }
+    ],
+    "sheet": "Export",
+    "importedAt": "2026-08-28T00:00:00.000Z",
+    "filtersText": "Applied filters:\nIncluded (1) B1 (Zone) + South Manchester (CDA) + RRG Denton (006927) (Dealer Name Code)\nIncluded (1) 2026 (Year)\nExcluded (1) 2026 (Year) + Q4 (Quarter)\nSupported Accounts Flag is No\nTrade Sale Flag is Yes\nCentre Status is Open"
   }
 ];
