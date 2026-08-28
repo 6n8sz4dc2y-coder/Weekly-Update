@@ -275,6 +275,13 @@ function pillarBadge(name){
   const basis = pillarBasis(name);
   return `<span class="status ${basis==='Actual'?'green':'blue'}" style="margin-left:8px;vertical-align:middle">${basis}</span>`;
 }
+// Every hero card on this hub (VCF pillars, Trade Parts Group, WRR) shows a
+// company-wide Group total, not a single centre/CDA - label it explicitly
+// rather than leaving that implicit, matching the badge already used on the
+// Trade Parts Group card.
+function groupBadge(){
+  return `<span class="status blue" style="margin-left:8px;vertical-align:middle">Group</span>`;
+}
 const CARD_ACCENTS = ['blue-card','green-card','purple-card','amber-card'];
 // Q3 (the opener) on the left, Year to Date on the right - one card per
 // pillar, mirroring the Weekly Update dashboard's Month-to-date / Total
@@ -289,7 +296,7 @@ function renderPillarCards(q3Data, ytdData, containerId){
     const ytd = pillarTotals(ytdData, name);
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
-      <div class="label">${name}${pillarBadge(name)}</div>
+      <div class="label">${name}${groupBadge()}${pillarBadge(name)}</div>
       <div class="kpi-split-main">
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3.svo)}</div><div class="note note-target"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div><div class="note">${gapLabel(name,q3.actual,q3.target)}</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note note-target"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div><div class="note">${gapLabel(name,ytd.actual,ytd.target)}</div></div>
@@ -525,7 +532,7 @@ function renderWrrCard(containerId, q3Data, ytdData){
   };
   const q3Cell = cell(q3), ytdCell = cell(ytd);
   el.innerHTML = `<div class="card half kpi-progress-card blue-card">
-    <div class="label">WRR<span class="status green" style="margin-left:8px;vertical-align:middle">Actual</span></div>
+    <div class="label">WRR${groupBadge()}<span class="status green" style="margin-left:8px;vertical-align:middle">Actual</span></div>
     <div class="kpi-split-main">
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
       <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
@@ -818,5 +825,203 @@ document.getElementById('downloadData')?.addEventListener('click', downloadDataB
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
 document.getElementById('exportPdfHeader')?.addEventListener('click', ()=>window.print());
 document.getElementById('exportPdf')?.addEventListener('click', ()=>window.print());
+
+// --- PowerPoint Board Pack Export ------------------------------------------
+// Mirrors the Weekly Update dashboard's board pack export (app.js) - same
+// pptxgen.bundle.js library, loaded the same lazy way, same slide-building
+// helpers - but built from this hub's own data: VCF pillars by Centre/CDA,
+// Group Trade Parts + its CDA/Lexus and site breakdowns, and WRR.
+let SERVICE_PPTX_CURRENT = null;
+function servicePptShape(name){ const st = (SERVICE_PPTX_CURRENT && SERVICE_PPTX_CURRENT.ShapeType) || {}; return st[name] || name; }
+function servicePptxLibraryPromise_getConstructor(){
+  return window.PptxGenJS || window.pptxgen || window.pptxgenjs || window.PPTXGenJS || null;
+}
+let servicePptxLibraryPromise = null;
+function ensureServicePptxLibrary(){
+  if(servicePptxLibraryPromise_getConstructor()) return Promise.resolve();
+  if(servicePptxLibraryPromise) return servicePptxLibraryPromise;
+  servicePptxLibraryPromise = new Promise((resolve, reject)=>{
+    const script = document.createElement('script');
+    script.src = './pptxgen.bundle.js?v=20260810-fleetmatch-13';
+    script.onload = () => servicePptxLibraryPromise_getConstructor() ? resolve() : reject(new Error('PowerPoint library loaded but constructor was not found'));
+    script.onerror = () => reject(new Error('PowerPoint library failed to load'));
+    document.head.appendChild(script);
+  });
+  return servicePptxLibraryPromise;
+}
+function setServiceExportStatus(message){
+  const admin = document.getElementById('adminStatus');
+  if(admin) admin.innerHTML = message;
+}
+function servicePptDate(){
+  return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function addServiceSlideTitle(slide, title, subtitle){
+  slide.addShape(servicePptShape('rect'), { x:0, y:0, w:13.333, h:0.62, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addText(title, { x:0.35, y:0.15, w:8.5, h:0.3, fontFace:'Aptos Display', fontSize:17, bold:true, color:'FFFFFF', margin:0 });
+  slide.addText(subtitle || 'RRG Group Programmes Hub', { x:9.2, y:0.18, w:3.7, h:0.25, fontFace:'Aptos', fontSize:9, color:'CBD5E1', align:'right', margin:0 });
+}
+function addServiceFooter(slide){
+  slide.addText(`Generated ${servicePptDate()} · RRG Group Programmes Hub`, { x:0.35, y:7.15, w:12.6, h:0.2, fontFace:'Aptos', fontSize:7, color:'64748B', margin:0 });
+}
+function addServiceMetricCard(slide, x, y, w, h, title, value, sub, color='2563EB'){
+  slide.addShape(servicePptShape('roundRect'), { x, y, w, h, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8', width:1} });
+  slide.addText(title.toUpperCase(), { x:x+0.15, y:y+0.15, w:w-0.3, h:0.22, fontFace:'Aptos', fontSize:7.5, bold:true, color:'6B7280', margin:0 });
+  slide.addText(String(value), { x:x+0.15, y:y+0.45, w:w-0.3, h:0.45, fontFace:'Aptos Display', fontSize:24, bold:true, color, margin:0 });
+  slide.addText(String(sub||''), { x:x+0.15, y:y+h-0.35, w:w-0.3, h:0.2, fontFace:'Aptos', fontSize:8, color:'6B7280', margin:0 });
+}
+function addServiceTableSlide(slide, title, rows, columns, subtitle){
+  addServiceSlideTitle(slide, title, subtitle || `${PERIOD_LABEL[ACTIVE_PERIOD]} · ${servicePptDate()}`);
+  const data = [columns.map(c=>({text:c.label, options:{bold:true,color:'334155',fill:'F8FAFC'}}))];
+  rows.slice(0,18).forEach(r=>{
+    data.push(columns.map(c=>({ text: String((typeof c.value === 'function' ? c.value(r) : r[c.key]) ?? '-'), options:{ color:'111827', fill:'FFFFFF' } })));
+  });
+  slide.addTable(data, { x:0.35, y:0.9, w:12.65, h:5.95, border:{type:'solid',color:'E5E7EB',pt:0.5}, fontFace:'Aptos', fontSize:8, color:'111827', margin:0.04, valign:'mid', fit:'shrink', colW:columns.map(c=>c.w||1) });
+  addServiceFooter(slide);
+}
+async function exportServiceBoardPack(){
+  try{
+    setServiceExportStatus('<strong>Creating PowerPoint...</strong><br>Loading export engine.');
+    await ensureServicePptxLibrary();
+  }catch(e){
+    console.error(e);
+    alert('PowerPoint generator did not load: ' + (e.message || e));
+    setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>' + (e.message || e));
+    return;
+  }
+  const PptxConstructor = servicePptxLibraryPromise_getConstructor();
+  if(!PptxConstructor){
+    alert('PowerPoint generator unavailable.');
+    setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>PowerPoint generator unavailable.');
+    return;
+  }
+  const pptx = new PptxConstructor();
+  SERVICE_PPTX_CURRENT = pptx;
+  pptx.layout = 'LAYOUT_WIDE';
+  pptx.author = 'Gavin Barry';
+  pptx.subject = 'RRG Group Programmes Hub - Service Figures Pack';
+  pptx.title = 'RRG Programmes Hub Pack';
+  pptx.company = 'RRG Group';
+  pptx.theme = { headFontFace:'Aptos Display', bodyFontFace:'Aptos', lang:'en-GB' };
+
+  const periodLabel = `${PERIOD_LABEL[ACTIVE_PERIOD]} · ${servicePptDate()}`;
+  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Group = groupData('q3'), ytdGroup = groupData('ytd');
+  const tpQ3 = tradePartsRow(DATA.tradeParts, 'Q3'), tpYtd = tradePartsYtdThroughQ3(DATA.tradeParts);
+  const wrrQ3Total = DATA.wrr.q3 && DATA.wrr.q3.total, wrrYtdTotal = DATA.wrr.ytd && DATA.wrr.ytd.total;
+
+  // Cover
+  let slide = pptx.addSlide();
+  slide.background = { color:'F5F7FB' };
+  slide.addShape(servicePptShape('rect'), { x:0, y:0, w:13.333, h:7.5, fill:{color:'0F172A'}, line:{color:'0F172A'} });
+  slide.addText('RRG Group', { x:0.75, y:0.75, w:4.5, h:0.4, fontFace:'Aptos', fontSize:18, bold:true, color:'CBD5E1', margin:0 });
+  slide.addText('Programmes Hub\nService Figures Pack', { x:0.75, y:1.6, w:8.5, h:1.6, fontFace:'Aptos Display', fontSize:40, bold:true, color:'FFFFFF', margin:0, breakLine:false });
+  slide.addText(`${periodLabel}\nPrepared by Gavin Barry`, { x:0.8, y:4.4, w:5, h:0.6, fontFace:'Aptos', fontSize:16, color:'CBD5E1', margin:0 });
+  slide.addShape(servicePptShape('roundRect'), { x:8.1, y:1.15, w:4.4, h:4.7, rectRadius:0.12, fill:{color:'FFFFFF', transparency:5}, line:{color:'334155'} });
+  slide.addText('Board Pack', { x:8.45, y:1.55, w:3.6, h:0.35, fontSize:18, bold:true, color:'FFFFFF', margin:0 });
+  const coverLines = pillars.map(name=>{
+    const t = pillarTotals(q3Group, name);
+    return `${name}: ${pct(t.svo)}`;
+  }).concat([
+    `Group Trade Parts: ${pct(tpQ3 ? tpQ3['Target % Achieved (Forecast)*'] : null)}`,
+    `WRR: ${pct(wrrQ3Total ? wrrQ3Total['Centre % Achieved'] : null)}`,
+  ]).join('\n');
+  slide.addText(coverLines, { x:8.45, y:2.15, w:3.8, h:2.4, fontSize:16, color:'E5E7EB', breakLine:false, fit:'shrink' });
+
+  // Executive Dashboard
+  slide = pptx.addSlide();
+  slide.background = { color:'F5F7FB' };
+  addServiceSlideTitle(slide, 'Executive Dashboard', periodLabel);
+  const cardColors = ['2563EB','15803D','6D28D9','B45309'];
+  const cardW = (12.65 - 0.35*3) / 4;
+  pillars.forEach((name,i)=>{
+    const t = pillarTotals(q3Group, name);
+    addServiceMetricCard(slide, 0.35 + i*(cardW+0.35), 0.9, cardW, 1.35, name, pct(t.svo), `${displayVal(name,t.actual)} / ${displayVal(name,t.target)} target`, cardColors[i % cardColors.length]);
+  });
+  addServiceMetricCard(slide, 0.35, 2.55, 4.05, 1.05, 'Group Trade Parts (Q3)', pct(tpQ3 ? tpQ3['Target % Achieved (Forecast)*'] : null), tpQ3 ? `${fmtGbp(tpQ3['SMROE Sales Out (Forecast)*'])} / ${fmtGbp(tpQ3['SMROE Target'])} target` : 'No data', '15803D');
+  addServiceMetricCard(slide, 4.65, 2.55, 4.05, 1.05, 'Group Trade Parts (YTD)', pct(tpYtd ? tpYtd['Target % Achieved (Forecast)*'] : null), tpYtd ? `${fmtGbp(tpYtd['SMROE Sales Out (Forecast)*'])} / ${fmtGbp(tpYtd['SMROE Target'])} target` : 'No data', '15803D');
+  addServiceMetricCard(slide, 8.95, 2.55, 3.75, 1.05, 'WRR (Q3)', pct(wrrQ3Total ? wrrQ3Total['Centre % Achieved'] : null), wrrQ3Total ? `${fmt(wrrQ3Total['CPUS Unique'])} / ${fmt(wrrQ3Total['Target'])} target` : 'No data', '2563EB');
+  slide.addShape(servicePptShape('roundRect'), { x:0.35, y:4.0, w:6.25, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addText('Highlights', { x:0.6, y:4.2, w:5.75, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
+  const centreRows = (DATA.centre[ACTIVE_PERIOD] && DATA.centre[ACTIVE_PERIOD].rows) || [];
+  const highlightLines = pillars.map(name=>{
+    const top = centreRows.slice().sort((a,b)=>(centreSvo(b,name)??-Infinity)-(centreSvo(a,name)??-Infinity))[0];
+    return top ? `${top.centre} leads ${name} at ${pct(centreSvo(top,name))}.` : '';
+  }).filter(Boolean).join('\n');
+  slide.addText(highlightLines || 'No highlights available yet.', { x:0.6, y:4.65, w:5.75, h:1.8, fontSize:12, color:'475569', breakLine:false, fit:'shrink' });
+  slide.addShape(servicePptShape('roundRect'), { x:6.9, y:4.0, w:6.1, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
+  slide.addText('CDA Summary', { x:7.15, y:4.2, w:5.6, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
+  const cdaRows = (DATA.cda[ACTIVE_PERIOD] && DATA.cda[ACTIVE_PERIOD].rows) || [];
+  const cdaLines = cdaRows.map(r=>pillars.map(name=>`${name} ${pct(centreSvo(r,name))}`).join(' · ')).map((line,i)=>`${cdaRows[i].centre}: ${line}`).join('\n');
+  slide.addText(cdaLines || 'No CDA data available yet.', { x:7.15, y:4.65, w:5.6, h:1.7, fontSize:11, color:'475569', breakLine:false, fit:'shrink' });
+  addServiceFooter(slide);
+
+  // VCF Centre League
+  addServiceTableSlide(pptx.addSlide(), 'VCF - Centre League', centreRows, [
+    {label:'Centre',key:'centre',w:2.2},
+    ...pillars.map(name=>({ label:`${name} %`, value:r=>pct(centreSvo(r,name)), w:2.6 })),
+  ], periodLabel);
+
+  // VCF CDA League
+  addServiceTableSlide(pptx.addSlide(), 'VCF - CDA League', cdaRows, [
+    {label:'CDA',key:'centre',w:2.2},
+    ...pillars.map(name=>({ label:`${name} %`, value:r=>pct(centreSvo(r,name)), w:2.6 })),
+  ], periodLabel);
+
+  // Group Trade Parts
+  addServiceTableSlide(pptx.addSlide(), 'Group Trade Parts', safeServiceRows(DATA.tradeParts && DATA.tradeParts.rows), [
+    {label:'Period',key:'Period',w:1.2},
+    {label:'Sales Out to Date',value:r=>fmtGbp(r['SMROE Sales Out To Date*']),w:1.9},
+    {label:'Sales Out (Forecast)',value:r=>fmtGbp(r['SMROE Sales Out (Forecast)*']),w:1.9},
+    {label:'Target',value:r=>fmtGbp(r['SMROE Target']),w:1.7},
+    {label:'Achieved %',value:r=>pct(r['Target % Achieved (Forecast)*']),w:1.4},
+    {label:'Reward %',value:r=>pct(r['Target Reward %*']),w:1.3},
+    {label:'Reward Payable',value:r=>fmtGbp(r['Reward Payable*']),w:1.9},
+  ], periodLabel);
+
+  // Trade Parts CDA + Lexus
+  addServiceTableSlide(pptx.addSlide(), 'Group Trade Parts - CDA & Lexus', safeServiceRows(DATA.tradePartsCda), [
+    {label:'CDA',value:r=>r.cda,w:1.9},
+    {label:'Q3 %',value:r=>{ const row=tradePartsRow(r,'Q3'); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
+    {label:'Q3 Forecast',value:r=>{ const row=tradePartsRow(r,'Q3'); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.7},
+    {label:'Q3 Target',value:r=>{ const row=tradePartsRow(r,'Q3'); return fmtGbp(row?row['SMROE Target']:null); },w:1.6},
+    {label:'YTD %',value:r=>{ const row=tradePartsYtdThroughQ3(r); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
+    {label:'YTD Forecast',value:r=>{ const row=tradePartsYtdThroughQ3(r); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.8},
+    {label:'YTD Target',value:r=>{ const row=tradePartsYtdThroughQ3(r); return fmtGbp(row?row['SMROE Target']:null); },w:1.7},
+    {label:'YTD Reward',value:r=>{ const row=tradePartsYtdThroughQ3(r); return pct(row?row['Target Reward %*']:null); },w:1.4},
+  ], periodLabel);
+
+  // Trade Parts Site League
+  const siteRanked = safeServiceRows(DATA.tradePartsSites).map(s=>{
+    const q3Row = tradePartsRow(s,'Q3'), ytdRow = tradePartsYtdThroughQ3(s);
+    return { site:s.site, q3Row, ytdRow, ytdAchieved: ytdRow ? ytdRow['Target % Achieved (Forecast)*'] : null };
+  }).sort((a,b)=>(b.ytdAchieved??-Infinity)-(a.ytdAchieved??-Infinity));
+  addServiceTableSlide(pptx.addSlide(), 'Group Trade Parts - Site League', siteRanked, [
+    {label:'Site',value:r=>r.site,w:2.1},
+    {label:'Q3 %',value:r=>pct(r.q3Row?r.q3Row['Target % Achieved (Forecast)*']:null),w:1.1},
+    {label:'Q3 Forecast',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Sales Out (Forecast)*']:null),w:1.7},
+    {label:'Q3 Target',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Target']:null),w:1.6},
+    {label:'YTD %',value:r=>pct(r.ytdRow?r.ytdRow['Target % Achieved (Forecast)*']:null),w:1.1},
+    {label:'YTD Forecast',value:r=>fmtGbp(r.ytdRow?r.ytdRow['SMROE Sales Out (Forecast)*']:null),w:1.8},
+    {label:'YTD Target',value:r=>fmtGbp(r.ytdRow?r.ytdRow['SMROE Target']:null),w:1.7},
+  ], periodLabel);
+
+  // WRR Detail
+  addServiceTableSlide(pptx.addSlide(), 'WRR Detail', safeServiceRows(DATA.wrr[ACTIVE_PERIOD] && DATA.wrr[ACTIVE_PERIOD].rows), [
+    {label:'Centre',value:r=>r['Centre Name'],w:2.1},
+    {label:'WRR Group',value:r=>r['WRR Group']||'',w:1.9},
+    {label:'CPUS',value:r=>fmt(r['CPUS Unique']),w:1.5},
+    {label:'Target',value:r=>fmt(r['Target']),w:1.5},
+    {label:'Achieved %',value:r=>pct(r['Centre % Achieved']),w:1.5},
+    {label:'Bonus Payable',value:r=>fmtGbp(r['Bonus Payable']),w:1.9},
+  ], periodLabel);
+
+  setServiceExportStatus('<strong>Creating PowerPoint...</strong><br>Saving presentation.');
+  await pptx.writeFile({ fileName: `RRG Programmes Hub Pack - ${PERIOD_LABEL[ACTIVE_PERIOD]}.pptx` });
+  setServiceExportStatus('<strong>PowerPoint ready.</strong><br>The programmes hub pack has been downloaded.');
+}
+function safeServiceRows(rows){ return Array.isArray(rows) ? rows : []; }
+document.getElementById('exportPptHeader')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
+document.getElementById('exportPpt')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
 
 build();
