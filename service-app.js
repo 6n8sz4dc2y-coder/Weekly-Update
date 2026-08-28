@@ -59,6 +59,11 @@ const isCurrencyPillar = name => /purchase|£|value|revenue|spend/i.test(String(
 const isActualPillar = name => /service plan/i.test(String(name||''));
 const pillarBasis = name => isActualPillar(name) ? 'Actual' : 'Run-rate';
 const displayVal = (pillarName, n) => isCurrencyPillar(pillarName) ? fmtGbp(n) : fmt(n);
+const fmtGbpCompact=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',notation:'compact',maximumFractionDigits:1}).format(n)};
+// Currency values get compacted (they're long, e.g. £758,605 -> £758.6K) to
+// keep the CDA table narrow; unit counts are already short, so keep full
+// precision for those rather than compacting a small number like 1,092.
+const displayValCompact = (pillarName, n) => isCurrencyPillar(pillarName) ? fmtGbpCompact(n) : fmt(n);
 const svoClass = n => n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red');
 const svoLabel = n => n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Watch':'Behind');
 const progressBar = n => `<div class="progress"><div class="bar ${svoClass(n)}" style="width:${Math.min(Math.max((n||0)*100,0),120)}%"></div></div>`;
@@ -242,6 +247,71 @@ function renderGroupTable(data, tableId, firstColLabel){
   });
 }
 
+// Compact single-pane table: one Actual + one Gap-to-Target column per
+// pillar (instead of Actual/Target/SvO), with the gap cell coloured by
+// achievement so the SvO column isn't needed to read performance at a
+// glance. Built for the small CDA row count so it fits without horizontal
+// scrolling. Includes the Group Total as a pinned, unsorted final row.
+function renderCompactTable(data, tableId, firstColLabel){
+  const table = document.getElementById(tableId);
+  if(!table) return;
+  if(!data){ table.innerHTML = ''; return; }
+  const cols = [{label:firstColLabel || 'CDA', key:'centre'}];
+  data.pillars.forEach(name=>{
+    cols.push({ label: 'Actual', pillar: name, kind: 'actual' });
+    cols.push({ label: 'Gap', pillar: name, kind: 'gap' });
+  });
+  const state = TABLE_SORT[tableId] || {};
+  const sorted = data.rows.slice();
+  if(state.index!==undefined){
+    const col = cols[state.index];
+    sorted.sort((a,b)=>{
+      const av = col.key==='centre' ? a.centre : gapSortValue(a, col);
+      const bv = col.key==='centre' ? b.centre : gapSortValue(b, col);
+      const bothNum = typeof av==='number' && typeof bv==='number';
+      const cmp = bothNum ? av-bv : String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
+      return state.dir==='desc' ? -cmp : cmp;
+    });
+  }
+  function gapSortValue(row, col){
+    const v = row.values[col.pillar];
+    if(!v) return -Infinity;
+    return col.kind==='actual' ? (v.actual ?? -Infinity) : ((v.actual??0) - (v.target??0));
+  }
+  function renderRow(row, isTotal){
+    return `<tr class="${isTotal?'group':''}">${cols.map(c=>{
+      if(c.key==='centre') return `<td>${row.centre}</td>`;
+      const v = row.values[c.pillar] || {};
+      if(c.kind==='actual') return `<td class="num" title="${displayVal(c.pillar, v.actual)}">${displayValCompact(c.pillar, v.actual)}</td>`;
+      const gap = (v.actual??null)===null || (v.target??null)===null ? null : v.actual - v.target;
+      const cls = isTotal ? '' : (svoClass(v.svo) ? 'cell-' + svoClass(v.svo) : '');
+      const sign = gap!==null && gap>0 ? '+' : '';
+      const title = gap===null ? '' : ` title="${sign}${displayVal(c.pillar, gap)}"`;
+      return `<td class="num ${cls}"${title}>${gap===null?'-':sign+displayValCompact(c.pillar, gap)}</td>`;
+    }).join('')}</tr>`;
+  }
+  table.classList.add('table-centre','table-compact');
+  // Two header rows: pillar name spanning its Actual/Gap pair (like the
+  // source workbook's merged headers), then the short sub-labels - this
+  // keeps column widths tight enough to fit in one pane without scrolling.
+  const pillarHeaderRow = `<tr><th></th>${data.pillars.map(name=>`<th colspan="2" style="text-align:center">${name}</th>`).join('')}</tr>`;
+  const subHeaderRow = `<tr>${cols.map((c,i)=>{
+    const active = state.index===i;
+    const arrow = active ? (state.dir==='desc' ? ' ▼' : ' ▲') : '';
+    return `<th data-sort-index="${i}" class="sortable ${c.key!=='centre'?'num':''} ${active?'sorted':''}" title="Click to sort">${c.label}${arrow}</th>`;
+  }).join('')}</tr>`;
+  table.innerHTML = `<thead>${pillarHeaderRow}${subHeaderRow}</thead><tbody>${sorted.map(r=>renderRow(r,false)).join('')}${data.total ? renderRow(data.total,true) : ''}</tbody>`;
+  table.querySelectorAll('th[data-sort-index]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const index = Number(th.dataset.sortIndex);
+      const cur = TABLE_SORT[tableId] || {};
+      const dir = cur.index===index && cur.dir==='desc' ? 'asc' : 'desc';
+      TABLE_SORT[tableId] = { index, dir };
+      renderCompactTable(data, tableId, firstColLabel);
+    });
+  });
+}
+
 function renderPeriodToggle(){
   const el = document.getElementById('periodToggle');
   if(!el) return;
@@ -257,7 +327,7 @@ function build(){
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD]);
   renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
   renderPillarCards(DATA.cda.q3, DATA.cda.ytd, 'cdaPillarCards');
-  renderGroupTable(DATA.cda[ACTIVE_PERIOD], 'cdaTable', 'CDA');
+  renderCompactTable(DATA.cda[ACTIVE_PERIOD], 'cdaTable', 'CDA');
   updateVersionDisplays();
 }
 
