@@ -7,10 +7,10 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Programmes Hub</title>
-<link rel="stylesheet" href="./styles.css?v=20260828-programmes-2">
+<link rel="stylesheet" href="./styles.css?v=20260828-programmes-3">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="centres">Centre Detail</button><button data-target="cdaSummary">CDA Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="centres">Centre Detail</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -19,12 +19,9 @@
   <div class="periodToggle"></div>
 </div>
 <div class="card wide"><h3>Rankings</h3><div id="pillarLeaderboards" class="grid" style="padding:0"></div></div>
+<div class="card wide"><h3>CDA Rankings</h3><div id="cdaLeaderboards" class="grid" style="padding:0"></div></div>
 </div></section>
 <section id="centres" class="section"><div class="card wide"><div class="toolbar"><h2>Centre Detail</h2><input class="search" data-filter="centreTable" placeholder="Search centre..."></div><div class="periodToggle" style="margin-bottom:12px"></div><div class="hint">Green = at or above target, amber = within 90%, red = below 90%. Click a column heading to rank by it.</div><div class="table-wrap"><table id="centreTable"></table></div></div></section>
-<section id="cdaSummary" class="section"><div class="grid">
-<div id="cdaPillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
-<div class="card wide"><div class="toolbar"><h2>CDA Detail</h2></div><div class="periodToggle" style="margin-bottom:12px"></div><div class="hint">Rolled up by CDA (North Manchester, South Manchester, West Yorkshire), plus the Group total. Gap coloured by achievement: green at/above target, amber within 90%, red below. Click a column heading to rank by it.</div><div class="table-wrap"><table id="cdaTable"></table></div></div>
-</div></section>
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
     <h2>Admin Update</h2>
@@ -76,5 +73,5 @@
 <script src="./service-data-ytd.js?v=3"></script>
 <script src="./service-cda-data.js?v=3"></script>
 <script src="./service-cda-data-ytd.js?v=3"></script>
-<script src="./service-app.js?v=3"></script>
+<script src="./service-app.js?v=4"></script>
 </body></html>
