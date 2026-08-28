@@ -15,13 +15,13 @@
 <section id="dashboard" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 <div class="card wide period-card" style="grid-column:span 12">
-  <div><strong>Reporting period</strong></div>
+  <div><strong>Reporting period</strong><div class="hint" style="margin:2px 0 0">Click to change period</div></div>
   <div class="periodToggle"></div>
 </div>
 <div class="card wide"><h3>Rankings</h3><div id="pillarLeaderboards" class="grid" style="padding:0"></div></div>
 <div class="card wide"><h3>CDA Rankings</h3><div id="cdaLeaderboards" class="grid" style="padding:0"></div></div>
 </div></section>
-<section id="centres" class="section"><div class="card wide"><div class="toolbar"><h2>Centre Detail</h2><input class="search" data-filter="centreTable" placeholder="Search centre..."></div><div class="periodToggle" style="margin-bottom:12px"></div><div class="hint">Green = at or above target, amber = within 90%, red = below 90%. Click a column heading to rank by it.</div><div class="table-wrap"><table id="centreTable"></table></div></div></section>
+<section id="centres" class="section"><div class="card wide"><div class="toolbar"><h2>Centre Detail</h2><input class="search" data-filter="centreTable" placeholder="Search centre..."></div><div class="hint" style="margin-bottom:4px">Click to change period</div><div class="periodToggle" style="margin-bottom:12px"></div><div class="hint">Green = at or above target, amber = within 90%, red = below 90%. Click a column heading to rank by it.</div><div class="table-wrap"><table id="centreTable"></table></div></div></section>
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
     <h2>Admin Update</h2>
@@ -73,5 +73,5 @@
 <script src="./service-data-ytd.js?v=3"></script>
 <script src="./service-cda-data.js?v=3"></script>
 <script src="./service-cda-data-ytd.js?v=3"></script>
-<script src="./service-app.js?v=7"></script>
+<script src="./service-app.js?v=8"></script>
 </body></html>
