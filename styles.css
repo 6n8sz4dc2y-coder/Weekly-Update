@@ -151,6 +151,18 @@ table{border-collapse:separate;border-spacing:0}
 .table-wrap td.col-target{background:#eff6ff;color:#1d4ed8;font-weight:800}
 .table-wrap td.col-actual{background:#f0fdf4;color:#15803d;font-weight:800}
 
+/* Compact single-pane table (CDA Detail): tighter padding/font so a small
+   number of rows with many columns fits without horizontal scrolling. */
+.table-compact table{font-size:12px}
+.table-compact th,.table-compact td{padding:8px 8px;white-space:nowrap}
+.table-compact tr.group td{background:#eef2ff!important;font-weight:900;color:#1e3a8a}
+
+/* Gap-to-target cells coloured by achievement (SvO), instead of a separate
+   SvO column - green at/above target, amber within 90%, red below. */
+.table-wrap td.cell-green{background:var(--lightgreen);color:var(--green);font-weight:800}
+.table-wrap td.cell-amber{background:var(--lightamber);color:var(--amber);font-weight:800}
+.table-wrap td.cell-red{background:var(--lightred);color:var(--red);font-weight:800}
+
 /* Per-month variance columns (actual minus target/budget). */
 .variance-cell{font-weight:800}
 .variance-cell.positive{color:var(--green)}
