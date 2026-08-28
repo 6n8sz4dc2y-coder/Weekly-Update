@@ -17,7 +17,7 @@ const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v2';
 
 const PERIODS = ['ytd','q3'];
 const PERIOD_LABEL = { ytd: 'Year to Date', q3: 'Q3 (Current Quarter)' };
-let ACTIVE_PERIOD = 'ytd';
+let ACTIVE_PERIOD = 'q3';
 
 function formatPublishedAt(iso){
   if(!iso) return '-';
@@ -156,19 +156,26 @@ function pillarBadge(name){
   const basis = pillarBasis(name);
   return `<span class="status ${basis==='Actual'?'green':'blue'}" style="margin-left:8px;vertical-align:middle">${basis}</span>`;
 }
-function renderPillarCards(data, containerId){
+const CARD_ACCENTS = ['blue-card','green-card','purple-card','amber-card'];
+// Q3 (the opener) on the left, Year to Date on the right - one card per
+// pillar, mirroring the Weekly Update dashboard's Month-to-date / Total
+// split cards, but split by reporting period instead of by month.
+function renderPillarCards(q3Data, ytdData, containerId){
   const el = document.getElementById(containerId);
   if(!el) return;
-  if(!data){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded for this period yet. Use Admin Update to upload the workbook.</div></div>'; return; }
-  const span = data.pillars.length<=2 ? 'half' : data.pillars.length===3 ? 'third' : 'half';
-  el.innerHTML = data.pillars.map(name=>{
-    const t = pillarTotals(data, name);
-    return `<div class="card kpi ${span} kpi-progress-card">
+  const pillars = (q3Data && q3Data.pillars) || (ytdData && ytdData.pillars) || [];
+  if(!pillars.length){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+  el.innerHTML = pillars.map((name,i)=>{
+    const q3 = pillarTotals(q3Data, name);
+    const ytd = pillarTotals(ytdData, name);
+    const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
+    return `<div class="card kpi kpi-progress-card ${accent}">
       <div class="label">${name}${pillarBadge(name)}</div>
-      <div class="value">${pct(t.svo)}</div>
-      <div class="note"><strong>${displayVal(name,t.actual)}</strong> / <strong>${displayVal(name,t.target)}</strong> target</div>
-      ${progressBar(t.svo)}
-      <div class="kpi-footer-strip two-up"><div><span>Status</span><strong>${statusPill(t.svo)}</strong></div><div><span>${data.rows.length} rows reporting</span><strong>${PERIOD_LABEL[ACTIVE_PERIOD]}</strong></div></div>
+      <div class="kpi-split-main">
+        <div><div class="mini-label">Q3 (Current Quarter)</div><div class="value">${pct(q3.svo)}</div><div class="note"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div></div>
+        <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div></div>
+      </div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPill(q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPill(ytd.svo)}</strong></div></div>
     </div>`;
   }).join('');
 }
@@ -246,10 +253,10 @@ function renderPeriodToggle(){
 
 function build(){
   renderPeriodToggle();
-  renderPillarCards(groupData(ACTIVE_PERIOD), 'pillarCards');
+  renderPillarCards(groupData('q3'), groupData('ytd'), 'pillarCards');
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD]);
   renderGroupTable(DATA.centre[ACTIVE_PERIOD], 'centreTable', 'Centre');
-  renderPillarCards(DATA.cda[ACTIVE_PERIOD], 'cdaPillarCards');
+  renderPillarCards(DATA.cda.q3, DATA.cda.ytd, 'cdaPillarCards');
   renderGroupTable(DATA.cda[ACTIVE_PERIOD], 'cdaTable', 'CDA');
   updateVersionDisplays();
 }
