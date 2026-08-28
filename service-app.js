@@ -408,10 +408,18 @@ function renderTradePartsCard(containerId, data){
 // which is already Q1 + Q2 actual plus the Q3 forecast (Q4 hasn't started
 // yet). Each column also shows the reward band (5/9/12%) that forecast is
 // currently tracking to earn.
+// Fixed display order rather than upload order (multi-file selection order
+// isn't guaranteed) - anything not in this list (a future new CDA) is
+// appended at the end rather than dropped.
+const TRADE_PARTS_CDA_ORDER = ['North Manchester', 'South Manchester', 'West Yorkshire', 'Lexus'];
 function renderTradePartsCdaCards(containerId, cdaList){
   const el = document.getElementById(containerId);
   if(!el) return;
   if(!cdaList || !cdaList.length){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+  cdaList = cdaList.slice().sort((a,b)=>{
+    const ia = TRADE_PARTS_CDA_ORDER.indexOf(a.cda), ib = TRADE_PARTS_CDA_ORDER.indexOf(b.cda);
+    return (ia===-1?TRADE_PARTS_CDA_ORDER.length:ia) - (ib===-1?TRADE_PARTS_CDA_ORDER.length:ib);
+  });
   const cell = (row) => {
     if(!row) return { value:'-', note:'No data', gap:'', reward:'-', statusHtml:'<span class="status">No data</span>' };
     const forecast = row['SMROE Sales Out (Forecast)*'];
