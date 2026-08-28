@@ -173,7 +173,7 @@ function renderPillarCards(q3Data, ytdData, containerId){
     return `<div class="card kpi kpi-progress-card ${accent}">
       <div class="label">${name}${pillarBadge(name)}</div>
       <div class="kpi-split-main">
-        <div><div class="mini-label">Q3 (Current Quarter)</div><div class="value">${pct(q3.svo)}</div><div class="note"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div></div>
+        <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3.svo)}</div><div class="note"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div></div>
       </div>
       <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPill(q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPill(ytd.svo)}</strong></div></div>
