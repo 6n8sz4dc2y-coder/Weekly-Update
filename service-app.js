@@ -12,8 +12,8 @@
 // lives in the header (sticky, so it's reachable from every tab) and
 // switches all of it together. Three tabs cover the three data sources:
 // VCF (pillar cards, Rankings, CDA Rankings, Centre Detail), Trade Parts
-// (a Group-level card/table plus a CDA + Lexus breakdown ranking, each its
-// own per-CDA export) and WRR (its own per-centre Rankings/CDA
+// (a Group-level card/table plus a CDA + Lexus breakdown of per-CDA
+// pillar cards, each its own export) and WRR (its own per-centre Rankings/CDA
 // Rankings/Detail, parsed from two flat workbooks rather than the VCF
 // pillar-group shape).
 
