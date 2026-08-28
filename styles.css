@@ -253,8 +253,18 @@ nav .hub-link-btn{margin-left:auto}
 .periodToggle button:active{transform:scale(.97)}
 .periodToggle button.primary-btn{background:var(--head);color:#fff;box-shadow:0 1px 4px rgba(15,23,42,.3)}
 .periodToggle button.primary-btn:hover{background:var(--head)}
-.period-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
-@media print{.hub-link-btn,.periodToggle{display:none!important}}
+/* Reporting period lives inside <header> now (was its own card on the
+   Dashboard tab) so it scrolls and sticks together with the rest of the
+   header on every tab, instead of scrolling out of view. */
+.header-period-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14)}
+.header-period-label{color:#cbd5e1;font-weight:800;font-size:13px}
+.header-period-label small{display:block;font-weight:600;color:#94a3b8;font-size:11px;margin-top:2px}
+header .periodToggle{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+header .periodToggle button{color:#e2e8f0}
+header .periodToggle button:hover{background:rgba(255,255,255,.18);color:#fff}
+header .periodToggle button.primary-btn{background:#fff;color:var(--head);box-shadow:none}
+header .periodToggle button.primary-btn:hover{background:#fff}
+@media print{.hub-link-btn,.periodToggle,.header-period-row{display:none!important}}
 
 /* #pillarCards gets an inline grid-template-columns override (set in JS,
    one column per card) so its variable card count always fits one line on
