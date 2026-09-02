@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260828-programmes-12">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
 <main>
 <section id="vcf" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -29,6 +29,10 @@
 <div class="card wide"><h3>Rankings</h3><div id="wrrLeaderboard" class="leader"></div></div>
 <div class="card wide"><h3>CDA Rankings</h3><div id="wrrCdaLeaderboard" class="leader"></div></div>
 <div class="card wide"><h3>WRR Detail</h3><div class="hint">Per-centre CPUS Unique vs Target, plus Bonus Payable. WRR Group is the same CDA grouping used elsewhere.</div><div class="table-wrap"><table id="wrrTable"></table></div></div>
+</div></section>
+<section id="siteSummary" class="section"><div class="grid">
+<div class="card wide"><h3>Site Summary</h3><div class="hint">Pick a site to see everything the hub knows about it - VCF, Trade Parts and WRR - in one place.</div><select id="siteSummarySelect" class="search" style="max-width:360px"></select></div>
+<div id="siteSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 </div></section>
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
@@ -117,5 +121,5 @@
 <script src="./service-trade-parts-sites-data.js?v=5"></script>
 <script src="./service-wrr-data.js?v=2"></script>
 <script src="./service-wrr-data-ytd.js?v=2"></script>
-<script src="./service-app.js?v=26"></script>
+<script src="./service-app.js?v=27"></script>
 </body></html>
