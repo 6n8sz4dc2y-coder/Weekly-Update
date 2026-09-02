@@ -590,6 +590,85 @@ function renderWrrTable(data){
   el.innerHTML = `<thead><tr>${cols.map(c=>`<th class="${c.num?'num':''}">${c.label}</th>`).join('')}</tr></thead><tbody>${rowsHtml}${totalHtml}</tbody>`;
 }
 
+// --- Site Summary -----------------------------------------------------------
+// Pulls together everything the hub knows about a single site - VCF pillars,
+// Trade Parts, WRR - across all three data sources, keyed by site/centre
+// name (the same "RRG <Site>" names used consistently everywhere). Not
+// every source necessarily has data for every site (Trade Parts sites are
+// uploaded incrementally), so each block degrades to "No data" rather than
+// failing when a source is missing that site.
+let SITE_SUMMARY_SELECTED = null;
+function allKnownSites(){
+  const set = new Set();
+  ['q3','ytd'].forEach(p=>{ (DATA.centre[p] && DATA.centre[p].rows || []).forEach(r=>set.add(r.centre)); });
+  (DATA.tradePartsSites||[]).forEach(s=>set.add(s.site));
+  ['q3','ytd'].forEach(p=>{ (DATA.wrr[p] && DATA.wrr[p].rows || []).forEach(r=>set.add(r['Centre Name'])); });
+  return Array.from(set).sort();
+}
+// Shared shape for the Trade Parts and WRR summary cards - both are a single
+// This-Quarter/Year-to-Date split card, same as their own tabs' hero cards.
+function renderSiteSummaryTwinCard(label, accent, q3Cell, ytdCell){
+  return `<div class="card half kpi-progress-card ${accent}">
+    <div class="label">${label}</div>
+    <div class="kpi-split-main">
+      <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
+      <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
+    </div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
+  </div>`;
+}
+function renderSiteSummarySelect(){
+  const el = document.getElementById('siteSummarySelect');
+  if(!el) return;
+  const sites = allKnownSites();
+  if((!SITE_SUMMARY_SELECTED || !sites.includes(SITE_SUMMARY_SELECTED)) && sites.length) SITE_SUMMARY_SELECTED = sites[0];
+  el.innerHTML = sites.map(s=>`<option value="${s}" ${s===SITE_SUMMARY_SELECTED?'selected':''}>${s}</option>`).join('');
+}
+function renderSiteSummary(){
+  renderSiteSummarySelect();
+  const el = document.getElementById('siteSummaryContent');
+  if(!el) return;
+  const site = SITE_SUMMARY_SELECTED;
+  if(!site){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+
+  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Row = DATA.centre.q3 && DATA.centre.q3.rows.find(r=>r.centre===site);
+  const ytdRow = DATA.centre.ytd && DATA.centre.ytd.rows.find(r=>r.centre===site);
+  const vcfCards = pillars.map((name,i)=>{
+    const q3v = q3Row && q3Row.values[name], ytdv = ytdRow && ytdRow.values[name];
+    const q3Svo = q3v ? (q3v.svo ?? (q3v.target ? q3v.actual/q3v.target : null)) : null;
+    const ytdSvo = ytdv ? (ytdv.svo ?? (ytdv.target ? ytdv.actual/ytdv.target : null)) : null;
+    const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
+    return `<div class="card kpi kpi-progress-card ${accent}">
+      <div class="label">${name}${pillarBadge(name)}</div>
+      <div class="kpi-split-main">
+        <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div></div>
+        <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div></div>
+      </div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
+    </div>`;
+  }).join('');
+
+  const siteTp = (DATA.tradePartsSites||[]).find(s=>s.site===site);
+  const tpCell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
+    const forecast = row['SMROE Sales Out (Forecast)*'], target = row['SMROE Target'], achieved = row['Target % Achieved (Forecast)*'];
+    return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target) };
+  };
+  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card', tpCell(siteTp && tradePartsRow(siteTp,'Q3')), tpCell(siteTp && tradePartsYtdThroughQ3(siteTp)));
+
+  const wrrQ3Row = DATA.wrr.q3 && DATA.wrr.q3.rows.find(r=>r['Centre Name']===site);
+  const wrrYtdRow = DATA.wrr.ytd && DATA.wrr.ytd.rows.find(r=>r['Centre Name']===site);
+  const wrrCell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
+    const actual = row['CPUS Unique'], target = row['Target'], achieved = row['Centre % Achieved'];
+    return { value: pct(achieved), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> target`, gap: wrrGapLabel(actual,target), statusHtml: achieved===null||achieved===undefined ? '<span class="status">No data</span>' : statusPill(achieved) };
+  };
+  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Row), wrrCell(wrrYtdRow));
+
+  el.innerHTML = vcfCards + tpCard + wrrCard;
+}
+
 function renderPeriodToggle(){
   // Multiple instances share the same state (Dashboard above Rankings,
   // Centre Detail) so the period can be switched from whichever tab is
@@ -619,6 +698,8 @@ function build(){
   renderWrrRankingCard('wrrLeaderboard', DATA.wrr[ACTIVE_PERIOD]);
   renderWrrCdaRankingCard('wrrCdaLeaderboard', DATA.wrr[ACTIVE_PERIOD]);
   renderWrrTable(DATA.wrr[ACTIVE_PERIOD]);
+  // Site Summary tab
+  renderSiteSummary();
   updateVersionDisplays();
 }
 
@@ -817,12 +898,13 @@ document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('clic
   btn.classList.add('active');
   const target=document.getElementById(btn.dataset.target);
   if(target) target.classList.add('active');
-  // The period toggle only matters on VCF and WRR - Trade Parts always shows
-  // This Quarter and Year to Date side by side, so the toggle has no effect
-  // there and just invites confusion.
+  // The period toggle only matters on VCF and WRR - Trade Parts and Site
+  // Summary always show This Quarter and Year to Date side by side, so the
+  // toggle has no effect there and just invites confusion.
   const periodRow=document.querySelector('.header-period-row');
-  if(periodRow) periodRow.style.display = btn.dataset.target==='tradeParts' ? 'none' : '';
+  if(periodRow) periodRow.style.display = (btn.dataset.target==='tradeParts'||btn.dataset.target==='siteSummary') ? 'none' : '';
 })});
+document.getElementById('siteSummarySelect')?.addEventListener('change', (e)=>{ SITE_SUMMARY_SELECTED = e.target.value; renderSiteSummary(); });
 document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{
   const table=document.getElementById(input.dataset.filter);
   if(!table) return;
