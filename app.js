@@ -593,6 +593,104 @@ function build(){
  renderYoyBySite(DATA.dashboard_activity||[], DATA.dashboard_activity_ly||[]);
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_total)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_total)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_total)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
  makeTable('q2UsedTable',[{label:'Centre',key:'centre'},{label:'Apr Used',key:'apr_counting',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_counting)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Used',key:'may_counting',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_counting)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Used',key:'jun_counting',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_counting)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q2_used);
+ renderSiteSummary();
+}
+
+// --- Site Summary -----------------------------------------------------------
+// Same idea as the Programmes Hub's Site Summary tab - pick a site, see
+// everything the Weekly Update dashboard knows about it in one place. Site
+// names here are the short forms used in the source workbooks ("Bolton",
+// "SQ") rather than the Programmes Hub's "RRG <Site>" - these are two
+// separate systems with their own naming, not cross-referenced.
+let WU_SITE_SELECTED = null;
+function wuKnownSites(){
+  const set = new Set();
+  const isRealSite = c => c && !String(c).toUpperCase().includes('CDA') && String(c).toUpperCase()!=='TOTAL';
+  [DATA.q3_regs, DATA.q3_used, DATA.q3_fleet, DATA.dashboard_orders, DATA.dashboard_activity].forEach(rows=>{
+    (rows||[]).forEach(r=>{ if(isRealSite(r.centre)) set.add(r.centre); });
+  });
+  return Array.from(set).sort();
+}
+function renderSiteSummarySelect(){
+  const el = document.getElementById('siteSummarySelect');
+  if(!el) return;
+  const sites = wuKnownSites();
+  if((!WU_SITE_SELECTED || !sites.includes(WU_SITE_SELECTED)) && sites.length) WU_SITE_SELECTED = sites[0];
+  el.innerHTML = sites.map(s=>`<option value="${s}" ${s===WU_SITE_SELECTED?'selected':''}>${siteDisplay(s)}</option>`).join('');
+}
+// Twin "Month to date / Q3 total" card, same framing as the Dashboard tab's
+// group-level KPI cards but scoped to a single site's row.
+function siteTwinCard(label, accent, monthCell, qtrCell){
+  return `<div class="card kpi kpi-progress-card ${accent}">
+    <div class="label">${label}</div>
+    <div class="kpi-split-main">
+      <div><div class="mini-label">Month to date</div><div class="value">${monthCell.value}</div><div class="note note-target">${monthCell.note}</div></div>
+      <div><div class="mini-label">Q3 total</div><div class="value">${qtrCell.value}</div><div class="note note-target">${qtrCell.note}</div></div>
+    </div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Month)</span><strong>${monthCell.statusHtml}</strong></div><div><span>Status (Q3)</span><strong>${qtrCell.statusHtml}</strong></div></div>
+  </div>`;
+}
+function siteQtrCell(actual, target, label){
+  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>' };
+  return { value: pct(target?actual/target:0), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(paceRatio(actual,target)) };
+}
+function siteMonthCell(actual, target, label){
+  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>' };
+  return { value: pct(target?actual/target:0), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(monthPaceRatio(actual,target)) };
+}
+function renderSiteSummary(){
+  renderSiteSummarySelect();
+  const el = document.getElementById('siteSummaryContent');
+  if(!el) return;
+  const site = WU_SITE_SELECTED;
+  if(!site){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+  const month = currentOrderMonth();
+
+  const regRow = (DATA.q3_regs||[]).find(r=>r.centre===site);
+  const usedRow = (DATA.q3_used||[]).find(r=>r.centre===site);
+  const nonRow = (DATA.q3_non||[]).find(r=>r.centre===site);
+  const fleetRow = (DATA.q3_fleet||[]).find(r=>r.centre===site);
+  const orderRow = (DATA.dashboard_orders||[]).find(r=>r.centre===site);
+  const actRow = (DATA.dashboard_activity||[]).find(r=>r.centre===site);
+
+  const regsCard = siteTwinCard('Q3 Registrations', 'blue-card',
+    siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target'),
+    siteQtrCell(regRow ? regRow.qtr_total : null, regRow ? regRow.qtr_target : null, 'target'));
+
+  const usedCard = siteTwinCard('Used Cars', 'green-card',
+    siteMonthCell(usedRow ? usedRow[month+'_counting'] : null, usedRow ? usedRow[month+'_target'] : null, 'target'),
+    siteQtrCell(usedRow ? usedRow.qtr_counting : null, usedRow ? usedRow.qtr_target : null, 'target'));
+
+  const nonCard = siteTwinCard('Non-Counting Fleet', 'purple-card',
+    siteMonthCell(nonRow ? nonRow[month+'_total'] : null, nonRow ? nonRow[month+'_budget'] : null, 'budget'),
+    siteQtrCell(nonRow ? nonRow.qtr_total : null, nonRow ? nonRow.qtr_budget : null, 'budget'));
+
+  const orderQtrActual = orderRow ? orderDoneFor(orderRow,'jul')+orderDoneFor(orderRow,'aug')+orderDoneFor(orderRow,'sep') : null;
+  const orderCard = siteTwinCard('Order Bank', 'amber-card',
+    siteMonthCell(orderRow ? orderDoneFor(orderRow, month) : null, orderRow ? orderRow[month+'_target'] : null, 'target'),
+    siteQtrCell(orderQtrActual, orderRow ? orderRow.q3_target : null, 'target'));
+
+  const fleetExpected = fleetRow ? (Number(fleetRow.regs)||0)+(Number(fleetRow.active_orders)||0) : null;
+  const fleetPace = fleetRow ? paceRatio(fleetExpected, fleetRow.target) : null;
+  const fleetCard = `<div class="card kpi kpi-progress-card amber-card">
+    <div class="label">Fleet BCH</div>
+    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${fleetRow?pct(fleetRow.target?fleetExpected/fleetRow.target:0):'-'}</div>
+    <div class="note">${fleetRow?`<strong>${fmt(fleetRow.regs)}</strong> regs + <strong>${fmt(fleetRow.active_orders)}</strong> active orders / <strong>${fmt(fleetRow.target)}</strong> target`:'No data'}</div>
+    <div class="kpi-footer-strip"><div><span>Status</span><strong>${fleetRow?paceStatus(fleetPace):'<span class="status">No data</span>'}</strong></div></div>
+  </div>`;
+
+  const actCard = `<div class="card kpi kpi-progress-card blue-card">
+    <div class="label">Sales Funnel</div>
+    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
+    <div class="note">enquiries</div>
+    <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
+      <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong></div>
+      <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong></div>
+      <div><span>Conversion %</span><strong>${actRow?pct(actRow.orders_ratio):'-'}</strong></div>
+    </div>
+  </div>`;
+
+  el.innerHTML = regsCard + usedCard + nonCard + fleetCard + orderCard + actCard;
 }
 
 
@@ -994,7 +1092,8 @@ document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('clic
   const target=document.getElementById(btn.dataset.target);
   if(target) target.classList.add('active');
 })});
-document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{const table=document.getElementById(input.dataset.filter);const term=input.value.toLowerCase();table.querySelectorAll('tbody tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(term)?'':'none'})})});
+document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{const table=document.getElementById(input.dataset.filter);if(!table)return;const term=input.value.toLowerCase();table.querySelectorAll('tbody tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(term)?'':'none'})})});
+document.getElementById('siteSummarySelect')?.addEventListener('change', (e)=>{ WU_SITE_SELECTED = e.target.value; renderSiteSummary(); });
 document.getElementById('previewImport')?.addEventListener('click', previewImport);
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
