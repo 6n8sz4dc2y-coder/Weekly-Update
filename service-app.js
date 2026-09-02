@@ -817,6 +817,11 @@ document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('clic
   btn.classList.add('active');
   const target=document.getElementById(btn.dataset.target);
   if(target) target.classList.add('active');
+  // The period toggle only matters on VCF and WRR - Trade Parts always shows
+  // This Quarter and Year to Date side by side, so the toggle has no effect
+  // there and just invites confusion.
+  const periodRow=document.querySelector('.header-period-row');
+  if(periodRow) periodRow.style.display = btn.dataset.target==='tradeParts' ? 'none' : '';
 })});
 document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{
   const table=document.getElementById(input.dataset.filter);
