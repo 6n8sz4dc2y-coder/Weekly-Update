@@ -17,46 +17,44 @@
 // Rankings/Detail, parsed from two flat workbooks rather than the VCF
 // pillar-group shape).
 
-const SERVICE_BUILD_VERSION = '2026.08.28.2';
-const SERVICE_META_KEY = 'rrgServiceDashboardMeta_v1';
 const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v2';
 
 const PERIODS = ['ytd','q3'];
 const PERIOD_LABEL = { ytd: 'Year to Date', q3: 'Q3 (Current Quarter)' };
 let ACTIVE_PERIOD = 'q3';
 
-function formatPublishedAt(iso){
-  if(!iso) return '-';
-  try{ return new Date(iso).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}); }
-  catch(e){ return iso; }
-}
-function getServiceMeta(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(SERVICE_META_KEY) || 'null');
-    if(saved) return saved;
-  }catch(e){}
-  return { version: SERVICE_BUILD_VERSION, publishedAt: null };
-}
-function makePublishVersion(){
-  const d = new Date();
-  return d.toISOString().slice(0,16).replace('T','.').replace(':','');
-}
-function saveServiceMeta(){
-  const meta = { version: makePublishVersion(), publishedAt: new Date().toISOString() };
-  localStorage.setItem(SERVICE_META_KEY, JSON.stringify(meta));
-  updateVersionDisplays();
-  return meta;
+function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
+
+// "Data last updated" - same idea as the Weekly Update dashboard, but this
+// hub's data lives in committed seed files (service-data.js etc.) rather
+// than workbooks fetched at load, and those load via <script src> tags,
+// which don't expose response headers to JS. So this fetches each one a
+// second time (cheap, browser-cached) purely to read its Last-Modified
+// header - the true last time that file was committed to GitHub - and
+// shows the newest one found, no manual "publish" step involved.
+const SERVICE_DATA_FILES = ['service-data.js','service-data-ytd.js','service-cda-data.js','service-cda-data-ytd.js','service-trade-parts-data.js','service-trade-parts-cda-data.js','service-trade-parts-sites-data.js','service-wrr-data.js','service-wrr-data-ytd.js'];
+let SERVICE_DATA_LAST_MODIFIED = null;
+function formatDataUpdated(d){
+  if(!d) return 'Not available yet';
+  return d.toLocaleString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function updateVersionDisplays(){
-  const meta = getServiceMeta();
-  setText('liveVersionHeader', 'Version ' + meta.version);
-  setText('footerVersion', 'Version ' + meta.version);
-  setText('adminLiveVersion', meta.version);
-  setText('livePublishedHeader', 'Published ' + formatPublishedAt(meta.publishedAt));
-  setText('footerPublished', 'Published ' + formatPublishedAt(meta.publishedAt));
-  setText('adminPublishedAt', formatPublishedAt(meta.publishedAt));
+  const text = `Data last updated ${formatDataUpdated(SERVICE_DATA_LAST_MODIFIED)}`;
+  setText('dataUpdatedHeader', text);
+  setText('footerDataUpdated', text);
+  setText('adminDataUpdated', formatDataUpdated(SERVICE_DATA_LAST_MODIFIED));
 }
-function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
+async function refreshDataLastModified(){
+  const results = await Promise.allSettled(SERVICE_DATA_FILES.map(f => fetch('./'+f, { cache:'no-cache' })));
+  results.forEach(r=>{
+    if(r.status!=='fulfilled' || !r.value.ok) return;
+    const lastModified = r.value.headers.get('Last-Modified');
+    if(!lastModified) return;
+    const d = new Date(lastModified);
+    if(!Number.isNaN(d.getTime()) && (!SERVICE_DATA_LAST_MODIFIED || d > SERVICE_DATA_LAST_MODIFIED)) SERVICE_DATA_LAST_MODIFIED = d;
+  });
+  updateVersionDisplays();
+}
 
 const fmt=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n)};
 const fmtGbp=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)};
@@ -848,9 +846,8 @@ function publishImport(){
   if(!PENDING_DATA){ status.innerHTML = 'Preview an import first.'; return; }
   DATA = PENDING_DATA;
   try{ localStorage.setItem(SERVICE_DATA_KEY, JSON.stringify(DATA)); }catch(e){ console.warn(e); }
-  const meta = saveServiceMeta();
   build();
-  status.innerHTML = `<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the relevant workbook(s) in GitHub and re-download the data backups below.<br>Version ${meta.version}<br>Published ${formatPublishedAt(meta.publishedAt)}`;
+  status.innerHTML = `<strong>Published.</strong><br>Preview published in this browser only. For the live site, replace the relevant workbook(s) in GitHub and re-download the data backups below.`;
 }
 function downloadOne(filename, varName, data){
   if(!data) return;
@@ -875,7 +872,6 @@ function downloadDataBackup(){
 }
 function resetSavedData(){
   localStorage.removeItem(SERVICE_DATA_KEY);
-  localStorage.removeItem(SERVICE_META_KEY);
   location.reload();
 }
 
@@ -1117,3 +1113,4 @@ document.getElementById('exportPptHeader')?.addEventListener('click', ()=>export
 document.getElementById('exportPpt')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
 
 build();
+refreshDataLastModified();

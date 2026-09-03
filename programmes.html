@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260828-programmes-12">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
 <main>
 <section id="vcf" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -40,8 +40,7 @@
     <div class="hint">This hub reads workbooks uploaded to GitHub, each with an "Export" sheet: four VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date and Q3; one Group Trade Parts export (a flat quarterly table, Group-level); a Group Trade Parts CDA breakdown (one file per CDA - select all of them at once, the CDA name is read automatically from each file); one Group Trade Parts Lexus export (same shape, reported separately from the geographic CDAs); a Group Trade Parts site breakdown (one file per site - select all of them at once, the site name is read automatically from each file, feeds the Q3 and Year to Date site leagues); and two WRR exports (a flat per-centre table, Q3 and Year to Date). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
   </div>
   <div class="card wide version-card">
-    <div><strong>Current Live Version</strong><br><span id="adminLiveVersion">-</span></div>
-    <div><strong>Published</strong><br><span id="adminPublishedAt">-</span></div>
+    <div><strong>Data last updated</strong><br><span id="adminDataUpdated">-</span></div>
     <div><strong>Cache status</strong><br><span>Versioned assets active</span></div>
   </div>
   <div class="card third">
@@ -110,7 +109,7 @@
     <div id="adminPreviewContainer"></div>
   </div>
 </div></section>
-<div class="footer-note">RRG Group Programmes Hub · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
+<div class="footer-note">RRG Group Programmes Hub · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="./service-data.js?v=4"></script>
 <script src="./service-data-ytd.js?v=4"></script>
@@ -121,5 +120,5 @@
 <script src="./service-trade-parts-sites-data.js?v=5"></script>
 <script src="./service-wrr-data.js?v=2"></script>
 <script src="./service-wrr-data-ytd.js?v=2"></script>
-<script src="./service-app.js?v=27"></script>
+<script src="./service-app.js?v=28-dataupdated"></script>
 </body></html>
