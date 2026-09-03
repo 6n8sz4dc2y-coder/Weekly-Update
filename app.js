@@ -1,40 +1,18 @@
-const DASHBOARD_BUILD_VERSION = '2026.07.21.performance.1';
-const DASHBOARD_META_KEY = 'rrgDashboardMeta_v1';
-function formatPublishedAt(iso){
-  if(!iso) return 'Not published in this browser yet';
-  const d = new Date(iso);
-  if(Number.isNaN(d.getTime())) return iso;
+// Tracks when the source workbooks were actually last changed in GitHub,
+// read straight off the Last-Modified response header each is served with
+// - no manual "publish" step to remember, and it reflects the real last
+// upload rather than a version string nobody needs to see.
+let DATA_LAST_MODIFIED = null;
+function formatDataUpdated(d){
+  if(!d) return 'Not available yet';
   return d.toLocaleString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
-function getDashboardMeta(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(DASHBOARD_META_KEY) || 'null');
-    if(saved && saved.version) return saved;
-  }catch(e){}
-  return { version: DASHBOARD_BUILD_VERSION, publishedAt: null };
-}
-function makePublishVersion(){
-  const d = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}.${pad(d.getHours())}${pad(d.getMinutes())}`;
-}
-function saveDashboardMeta(){
-  const meta = { version: makePublishVersion(), publishedAt: new Date().toISOString() };
-  localStorage.setItem(DASHBOARD_META_KEY, JSON.stringify(meta));
-  updateVersionDisplays();
-  return meta;
-}
 function updateVersionDisplays(){
-  const meta = getDashboardMeta();
-  const versionText = `Version ${meta.version}`;
-  const publishedText = `Published ${formatPublishedAt(meta.publishedAt)}`;
-  const set = (id, text) => { const el = document.getElementById(id); if(el) el.textContent = text; };
-  set('liveVersionHeader', versionText);
-  set('livePublishedHeader', publishedText);
-  set('footerVersion', versionText);
-  set('footerPublished', publishedText);
-  set('adminLiveVersion', versionText);
-  set('adminPublishedAt', formatPublishedAt(meta.publishedAt));
+  const text = `Data last updated ${formatDataUpdated(DATA_LAST_MODIFIED)}`;
+  const set = (id, t) => { const el = document.getElementById(id); if(el) el.textContent = t; };
+  set('dataUpdatedHeader', text);
+  set('footerDataUpdated', text);
+  set('adminDataUpdated', formatDataUpdated(DATA_LAST_MODIFIED));
 }
 
 const NORTH_SITES = ['Bolton','Bury','Rochdale','SQ'];
@@ -995,9 +973,8 @@ async function previewImport(){
 function publishImport(){
   if(!PENDING_DATA){ document.getElementById('adminStatus').innerHTML='Preview an import first.'; return; }
   DATA=PENDING_DATA;
-  const publishedMeta = saveDashboardMeta();
   build();
-  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser. For the live site, replace the workbook files in GitHub and commit.<br>${'Version ' + publishedMeta.version}<br>${'Published ' + formatPublishedAt(publishedMeta.publishedAt)}`;
+  document.getElementById('adminStatus').innerHTML=`<strong>Published.</strong><br>Preview published in this browser only. For the live site, replace the workbook files in GitHub and commit.`;
 }
 function downloadDataBackup(){
   const payload = 'window.DASHBOARD_DATA = ' + JSON.stringify(DATA, null, 2) + ';\n';
@@ -1010,7 +987,6 @@ function downloadDataBackup(){
 }
 function resetSavedData(){
   localStorage.removeItem('rrgDashboardData_orderbank_v2');
-  localStorage.removeItem(DASHBOARD_META_KEY);
   location.reload();
 }
 
@@ -1019,6 +995,11 @@ function resetSavedData(){
 async function fetchWorkbook(path){
   const res = await fetch(path, { cache: 'no-cache' });
   if(!res.ok) throw new Error(path + ' not found (' + res.status + ')');
+  const lastModified = res.headers.get('Last-Modified');
+  if(lastModified){
+    const d = new Date(lastModified);
+    if(!Number.isNaN(d.getTime()) && (!DATA_LAST_MODIFIED || d > DATA_LAST_MODIFIED)) DATA_LAST_MODIFIED = d;
+  }
   const buf = await res.arrayBuffer();
   return XLSX.read(buf, { type: 'array' });
 }
