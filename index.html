@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260828-programmes-12">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="liveVersionHeader">Version -</span><br><span id="livePublishedHeader">Published -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site Summary</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site Summary</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -92,8 +92,7 @@
     <div class="hint">This version reads four workbook files uploaded to GitHub: weekly-update.xlsx, sales-activity.xls, order-bank.xlsx and sales-activity-ly.xls. Replace those four files each week, commit, and refresh the dashboard.</div>
   </div>
   <div class="card wide version-card">
-    <div><strong>Current Live Version</strong><br><span id="adminLiveVersion">-</span></div>
-    <div><strong>Published</strong><br><span id="adminPublishedAt">-</span></div>
+    <div><strong>Data last updated</strong><br><span id="adminDataUpdated">-</span></div>
     <div><strong>Cache status</strong><br><span>Versioned assets active</span></div>
   </div>
   <div class="card third">
@@ -131,7 +130,7 @@
     <div class="table-wrap" style="margin-top:12px;max-height:360px"><table id="adminPreviewTable"></table></div>
   </div>
 </div></section>
-<div class="footer-note">RRG Group Dashboard · <span id="footerVersion">Version -</span> · <span id="footerPublished">Published -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
+<div class="footer-note">RRG Group Dashboard · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260901-sitesummary-1"></script>
+<script src="./app.js?v=20260903-dataupdated-1"></script>
 </body></html>
