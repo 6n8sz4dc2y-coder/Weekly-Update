@@ -431,10 +431,12 @@ function cdaOrderRows(){
 // nothing here touches Q3's own targets or figures.
 function renderQ4Cards(){
   const el = document.getElementById('q4Cards');
+  const note = document.getElementById('q4Note');
   if(!el) return;
   const rows = DATA.q4_regs || [];
   if(!rows.length){
-    el.innerHTML = '<div class="card wide"><div class="note-box">No Q4 data loaded yet. Once the team\'s Oct/Nov/Dec forward orders land in a "2026 - Q4" sheet in the Weekly Update workbook, upload it via Admin Update and this fills in automatically.</div></div>';
+    el.innerHTML = '';
+    if(note) note.innerHTML = 'No Q4 data loaded yet. Once the team\'s Oct/Nov/Dec forward orders land in a "2026 - Q4" sheet in the Weekly Update workbook, upload it via Admin Update and this fills in automatically.';
     return;
   }
   const cda = rows.filter(r=>['NORTH CDA','SOUTH CDA','WY CDA'].includes(r.centre));
@@ -455,6 +457,11 @@ function renderQ4Cards(){
   const cardsHtml = months.map(m => cardHtml(m.label, totalOf(m.totalKey), totalOf(m.targetKey))).join('')
     + cardHtml('Q4 Total', totalOf('qtr_total'), totalOf('qtr_target'));
   el.innerHTML = cardsHtml;
+  if(note){
+    const qtrTotal = totalOf('qtr_total'), qtrTarget = totalOf('qtr_target');
+    const qtrPct = qtrTarget ? qtrTotal/qtrTarget : 0;
+    note.innerHTML = `<strong>${pct(qtrPct)} of Q4 target logged so far</strong> (${fmt(qtrTotal)} of ${fmt(qtrTarget)} across Oct / Nov / Dec). Tracks what the team logs against Q4 target, from a "2026 - Q4" sheet in the same Weekly Update workbook - same shape as the Q3 one. Q3's own tabs and targets are completely untouched.`;
+  }
 }
 
 function build(){
