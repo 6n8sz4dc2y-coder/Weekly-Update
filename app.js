@@ -434,7 +434,7 @@ function renderQ4Cards(){
   if(!el) return;
   const rows = DATA.q4_regs || [];
   if(!rows.length){
-    el.innerHTML = '<div class="card wide"><div class="note-box">No Q4 data loaded yet. Once the team\'s Oct/Nov/Dec forward orders land in a "2026 - Q4" sheet in the Weekly Update workbook, upload it via Admin Update and this fills in automatically.</div></div>';
+    el.innerHTML = '';
     return;
   }
   const cda = rows.filter(r=>['NORTH CDA','SOUTH CDA','WY CDA'].includes(r.centre));
@@ -581,8 +581,12 @@ function build(){
  // Kept to a handful of columns (each month as one "orders / target" cell
  // rather than separate Booked/Target/Variance columns) so the table fits
  // on screen without horizontal scrolling.
- const monthCell=(actualKey,targetKey)=>r=>`${fmt(r[actualKey])} / ${fmt(r[targetKey])}`;
- makeTable('q4Table',[{label:'Centre',key:'centre'},{label:'Oct',value:monthCell('oct_total','oct_target')},{label:'Nov',value:monthCell('nov_total','nov_target')},{label:'Dec',value:monthCell('dec_total','dec_target')},{label:'Q4 Total',value:monthCell('qtr_total','qtr_target')},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true}],DATA.q4_regs||[]);
+ const monthCell=(actualKey,targetKey)=>r=>{
+   const actual=r[actualKey], target=r[targetKey];
+   const p = target ? actual/target : 0;
+   return `${fmt(actual)} / ${fmt(target)} <span class="mini">(${pct(p)})</span>`;
+ };
+ makeTable('q4Table',[{label:'Centre',key:'centre'},{label:'Oct',value:monthCell('oct_total','oct_target')},{label:'Nov',value:monthCell('nov_total','nov_target')},{label:'Dec',value:monthCell('dec_total','dec_target')},{label:'Q4 Total',value:monthCell('qtr_total','qtr_target')}],DATA.q4_regs||[]);
  makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_counting)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_counting)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_counting)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress',colorValue:r=>usedForecastPct(r)},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Req / Week',value:r=>usedRequiredPerWeek(r),num:true},{label:'Forecast',value:r=>usedForecastFinish(r),num:true},{label:'Forecast %',value:r=>usedForecastPct(r),format:'pct',num:true},{label:'Status',value:r=>usedForecastPct(r),format:'paceStatus'}],DATA.q3_used);
  makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Expected Achievement',value:r=>r.bch_target?((Number(r.bch_regs)||0)+(Number(r.active_orders)||0))/r.bch_target:0,format:'pct',num:true},{label:'Progress',value:r=>r.bch_target?((Number(r.bch_regs)||0)+(Number(r.active_orders)||0))/r.bch_target:0,format:'progress',colorValue:r=>paceRatio((Number(r.bch_regs)||0)+(Number(r.active_orders)||0),r.bch_target)},{label:'Status',value:r=>paceRatio((Number(r.bch_regs)||0)+(Number(r.active_orders)||0),r.bch_target),format:'paceStatus'}],DATA.q3_fleet_monthly);
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Expected Achievement',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'pct',num:true},{label:'Progress',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'progress',colorValue:r=>paceRatio((Number(r.regs)||0)+(Number(r.active_orders)||0),r.target)},{label:'Status',value:r=>paceRatio((Number(r.regs)||0)+(Number(r.active_orders)||0),r.target),format:'paceStatus'}],DATA.q3_fleet);
