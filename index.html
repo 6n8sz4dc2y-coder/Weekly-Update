@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260907-printfix-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site Summary</button><button data-target="q2">Q2 Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site Summary</button><button data-target="q2">Q2 Reference</button><button data-target="q4fwd">Q4 Forward Orders</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -83,6 +83,11 @@
 <div id="siteSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 </div></section>
 <section id="q2" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q2 Registrations Reference</h2><input class="search" data-filter="q2RegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2RegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q2 Used Reference</h2><input class="search" data-filter="q2UsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2UsedTable"></table></div></div></div></section>
+<section id="q4fwd" class="section"><div class="grid">
+<div class="card wide"><div class="toolbar"><h2>Q4 Forward Orders</h2><input class="search" data-filter="q4Table" placeholder="Search centre or CDA..."></div><div class="note-box" style="margin-top:8px">Tracks what the team logs for Oct / Nov / Dec against Q4 target, from a "2026 - Q4" sheet in the same Weekly Update workbook - same shape as the Q3 one. Q3's own tabs and targets are completely untouched.</div></div>
+<div id="q4Cards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
+<div class="card wide"><div class="table-wrap"><table id="q4Table"></table></div></div>
+</div></section>
 
 
 
@@ -98,7 +103,7 @@
   <div class="card third">
     <h3>1. Weekly Update.xlsx</h3>
     <input id="weeklyFile" type="file" accept=".xlsx,.xls" class="search">
-    <div class="hint">Updates registrations, used cars, non-counting fleet and fleet BCH.</div>
+    <div class="hint">Updates registrations, used cars, non-counting fleet and fleet BCH. If the workbook has a "2026 - Q4" sheet (same shape as "2026 - Q3"), Q4 Forward Orders picks it up automatically too.</div>
   </div>
   <div class="card third">
     <h3>2. Sales Activity.xls</h3>
@@ -132,5 +137,5 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260903-dataupdated-1"></script>
+<script src="./app.js?v=20260921-q4fwd-1"></script>
 </body></html>
