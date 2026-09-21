@@ -60,10 +60,12 @@ function aggregateRows(rows, label, items, fields){
 }
 function ensureCdaTotals(data){
   const regFields=['jul_counting','jul_clcp','jul_fleet','jul_total','jul_target','aug_counting','aug_clcp','aug_fleet','aug_total','aug_target','sep_counting','sep_clcp','sep_fleet','sep_total','sep_target','qtr_counting','qtr_fleet','qtr_total','qtr_target'];
+  const regFieldsQ4=['oct_counting','oct_clcp','oct_fleet','oct_total','oct_target','nov_counting','nov_clcp','nov_fleet','nov_total','nov_target','dec_counting','dec_clcp','dec_fleet','dec_total','dec_target','qtr_counting','qtr_fleet','qtr_total','qtr_target'];
   const usedFields=['jul_counting','jul_target','aug_counting','aug_target','sep_counting','sep_target','qtr_counting','qtr_target'];
   const fleetFields=['regs','target','active_orders'];
   for(const g of CDA_TOTALS){
     if((data.q3_regs||[]).some(r=>g.items.includes(r.centre))) aggregateRows(data.q3_regs, g.label, g.items, regFields);
+    if((data.q4_regs||[]).some(r=>g.items.includes(r.centre))) aggregateRows(data.q4_regs, g.label, g.items, regFieldsQ4);
     if((data.q3_used||[]).some(r=>g.items.includes(r.centre))) aggregateRows(data.q3_used, g.label, g.items, usedFields);
     if((data.q3_fleet||[]).some(r=>g.items.includes(r.centre))){
       const row=aggregateRows(data.q3_fleet, g.label, g.items, fleetFields);
@@ -103,9 +105,14 @@ const progress=(n,p)=>`<div class="progress"><div class="bar ${paceStatusClass(p
 const paceProgress=n=>`<div class="progress"><div class="bar ${paceStatusClass(n)}" style="width:${Math.min(Math.max(n*100,0),120)}%"></div></div>`;
 const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.9?'Watch':'Behind'}</span>`;
 const paceStatus=n=>`<span class="status ${paceStatusClass(n)}">${n>=1?'On pace':n>=.9?'Slightly behind':'Behind pace'}</span>`;
+// Q4 hasn't started yet, so there's no "elapsed time" to pace against like
+// Q3's paceStatus - any booking at all ahead of the quarter opening is
+// forward progress, not lateness, so this reads as neutral/positive rather
+// than red/amber "behind".
+const q4Status=n=>`<span class="status ${n>=1?'green':'blue'}">${n>=1?'Fully booked':'Booking ahead'}</span>`;
 const variance=n=>{const v=Number(n)||0;return `<span class="variance-cell ${v>=0?'positive':'negative'}">${v>0?'+':''}${fmt(v)}</span>`};
 const yoyPct=(ty,ly)=>{ty=Number(ty)||0;ly=Number(ly)||0;if(!ly)return '<span class="variance-cell">-</span>';const d=(ty-ly)/ly;return `<span class="variance-cell ${d>=0?'positive':'negative'}">${d>0?'+':''}${Math.round(d*100)}%</span>`};
-function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);if(col.format==='variance')return variance(v);return col.num?fmt(v):(v??'-')}
+function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);if(col.format==='q4Status')return q4Status(v);if(col.format==='variance')return variance(v);return col.num?fmt(v):(v??'-')}
 
 const TABLE_SORT_STATE = {};
 function rawCellValue(col,row){
@@ -135,7 +142,7 @@ function renderTable(id,cols,rows){
   // every table has the same first two columns.
   const rankIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='rank');
   const centreIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='centre');
-  const statusIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='status' && (c.format==='status' || c.format==='paceStatus'));
+  const statusIndex=cols.findIndex(c=>String(c.label||'').trim().toLowerCase()==='status' && (c.format==='status' || c.format==='paceStatus' || c.format==='q4Status'));
   const statusCol=statusIndex>=0 ? cols[statusIndex] : null;
   const displayCols=cols.filter((_,i)=>i!==statusIndex);
   const hasTargetCol=displayCols.some(c=>/(target|budget)$/i.test(String(c.label||'').trim()));
@@ -423,6 +430,39 @@ function cdaOrderRows(){
   }).filter(Boolean);
 }
 
+// Q4 Forward Orders hero row - Oct/Nov/Dec plus a Q4 total, summed from the
+// three CDA rows (already a clean rollup of the individual sites, so this
+// avoids double-counting). Kept separate from Q3's cards/table entirely -
+// nothing here touches Q3's own targets or figures.
+function renderQ4Cards(){
+  const el = document.getElementById('q4Cards');
+  if(!el) return;
+  const rows = DATA.q4_regs || [];
+  if(!rows.length){
+    el.innerHTML = '<div class="card wide"><div class="note-box">No Q4 data loaded yet. Once the team\'s Oct/Nov/Dec forward orders land in a "2026 - Q4" sheet in the Weekly Update workbook, upload it via Admin Update and this fills in automatically.</div></div>';
+    return;
+  }
+  const cda = rows.filter(r=>['NORTH CDA','SOUTH CDA','WY CDA'].includes(r.centre));
+  const totalOf = key => sum(cda, key);
+  const months = [
+    {label:'October', totalKey:'oct_total', targetKey:'oct_target'},
+    {label:'November', totalKey:'nov_total', targetKey:'nov_target'},
+    {label:'December', totalKey:'dec_total', targetKey:'dec_target'},
+  ];
+  const cardHtml = (label, total, target) => {
+    const p = target ? total/target : 0;
+    return `<div class="card kpi">
+      <div class="label">${label}</div>
+      <div class="value">${pct(p)}</div>
+      <div class="note"><strong>${fmt(total)}</strong> / ${fmt(target)} target</div>
+      <div style="margin-top:8px">${q4Status(p)}</div>
+    </div>`;
+  };
+  const cardsHtml = months.map(m => cardHtml(m.label, totalOf(m.totalKey), totalOf(m.targetKey))).join('')
+    + cardHtml('Q4 Total', totalOf('qtr_total'), totalOf('qtr_target'));
+  el.innerHTML = cardsHtml;
+}
+
 function build(){
  updateVersionDisplays();
  const regs=DATA.dashboard_regs, used=DATA.dashboard_used, non=DATA.q3_non, acts=DATA.dashboard_activity;
@@ -543,6 +583,8 @@ function build(){
  document.getElementById('highlights').innerHTML=highlights(regs,used,acts,DATA.dashboard_orders||[]);
  document.getElementById('execNote').innerHTML=`<strong>H2 is now the active period.</strong> Dashboard focus has been simplified to new registrations, used cars and non-counting fleet. Q3 new registration target is <strong>${fmt(regTarget)}</strong>, with <strong>${fmt(regToGo)}</strong> still to go in the loaded report. Used car target is <strong>${fmt(usedTarget)}</strong>, with <strong>${fmt(usedToGo)}</strong> still to go. Non-counting fleet currently shows <strong>${fmt(nonFleetCurrent)}</strong> against a budget of <strong>${fmt(nonFleetBudget)}</strong>. Sales funnel totals are now shown at the top: enquiries, test drive %, offer sheet % and conversion %. Full sales activity remains available in its own tab.`;
  makeTable('q3Table',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_total)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_total)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_total)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress',colorValue:r=>paceRatio(r.qtr_total,r.qtr_target)},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'To Go',key:'to_go',num:true},{label:'Per Week',key:'per_week',num:true},{label:'Status',value:r=>paceRatio(r.qtr_total,r.qtr_target),format:'paceStatus'}],DATA.q3_regs);
+ renderQ4Cards();
+ makeTable('q4Table',[{label:'Centre',key:'centre'},{label:'Oct Booked',key:'oct_total',num:true},{label:'Oct Target',key:'oct_target',num:true},{label:'Oct Variance',value:r=>(Number(r.oct_total)||0)-(Number(r.oct_target)||0),format:'variance',num:true},{label:'Nov Booked',key:'nov_total',num:true},{label:'Nov Target',key:'nov_target',num:true},{label:'Nov Variance',value:r=>(Number(r.nov_total)||0)-(Number(r.nov_target)||0),format:'variance',num:true},{label:'Dec Booked',key:'dec_total',num:true},{label:'Dec Target',key:'dec_target',num:true},{label:'Dec Variance',value:r=>(Number(r.dec_total)||0)-(Number(r.dec_target)||0),format:'variance',num:true},{label:'Q4 Booked',key:'qtr_total',num:true},{label:'Q4 Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'pct',num:true},{label:'Status',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'q4Status'}],DATA.q4_regs||[]);
  makeTable('usedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_counting)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_counting)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_counting)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress',colorValue:r=>usedForecastPct(r)},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true},{label:'Req / Week',value:r=>usedRequiredPerWeek(r),num:true},{label:'Forecast',value:r=>usedForecastFinish(r),num:true},{label:'Forecast %',value:r=>usedForecastPct(r),format:'pct',num:true},{label:'Status',value:r=>usedForecastPct(r),format:'paceStatus'}],DATA.q3_used);
  makeTable('fleetMonthlyTable',[{label:'Centre',key:'centre'},{label:'Jul Fleet',key:'jul_fleet',num:true},{label:'Aug Fleet',key:'aug_fleet',num:true},{label:'Sep Fleet',key:'sep_fleet',num:true},{label:'QTR Fleet',key:'qtr_fleet',num:true},{label:'BCH Regs',key:'bch_regs',num:true},{label:'BCH Target',key:'bch_target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Expected Achievement',value:r=>r.bch_target?((Number(r.bch_regs)||0)+(Number(r.active_orders)||0))/r.bch_target:0,format:'pct',num:true},{label:'Progress',value:r=>r.bch_target?((Number(r.bch_regs)||0)+(Number(r.active_orders)||0))/r.bch_target:0,format:'progress',colorValue:r=>paceRatio((Number(r.bch_regs)||0)+(Number(r.active_orders)||0),r.bch_target)},{label:'Status',value:r=>paceRatio((Number(r.bch_regs)||0)+(Number(r.active_orders)||0),r.bch_target),format:'paceStatus'}],DATA.q3_fleet_monthly);
  makeTable('fleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Expected Achievement',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'pct',num:true},{label:'Progress',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'progress',colorValue:r=>paceRatio((Number(r.regs)||0)+(Number(r.active_orders)||0),r.target)},{label:'Status',value:r=>paceRatio((Number(r.regs)||0)+(Number(r.active_orders)||0),r.target),format:'paceStatus'}],DATA.q3_fleet);
@@ -708,6 +750,7 @@ function recomputeDashboardSets(data){
   const userSites = ALL_DASHBOARD_SITES;
   data.user_sites = userSites;
   data.dashboard_regs = (data.q3_regs||[]).filter(r=>userSites.includes(r.centre));
+  data.dashboard_q4regs = (data.q4_regs||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_used = (data.q3_used||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_activity = (data.sales_activity||data.dashboard_activity||[]).filter(r=>userSites.includes(r.centre));
   data.dashboard_activity_ly = (data.sales_activity_ly||data.dashboard_activity_ly||[]).filter(r=>userSites.includes(r.centre));
@@ -757,6 +800,41 @@ function parseWeeklyWorkbook(wb, data){
     updateRow(data.q3_fleet, centre, {regs:nval(r[1]),target:nval(r[2]),pct:pctval(r[3]),active_orders:nval(r[5])});
     updateRow(data.q3_fleet_monthly, centre, {bch_regs:nval(r[1]),bch_target:nval(r[2]),active_orders:nval(r[5])});
   });
+  // Q4 forward orders - a separate '2026 - Q4' sheet in the same workbook,
+  // once the team starts logging Oct/Nov/Dec against target. Same shape as
+  // the Q3 sheet above (Registrations (Counting) section, Oct/Nov/Dec in
+  // place of Jul/Aug/Sep) - entirely optional, so nothing breaks if the
+  // sheet isn't there yet.
+  const wsQ4 = wb.Sheets['2026 - Q4'];
+  if(wsQ4){
+    const a4 = XLSX.utils.sheet_to_json(wsQ4,{header:1,defval:null,raw:true});
+    const findSection4 = (txt)=>a4.findIndex(r=>String(r && r[0] || '').toUpperCase().includes(txt));
+    const nextSection4 = (start)=>{
+      let next=a4.length;
+      for(let i=start+1;i<a4.length;i++){
+        const label=String(a4[i] && a4[i][0] || '').toUpperCase();
+        if(label.includes('REGISTRATIONS') || label.includes('USED COUNTING') || label.includes('CENTRE FLEET')){ next=i; break; }
+      }
+      return next;
+    };
+    const start4 = findSection4('REGISTRATIONS (COUNTING)');
+    if(start4>=0){
+      const end4 = nextSection4(start4);
+      data.q4_regs = data.q4_regs || [];
+      for(let i=start4+1;i<end4;i++){
+        const r=a4[i]; if(!r || !r[0]) continue;
+        const centre=normCentreName(r[0]);
+        if(!isKnownCentreLabel(centre)) continue;
+        updateRow(data.q4_regs, centre, {
+          oct_counting:nval(r[1]), oct_clcp:nval(r[2]), oct_fleet:nval(r[3]), oct_total:nval(r[4]), oct_target:nval(r[5]),
+          nov_counting:nval(r[7]), nov_clcp:nval(r[8]), nov_fleet:nval(r[9]), nov_total:nval(r[10]), nov_target:nval(r[11]),
+          dec_counting:nval(r[13]), dec_clcp:nval(r[14]), dec_fleet:nval(r[15]), dec_total:nval(r[16]), dec_target:nval(r[17]),
+          qtr_counting:nval(r[19]), qtr_fleet:nval(r[20]), qtr_total:nval(r[21]), qtr_target:nval(r[22]),
+          to_go:nval(r[23]), per_week:nval(r[24]), qtr_regs:nval(r[25]), target:nval(r[26]), regs_v_target:pctval(r[27])
+        });
+      }
+    }
+  }
   recomputeDashboardSets(data);
 }
 
