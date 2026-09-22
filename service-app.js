@@ -667,6 +667,63 @@ function renderSiteSummary(){
   el.innerHTML = vcfCards + tpCard + wrrCard;
 }
 
+// --- CDA Summary --------------------------------------------------------
+// Same idea as Site Summary above, but rolled up to CDA level. VCF and
+// Trade Parts already have dedicated CDA-level data sources (DATA.cda,
+// DATA.tradePartsCda); WRR doesn't, so wrrGroupRollup() (already used by
+// the WRR CDA Rankings card) does the rollup from the per-centre rows.
+let CDA_SUMMARY_SELECTED = null;
+const CDA_SUMMARY_GROUPS = ['North Manchester','South Manchester','West Yorkshire'];
+function renderCdaSummarySelect(){
+  const el = document.getElementById('cdaSummarySelect');
+  if(!el) return;
+  if(!CDA_SUMMARY_SELECTED) CDA_SUMMARY_SELECTED = CDA_SUMMARY_GROUPS[0];
+  el.innerHTML = CDA_SUMMARY_GROUPS.map(c=>`<option value="${c}" ${c===CDA_SUMMARY_SELECTED?'selected':''}>${c}</option>`).join('');
+}
+function renderCdaSummary(){
+  renderCdaSummarySelect();
+  const el = document.getElementById('cdaSummaryContent');
+  if(!el) return;
+  const cda = CDA_SUMMARY_SELECTED;
+  if(!cda){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+
+  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Row = DATA.cda.q3 && DATA.cda.q3.rows.find(r=>r.centre===cda);
+  const ytdRow = DATA.cda.ytd && DATA.cda.ytd.rows.find(r=>r.centre===cda);
+  const vcfCards = pillars.map((name,i)=>{
+    const q3v = q3Row && q3Row.values[name], ytdv = ytdRow && ytdRow.values[name];
+    const q3Svo = q3v ? (q3v.svo ?? (q3v.target ? q3v.actual/q3v.target : null)) : null;
+    const ytdSvo = ytdv ? (ytdv.svo ?? (ytdv.target ? ytdv.actual/ytdv.target : null)) : null;
+    const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
+    return `<div class="card kpi kpi-progress-card ${accent}">
+      <div class="label">${name}${pillarBadge(name)}</div>
+      <div class="kpi-split-main">
+        <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div></div>
+        <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div></div>
+      </div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
+    </div>`;
+  }).join('');
+
+  const cdaTp = (DATA.tradePartsCda||[]).find(s=>s.cda===cda);
+  const tpCell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
+    const forecast = row['SMROE Sales Out (Forecast)*'], target = row['SMROE Target'], achieved = row['Target % Achieved (Forecast)*'];
+    return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target) };
+  };
+  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card', tpCell(cdaTp && tradePartsRow(cdaTp,'Q3')), tpCell(cdaTp && tradePartsYtdThroughQ3(cdaTp)));
+
+  const wrrQ3Group = wrrGroupRollup(DATA.wrr.q3 && DATA.wrr.q3.rows).find(g=>g.group===cda);
+  const wrrYtdGroup = wrrGroupRollup(DATA.wrr.ytd && DATA.wrr.ytd.rows).find(g=>g.group===cda);
+  const wrrCell = (row) => {
+    if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
+    return { value: pct(row.achieved), note: `<strong>${fmt(row.actual)}</strong> / <strong>${fmt(row.target)}</strong> target`, gap: wrrGapLabel(row.actual,row.target), statusHtml: row.achieved===null||row.achieved===undefined ? '<span class="status">No data</span>' : statusPill(row.achieved) };
+  };
+  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Group), wrrCell(wrrYtdGroup));
+
+  el.innerHTML = vcfCards + tpCard + wrrCard;
+}
+
 function renderPeriodToggle(){
   // Multiple instances share the same state (Dashboard above Rankings,
   // Centre Detail) so the period can be switched from whichever tab is
@@ -698,6 +755,7 @@ function build(){
   renderWrrTable(DATA.wrr[ACTIVE_PERIOD]);
   // Site Summary tab
   renderSiteSummary();
+  renderCdaSummary();
   updateVersionDisplays();
 }
 
@@ -901,6 +959,7 @@ document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('clic
   if(periodRow) periodRow.style.display = (btn.dataset.target==='tradeParts'||btn.dataset.target==='siteSummary') ? 'none' : '';
 })});
 document.getElementById('siteSummarySelect')?.addEventListener('change', (e)=>{ SITE_SUMMARY_SELECTED = e.target.value; renderSiteSummary(); });
+document.getElementById('cdaSummarySelect')?.addEventListener('change', (e)=>{ CDA_SUMMARY_SELECTED = e.target.value; renderCdaSummary(); });
 document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{
   const table=document.getElementById(input.dataset.filter);
   if(!table) return;
