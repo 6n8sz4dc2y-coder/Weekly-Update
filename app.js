@@ -650,19 +650,30 @@ function siteTwinCard(label, accent, monthCell, qtrCell){
   return `<div class="card kpi kpi-progress-card ${accent}">
     <div class="label">${label}</div>
     <div class="kpi-split-main">
-      <div><div class="mini-label">Month to date</div><div class="value">${monthCell.value}</div><div class="note note-target">${monthCell.note}</div></div>
-      <div><div class="mini-label">Q3 total</div><div class="value">${qtrCell.value}</div><div class="note note-target">${qtrCell.note}</div></div>
+      <div><div class="mini-label">Month to date</div><div class="value">${monthCell.value}</div><div class="note note-target">${monthCell.note}</div>${monthCell.groupNote||''}</div>
+      <div><div class="mini-label">Q3 total</div><div class="value">${qtrCell.value}</div><div class="note note-target">${qtrCell.note}</div>${qtrCell.groupNote||''}</div>
     </div>
     <div class="kpi-footer-strip two-up"><div><span>Status (Month)</span><strong>${monthCell.statusHtml}</strong></div><div><span>Status (Q3)</span><strong>${qtrCell.statusHtml}</strong></div></div>
   </div>`;
 }
 function siteQtrCell(actual, target, label){
-  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>' };
-  return { value: pct(target?actual/target:0), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(paceRatio(actual,target)) };
+  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>', pct:null };
+  const p = target?actual/target:0;
+  return { value: pct(p), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(paceRatio(actual,target)), pct:p };
 }
 function siteMonthCell(actual, target, label){
-  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>' };
-  return { value: pct(target?actual/target:0), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(monthPaceRatio(actual,target)) };
+  if(actual===null||actual===undefined||target===null||target===undefined) return { value:'-', note:'No data', statusHtml:'<span class="status">No data</span>', pct:null };
+  const p = target?actual/target:0;
+  return { value: pct(p), note: `<strong>${fmt(actual)}</strong> / <strong>${fmt(target)}</strong> ${label}`, statusHtml: paceStatus(monthPaceRatio(actual,target)), pct:p };
+}
+// vs-group-average delta line, used only on the CDA Summary (never Site
+// Summary, since monthCell/qtrCell.groupNote is only ever set there).
+function groupDeltaNote(value, groupValue){
+  if(typeof value!=='number' || typeof groupValue!=='number') return '';
+  const diffPts = (value-groupValue)*100;
+  if(Math.abs(diffPts) < 0.05) return '<div class="mini">On group average</div>';
+  const up = diffPts > 0;
+  return `<div class="mini" style="color:${up?'var(--green)':'var(--red)'};font-weight:800;margin-top:2px">${up?'▲':'▼'} ${Math.abs(diffPts).toFixed(1)}pts vs group avg</div>`;
 }
 function renderSiteSummary(){
   renderSiteSummarySelect();
@@ -753,6 +764,41 @@ function cdaActivityRow(cdaLabel){
   row.orders_ratio = row.total_enquiries ? row.total_orders/row.total_enquiries : 0;
   return row;
 }
+// Group (whole-company) ratio for a metric, summed across whichever CDA rows
+// exist (their sites partition the company exactly, Lexus-style outliers
+// aside) - the same basis "Group" figures use elsewhere in this dashboard.
+function groupRatioFromCdaRows(rows, actualKey, targetKey){
+  const cdaRows = (rows||[]).filter(r=>['NORTH CDA','WY CDA','SOUTH CDA'].includes(r.centre));
+  if(!cdaRows.length) return null;
+  const target = sum(cdaRows, targetKey);
+  return target ? sum(cdaRows, actualKey)/target : null;
+}
+function groupFleetRatio(){
+  const cdaRows = (DATA.q3_fleet||[]).filter(r=>['NORTH CDA','WY CDA','SOUTH CDA'].includes(r.centre));
+  if(!cdaRows.length) return null;
+  const target = sum(cdaRows,'target');
+  return target ? (sum(cdaRows,'regs')+sum(cdaRows,'active_orders'))/target : null;
+}
+// Order Bank and Sales Funnel don't have CDA rows (dashboard_orders /
+// dashboard_activity are site-only), so the group ratio is aggregated
+// straight from every site rather than from a CDA rollup.
+function groupOrderMonthRatio(month){
+  const rows = DATA.dashboard_orders||[];
+  if(!rows.length) return null;
+  const target = sum(rows, month+'_target');
+  return target ? rows.reduce((a,r)=>a+orderDoneFor(r,month),0)/target : null;
+}
+function groupOrderQtrRatio(){
+  const rows = DATA.dashboard_orders||[];
+  if(!rows.length) return null;
+  const target = sum(rows,'q3_target');
+  return target ? rows.reduce((a,r)=>a+orderDoneFor(r,'jul')+orderDoneFor(r,'aug')+orderDoneFor(r,'sep'),0)/target : null;
+}
+function groupActivityRatio(field){
+  const rows = DATA.dashboard_activity||[];
+  const enquiries = sum(rows,'total_enquiries');
+  return enquiries ? sum(rows,field)/enquiries : null;
+}
 function renderCdaSummarySelect(){
   const el = document.getElementById('cdaSummarySelect');
   if(!el) return;
@@ -775,29 +821,39 @@ function renderCdaSummary(){
   const orderRow = cdaOrderRow(cda);
   const actRow = cdaActivityRow(cda);
 
-  const regsCard = siteTwinCard('Q3 Registrations', 'blue-card',
-    siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target'),
-    siteQtrCell(regRow ? regRow.qtr_total : null, regRow ? regRow.qtr_target : null, 'target'));
+  const regMonthCell = siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target');
+  regMonthCell.groupNote = groupDeltaNote(regMonthCell.pct, groupRatioFromCdaRows(DATA.q3_regs, month+'_total', month+'_target'));
+  const regQtrCell = siteQtrCell(regRow ? regRow.qtr_total : null, regRow ? regRow.qtr_target : null, 'target');
+  regQtrCell.groupNote = groupDeltaNote(regQtrCell.pct, groupRatioFromCdaRows(DATA.q3_regs, 'qtr_total', 'qtr_target'));
+  const regsCard = siteTwinCard('Q3 Registrations', 'blue-card', regMonthCell, regQtrCell);
 
-  const usedCard = siteTwinCard('Used Cars', 'green-card',
-    siteMonthCell(usedRow ? usedRow[month+'_counting'] : null, usedRow ? usedRow[month+'_target'] : null, 'target'),
-    siteQtrCell(usedRow ? usedRow.qtr_counting : null, usedRow ? usedRow.qtr_target : null, 'target'));
+  const usedMonthCell = siteMonthCell(usedRow ? usedRow[month+'_counting'] : null, usedRow ? usedRow[month+'_target'] : null, 'target');
+  usedMonthCell.groupNote = groupDeltaNote(usedMonthCell.pct, groupRatioFromCdaRows(DATA.q3_used, month+'_counting', month+'_target'));
+  const usedQtrCell = siteQtrCell(usedRow ? usedRow.qtr_counting : null, usedRow ? usedRow.qtr_target : null, 'target');
+  usedQtrCell.groupNote = groupDeltaNote(usedQtrCell.pct, groupRatioFromCdaRows(DATA.q3_used, 'qtr_counting', 'qtr_target'));
+  const usedCard = siteTwinCard('Used Cars', 'green-card', usedMonthCell, usedQtrCell);
 
-  const nonCard = siteTwinCard('Non-Counting Fleet', 'purple-card',
-    siteMonthCell(nonRow ? nonRow[month+'_total'] : null, nonRow ? nonRow[month+'_budget'] : null, 'budget'),
-    siteQtrCell(nonRow ? nonRow.qtr_total : null, nonRow ? nonRow.qtr_budget : null, 'budget'));
+  const nonMonthCell = siteMonthCell(nonRow ? nonRow[month+'_total'] : null, nonRow ? nonRow[month+'_budget'] : null, 'budget');
+  nonMonthCell.groupNote = groupDeltaNote(nonMonthCell.pct, groupRatioFromCdaRows(DATA.q3_non, month+'_total', month+'_budget'));
+  const nonQtrCell = siteQtrCell(nonRow ? nonRow.qtr_total : null, nonRow ? nonRow.qtr_budget : null, 'budget');
+  nonQtrCell.groupNote = groupDeltaNote(nonQtrCell.pct, groupRatioFromCdaRows(DATA.q3_non, 'qtr_total', 'qtr_budget'));
+  const nonCard = siteTwinCard('Non-Counting Fleet', 'purple-card', nonMonthCell, nonQtrCell);
 
   const orderQtrActual = orderRow ? orderDoneFor(orderRow,'jul')+orderDoneFor(orderRow,'aug')+orderDoneFor(orderRow,'sep') : null;
-  const orderCard = siteTwinCard('Order Bank', 'amber-card',
-    siteMonthCell(orderRow ? orderDoneFor(orderRow, month) : null, orderRow ? orderRow[month+'_target'] : null, 'target'),
-    siteQtrCell(orderQtrActual, orderRow ? orderRow.q3_target : null, 'target'));
+  const orderMonthCell = siteMonthCell(orderRow ? orderDoneFor(orderRow, month) : null, orderRow ? orderRow[month+'_target'] : null, 'target');
+  orderMonthCell.groupNote = groupDeltaNote(orderMonthCell.pct, groupOrderMonthRatio(month));
+  const orderQtrCell = siteQtrCell(orderQtrActual, orderRow ? orderRow.q3_target : null, 'target');
+  orderQtrCell.groupNote = groupDeltaNote(orderQtrCell.pct, groupOrderQtrRatio());
+  const orderCard = siteTwinCard('Order Bank', 'amber-card', orderMonthCell, orderQtrCell);
 
   const fleetExpected = fleetRow ? (Number(fleetRow.regs)||0)+(Number(fleetRow.active_orders)||0) : null;
   const fleetPace = fleetRow ? paceRatio(fleetExpected, fleetRow.target) : null;
+  const fleetOwnPct = fleetRow ? (fleetRow.target?fleetExpected/fleetRow.target:0) : null;
   const fleetCard = `<div class="card kpi kpi-progress-card amber-card">
     <div class="label">Fleet BCH</div>
-    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${fleetRow?pct(fleetRow.target?fleetExpected/fleetRow.target:0):'-'}</div>
+    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${fleetRow?pct(fleetOwnPct):'-'}</div>
     <div class="note">${fleetRow?`<strong>${fmt(fleetRow.regs)}</strong> regs + <strong>${fmt(fleetRow.active_orders)}</strong> active orders / <strong>${fmt(fleetRow.target)}</strong> target`:'No data'}</div>
+    ${groupDeltaNote(fleetOwnPct, groupFleetRatio())}
     <div class="kpi-footer-strip"><div><span>Status</span><strong>${fleetRow?paceStatus(fleetPace):'<span class="status">No data</span>'}</strong></div></div>
   </div>`;
 
@@ -806,9 +862,9 @@ function renderCdaSummary(){
     <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
     <div class="note">enquiries</div>
     <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
-      <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong></div>
-      <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong></div>
-      <div><span>Conversion %</span><strong>${actRow?pct(actRow.orders_ratio):'-'}</strong></div>
+      <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.td_ratio, groupActivityRatio('total_test_drives')):''}</div>
+      <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.os_ratio, groupActivityRatio('total_os')):''}</div>
+      <div><span>Conversion %</span><strong>${actRow?pct(actRow.orders_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.orders_ratio, groupActivityRatio('total_orders')):''}</div>
     </div>
   </div>`;
 

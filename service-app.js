@@ -609,11 +609,30 @@ function renderSiteSummaryTwinCard(label, accent, q3Cell, ytdCell){
   return `<div class="card half kpi-progress-card ${accent}">
     <div class="label">${label}</div>
     <div class="kpi-split-main">
-      <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
-      <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
+      <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div>${q3Cell.groupNote||''}</div>
+      <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div>${ytdCell.groupNote||''}</div>
     </div>
     <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
   </div>`;
+}
+// vs-group-average delta line, used only on the CDA Summary (Site Summary's
+// cells never set .groupNote).
+function groupDeltaNote(value, groupValue){
+  if(typeof value!=='number' || typeof groupValue!=='number') return '';
+  const diffPts = (value-groupValue)*100;
+  if(Math.abs(diffPts) < 0.05) return '<div class="mini">On group average</div>';
+  const up = diffPts > 0;
+  return `<div class="mini" style="color:${up?'var(--green)':'var(--red)'};font-weight:800;margin-top:2px">${up?'▲':'▼'} ${Math.abs(diffPts).toFixed(1)}pts vs group avg</div>`;
+}
+function groupTradePartsRatio(data){
+  if(!data) return null;
+  const forecast = data['SMROE Sales Out (Forecast)*'], target = data['SMROE Target'];
+  return target ? forecast/target : null;
+}
+function groupWrrRatio(periodData){
+  if(!periodData || !periodData.total) return null;
+  const actual = Number(periodData.total['CPUS Unique'])||0, target = Number(periodData.total['Target'])||0;
+  return target ? actual/target : null;
 }
 function renderSiteSummarySelect(){
   const el = document.getElementById('siteSummarySelect');
@@ -694,32 +713,36 @@ function renderCdaSummary(){
     const q3v = q3Row && q3Row.values[name], ytdv = ytdRow && ytdRow.values[name];
     const q3Svo = q3v ? (q3v.svo ?? (q3v.target ? q3v.actual/q3v.target : null)) : null;
     const ytdSvo = ytdv ? (ytdv.svo ?? (ytdv.target ? ytdv.actual/ytdv.target : null)) : null;
+    const q3GroupNote = groupDeltaNote(q3Svo, pillarTotals(groupData('q3'), name).svo);
+    const ytdGroupNote = groupDeltaNote(ytdSvo, pillarTotals(groupData('ytd'), name).svo);
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
       <div class="label">${name}${pillarBadge(name)}</div>
       <div class="kpi-split-main">
-        <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div></div>
-        <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div></div>
+        <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div>${q3GroupNote}</div>
+        <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div>${ytdGroupNote}</div>
       </div>
       <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
     </div>`;
   }).join('');
 
   const cdaTp = (DATA.tradePartsCda||[]).find(s=>s.cda===cda);
-  const tpCell = (row) => {
+  const tpCell = (row, groupRow) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
     const forecast = row['SMROE Sales Out (Forecast)*'], target = row['SMROE Target'], achieved = row['Target % Achieved (Forecast)*'];
-    return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target) };
+    return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target), groupNote: groupDeltaNote(achieved, groupTradePartsRatio(groupRow)) };
   };
-  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card', tpCell(cdaTp && tradePartsRow(cdaTp,'Q3')), tpCell(cdaTp && tradePartsYtdThroughQ3(cdaTp)));
+  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card',
+    tpCell(cdaTp && tradePartsRow(cdaTp,'Q3'), tradePartsRow(DATA.tradeParts,'Q3')),
+    tpCell(cdaTp && tradePartsYtdThroughQ3(cdaTp), tradePartsYtdThroughQ3(DATA.tradeParts)));
 
   const wrrQ3Group = wrrGroupRollup(DATA.wrr.q3 && DATA.wrr.q3.rows).find(g=>g.group===cda);
   const wrrYtdGroup = wrrGroupRollup(DATA.wrr.ytd && DATA.wrr.ytd.rows).find(g=>g.group===cda);
-  const wrrCell = (row) => {
+  const wrrCell = (row, periodData) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
-    return { value: pct(row.achieved), note: `<strong>${fmt(row.actual)}</strong> / <strong>${fmt(row.target)}</strong> target`, gap: wrrGapLabel(row.actual,row.target), statusHtml: row.achieved===null||row.achieved===undefined ? '<span class="status">No data</span>' : statusPill(row.achieved) };
+    return { value: pct(row.achieved), note: `<strong>${fmt(row.actual)}</strong> / <strong>${fmt(row.target)}</strong> target`, gap: wrrGapLabel(row.actual,row.target), statusHtml: row.achieved===null||row.achieved===undefined ? '<span class="status">No data</span>' : statusPill(row.achieved), groupNote: groupDeltaNote(row.achieved, groupWrrRatio(periodData)) };
   };
-  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Group), wrrCell(wrrYtdGroup));
+  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Group, DATA.wrr.q3), wrrCell(wrrYtdGroup, DATA.wrr.ytd));
 
   el.innerHTML = vcfCards + tpCard + wrrCard;
 }
