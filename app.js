@@ -619,6 +619,7 @@ function build(){
  makeTable('q2RegTable',[{label:'Centre',key:'centre'},{label:'Apr Total',key:'apr_total',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_total)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Total',key:'may_total',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_total)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Total',key:'jun_total',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_total)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q2_regs);
  makeTable('q2UsedTable',[{label:'Centre',key:'centre'},{label:'Apr Used',key:'apr_counting',num:true},{label:'Apr Target',key:'apr_target',num:true},{label:'Apr Variance',value:r=>(Number(r.apr_counting)||0)-(Number(r.apr_target)||0),format:'variance',num:true},{label:'May Used',key:'may_counting',num:true},{label:'May Target',key:'may_target',num:true},{label:'May Variance',value:r=>(Number(r.may_counting)||0)-(Number(r.may_target)||0),format:'variance',num:true},{label:'Jun Used',key:'jun_counting',num:true},{label:'Jun Target',key:'jun_target',num:true},{label:'Jun Variance',value:r=>(Number(r.jun_counting)||0)-(Number(r.jun_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q2_used);
  renderSiteSummary();
+ renderCdaSummary();
 }
 
 // --- Site Summary -----------------------------------------------------------
@@ -718,6 +719,101 @@ function renderSiteSummary(){
   el.innerHTML = regsCard + usedCard + nonCard + fleetCard + orderCard + actCard;
 }
 
+// CDA Summary - same idea as Site Summary above, but rolled up to
+// NORTH/WY/SOUTH CDA level. Registrations, Used Cars, Non-Counting Fleet
+// and Fleet BCH already have CDA rows from ensureCdaTotals(); Order Bank and
+// Sales Funnel don't (dashboard_orders/dashboard_activity are site-only), so
+// those two are aggregated here from the individual sites in each CDA.
+let WU_CDA_SELECTED = null;
+function wuKnownCdas(){
+  return CDA_TOTALS.map(g=>g.label).filter(label=>
+    [DATA.q3_regs, DATA.q3_used, DATA.q3_fleet].some(rows=>(rows||[]).some(r=>r.centre===label))
+  );
+}
+function cdaOrderRow(cdaLabel){
+  const g = CDA_TOTALS.find(x=>x.label===cdaLabel);
+  if(!g) return null;
+  const rows = (DATA.dashboard_orders||[]).filter(r=>g.items.includes(r.centre));
+  if(!rows.length) return null;
+  const row = {centre:cdaLabel, q3_target: sum(rows,'q3_target')};
+  ['jul','aug','sep','oct','nov','dec'].forEach(m=>{
+    row[m+'_target'] = sum(rows, m+'_target');
+    row[m+'_orders'] = rows.reduce((a,r)=>a+orderDoneFor(r,m),0);
+  });
+  return row;
+}
+function cdaActivityRow(cdaLabel){
+  const g = CDA_TOTALS.find(x=>x.label===cdaLabel);
+  if(!g) return null;
+  const rows = (DATA.dashboard_activity||[]).filter(r=>g.items.includes(r.centre));
+  if(!rows.length) return null;
+  const row = {centre:cdaLabel, total_enquiries:sum(rows,'total_enquiries'), total_test_drives:sum(rows,'total_test_drives'), total_os:sum(rows,'total_os'), total_orders:sum(rows,'total_orders')};
+  row.td_ratio = row.total_enquiries ? row.total_test_drives/row.total_enquiries : 0;
+  row.os_ratio = row.total_enquiries ? row.total_os/row.total_enquiries : 0;
+  row.orders_ratio = row.total_enquiries ? row.total_orders/row.total_enquiries : 0;
+  return row;
+}
+function renderCdaSummarySelect(){
+  const el = document.getElementById('cdaSummarySelect');
+  if(!el) return;
+  const cdas = wuKnownCdas();
+  if((!WU_CDA_SELECTED || !cdas.includes(WU_CDA_SELECTED)) && cdas.length) WU_CDA_SELECTED = cdas[0];
+  el.innerHTML = cdas.map(c=>`<option value="${c}" ${c===WU_CDA_SELECTED?'selected':''}>${c}</option>`).join('');
+}
+function renderCdaSummary(){
+  renderCdaSummarySelect();
+  const el = document.getElementById('cdaSummaryContent');
+  if(!el) return;
+  const cda = WU_CDA_SELECTED;
+  if(!cda){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
+  const month = currentOrderMonth();
+
+  const regRow = (DATA.q3_regs||[]).find(r=>r.centre===cda);
+  const usedRow = (DATA.q3_used||[]).find(r=>r.centre===cda);
+  const nonRow = (DATA.q3_non||[]).find(r=>r.centre===cda);
+  const fleetRow = (DATA.q3_fleet||[]).find(r=>r.centre===cda);
+  const orderRow = cdaOrderRow(cda);
+  const actRow = cdaActivityRow(cda);
+
+  const regsCard = siteTwinCard('Q3 Registrations', 'blue-card',
+    siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target'),
+    siteQtrCell(regRow ? regRow.qtr_total : null, regRow ? regRow.qtr_target : null, 'target'));
+
+  const usedCard = siteTwinCard('Used Cars', 'green-card',
+    siteMonthCell(usedRow ? usedRow[month+'_counting'] : null, usedRow ? usedRow[month+'_target'] : null, 'target'),
+    siteQtrCell(usedRow ? usedRow.qtr_counting : null, usedRow ? usedRow.qtr_target : null, 'target'));
+
+  const nonCard = siteTwinCard('Non-Counting Fleet', 'purple-card',
+    siteMonthCell(nonRow ? nonRow[month+'_total'] : null, nonRow ? nonRow[month+'_budget'] : null, 'budget'),
+    siteQtrCell(nonRow ? nonRow.qtr_total : null, nonRow ? nonRow.qtr_budget : null, 'budget'));
+
+  const orderQtrActual = orderRow ? orderDoneFor(orderRow,'jul')+orderDoneFor(orderRow,'aug')+orderDoneFor(orderRow,'sep') : null;
+  const orderCard = siteTwinCard('Order Bank', 'amber-card',
+    siteMonthCell(orderRow ? orderDoneFor(orderRow, month) : null, orderRow ? orderRow[month+'_target'] : null, 'target'),
+    siteQtrCell(orderQtrActual, orderRow ? orderRow.q3_target : null, 'target'));
+
+  const fleetExpected = fleetRow ? (Number(fleetRow.regs)||0)+(Number(fleetRow.active_orders)||0) : null;
+  const fleetPace = fleetRow ? paceRatio(fleetExpected, fleetRow.target) : null;
+  const fleetCard = `<div class="card kpi kpi-progress-card amber-card">
+    <div class="label">Fleet BCH</div>
+    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${fleetRow?pct(fleetRow.target?fleetExpected/fleetRow.target:0):'-'}</div>
+    <div class="note">${fleetRow?`<strong>${fmt(fleetRow.regs)}</strong> regs + <strong>${fmt(fleetRow.active_orders)}</strong> active orders / <strong>${fmt(fleetRow.target)}</strong> target`:'No data'}</div>
+    <div class="kpi-footer-strip"><div><span>Status</span><strong>${fleetRow?paceStatus(fleetPace):'<span class="status">No data</span>'}</strong></div></div>
+  </div>`;
+
+  const actCard = `<div class="card kpi kpi-progress-card blue-card">
+    <div class="label">Sales Funnel</div>
+    <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
+    <div class="note">enquiries</div>
+    <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
+      <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong></div>
+      <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong></div>
+      <div><span>Conversion %</span><strong>${actRow?pct(actRow.orders_ratio):'-'}</strong></div>
+    </div>
+  </div>`;
+
+  el.innerHTML = regsCard + usedCard + nonCard + fleetCard + orderCard + actCard;
+}
 
 function cloneData(){ return JSON.parse(JSON.stringify(DATA)); }
 function normCentreName(v){
@@ -1158,6 +1254,7 @@ document.querySelectorAll('nav button').forEach(btn=>{btn.addEventListener('clic
 })});
 document.querySelectorAll('.search').forEach(input=>{input.addEventListener('input',()=>{const table=document.getElementById(input.dataset.filter);if(!table)return;const term=input.value.toLowerCase();table.querySelectorAll('tbody tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(term)?'':'none'})})});
 document.getElementById('siteSummarySelect')?.addEventListener('change', (e)=>{ WU_SITE_SELECTED = e.target.value; renderSiteSummary(); });
+document.getElementById('cdaSummarySelect')?.addEventListener('change', (e)=>{ WU_CDA_SELECTED = e.target.value; renderCdaSummary(); });
 document.getElementById('previewImport')?.addEventListener('click', previewImport);
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
