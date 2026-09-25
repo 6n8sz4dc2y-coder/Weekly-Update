@@ -721,8 +721,7 @@ function renderSiteSummary(){
     <div class="label">Sales Funnel</div>
     <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
     <div class="note">enquiries</div>
-    ${yoyFunnelLine(actRow, actLyRow)}
-    ${yoyNewUsedLine(actRow, actLyRow)}
+    ${yoyFunnelBlock(actRow, actLyRow)}
     <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
       <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong></div>
       <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong></div>
@@ -762,14 +761,14 @@ function cdaActivityRow(cdaLabel, source){
   const rows = (source||DATA.dashboard_activity||[]).filter(r=>g.items.includes(r.centre));
   if(!rows.length) return null;
   const row = {centre:cdaLabel, total_enquiries:sum(rows,'total_enquiries'), total_test_drives:sum(rows,'total_test_drives'), total_os:sum(rows,'total_os'), total_orders:sum(rows,'total_orders'),
-    new_enquiries:sum(rows,'new_enquiries'), used_enquiries:sum(rows,'used_enquiries')};
+    new_enquiries:sum(rows,'new_enquiries'), used_enquiries:sum(rows,'used_enquiries'), new_orders:sum(rows,'new_orders'), used_orders:sum(rows,'used_orders')};
   row.td_ratio = row.total_enquiries ? row.total_test_drives/row.total_enquiries : 0;
   row.os_ratio = row.total_enquiries ? row.total_os/row.total_enquiries : 0;
   row.orders_ratio = row.total_enquiries ? row.total_orders/row.total_enquiries : 0;
   return row;
 }
 // vs-last-year badge, used on the Sales Funnel card of both Site Summary and
-// CDA Summary - "Enquiries +N% / Orders +N% vs LY".
+// CDA Summary.
 function yoyPctLabel(cur, prev){
   if(!prev) return null;
   const change = (cur-prev)/prev;
@@ -777,22 +776,24 @@ function yoyPctLabel(cur, prev){
   const cls = change>=0?'positive':'negative';
   return `<span class="yoy-pct ${cls}">${pctText}</span>`;
 }
-function yoyFunnelLine(actRow, actLyRow){
+// Two blocks - Enquiries (total, then New/Used) and Orders (total, then
+// New/Used) - kept separate with a divider so New/Used is never mistaken
+// for belonging to the wrong metric. Just the %, no counts: the full
+// breakdown is a click away on the Sales Funnel report.
+function yoyFunnelBlock(actRow, actLyRow){
   if(!actRow || !actLyRow) return '';
-  const enqYoy = yoyPctLabel(actRow.total_enquiries, actLyRow.total_enquiries);
-  const ordYoy = yoyPctLabel(actRow.total_orders, actLyRow.total_orders);
-  if(!enqYoy && !ordYoy) return '';
-  return `<div class="note" style="margin-top:2px">Enquiries ${enqYoy||'-'} &middot; Orders ${ordYoy||'-'} <span class="mini">vs LY</span></div>`;
-}
-// Just the up/down %, no counts - the full breakdown is a click away on the
-// Sales Funnel report, this is only meant to flag where New/Used enquiries
-// are pulling apart.
-function yoyNewUsedLine(actRow, actLyRow){
-  if(!actRow || !actLyRow) return '';
-  const newYoy = yoyPctLabel(actRow.new_enquiries, actLyRow.new_enquiries);
-  const usedYoy = yoyPctLabel(actRow.used_enquiries, actLyRow.used_enquiries);
-  if(!newYoy && !usedYoy) return '';
-  return `<div class="note" style="margin-top:2px">New ${newYoy||'-'} &middot; Used ${usedYoy||'-'} <span class="mini">vs LY</span></div>`;
+  const enqTotal = yoyPctLabel(actRow.total_enquiries, actLyRow.total_enquiries);
+  const enqNew = yoyPctLabel(actRow.new_enquiries, actLyRow.new_enquiries);
+  const enqUsed = yoyPctLabel(actRow.used_enquiries, actLyRow.used_enquiries);
+  const ordTotal = yoyPctLabel(actRow.total_orders, actLyRow.total_orders);
+  const ordNew = yoyPctLabel(actRow.new_orders, actLyRow.new_orders);
+  const ordUsed = yoyPctLabel(actRow.used_orders, actLyRow.used_orders);
+  if(!enqTotal && !ordTotal) return '';
+  return `<div class="note" style="margin-top:6px">Enquiries ${enqTotal||'-'} <span class="mini">vs LY</span></div>
+    <div class="note">New ${enqNew||'-'} &middot; Used ${enqUsed||'-'} <span class="mini">vs LY</span></div>
+    <div style="border-top:1px solid var(--line);margin:8px 0"></div>
+    <div class="note">Orders ${ordTotal||'-'} <span class="mini">vs LY</span></div>
+    <div class="note">New ${ordNew||'-'} &middot; Used ${ordUsed||'-'} <span class="mini">vs LY</span></div>`;
 }
 // Group (whole-company) ratio for a metric, summed across whichever CDA rows
 // exist (their sites partition the company exactly, Lexus-style outliers
@@ -892,8 +893,7 @@ function renderCdaSummary(){
     <div class="label">Sales Funnel</div>
     <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
     <div class="note">enquiries</div>
-    ${yoyFunnelLine(actRow, actLyRow)}
-    ${yoyNewUsedLine(actRow, actLyRow)}
+    ${yoyFunnelBlock(actRow, actLyRow)}
     <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
       <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.td_ratio, groupActivityRatio('total_test_drives')):''}</div>
       <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.os_ratio, groupActivityRatio('total_os')):''}</div>
