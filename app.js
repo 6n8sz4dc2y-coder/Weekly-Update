@@ -407,10 +407,10 @@ function renderYoyBySite(ty, ly){
     const metricsHtml=r.data.map(d=>{
       const max=maxByMetric[d.label];
       const {pctText,pctClass}=yoyChangeHtml(d.change);
-      return `<div class="yoy-metric"><div class="yoy-metric-head"><span>${d.label}</span><span class="yoy-pct ${pctClass}">${pctText}</span></div><div class="yoy-bar-row"><span>TY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${d.tyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${d.lyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.lyVal)}</span></div></div>`;
+      return `<div class="yoy-metric"><div class="yoy-metric-head"><span>${d.label}</span><span class="yoy-pct ${pctClass}">${pctText}</span></div><div class="yoy-bar-row"><span>CY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ty" style="width:${d.tyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.tyVal)}</span></div><div class="yoy-bar-row"><span>LY</span><div class="yoy-bar-track"><div class="yoy-bar-fill ly" style="width:${d.lyVal/max*100}%"></div></div><span class="yoy-bar-value">${fmt(d.lyVal)}</span></div></div>`;
     }).join('');
     const {pctText:ordersPctText,pctClass:ordersPctClass}=yoyChangeHtml(r.ordersChange);
-    const ordersHtml=`<div class="yoy-orders"><div class="yoy-metric-head"><span>Orders</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div><div class="yoy-orders-row"><span>TY</span><strong>${fmt(r.ordersTy)}</strong></div><div class="yoy-orders-row"><span>LY</span><strong>${fmt(r.ordersLy)}</strong></div></div>`;
+    const ordersHtml=`<div class="yoy-orders"><div class="yoy-metric-head"><span>Orders</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div><div class="yoy-orders-row"><span>CY</span><strong>${fmt(r.ordersTy)}</strong></div><div class="yoy-orders-row"><span>LY</span><strong>${fmt(r.ordersLy)}</strong></div></div>`;
     return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-metrics">${metricsHtml}</div>${ordersHtml}</div>`;
   }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
 }
@@ -689,6 +689,7 @@ function renderSiteSummary(){
   const fleetRow = (DATA.q3_fleet||[]).find(r=>r.centre===site);
   const orderRow = (DATA.dashboard_orders||[]).find(r=>r.centre===site);
   const actRow = (DATA.dashboard_activity||[]).find(r=>r.centre===site);
+  const actLyRow = (DATA.dashboard_activity_ly||[]).find(r=>r.centre===site);
 
   const regsCard = siteTwinCard('Q3 Registrations', 'blue-card',
     siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target'),
@@ -720,6 +721,7 @@ function renderSiteSummary(){
     <div class="label">Sales Funnel</div>
     <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
     <div class="note">enquiries</div>
+    ${yoyFunnelLine(actRow, actLyRow)}
     <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
       <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong></div>
       <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong></div>
@@ -753,16 +755,32 @@ function cdaOrderRow(cdaLabel){
   });
   return row;
 }
-function cdaActivityRow(cdaLabel){
+function cdaActivityRow(cdaLabel, source){
   const g = CDA_TOTALS.find(x=>x.label===cdaLabel);
   if(!g) return null;
-  const rows = (DATA.dashboard_activity||[]).filter(r=>g.items.includes(r.centre));
+  const rows = (source||DATA.dashboard_activity||[]).filter(r=>g.items.includes(r.centre));
   if(!rows.length) return null;
   const row = {centre:cdaLabel, total_enquiries:sum(rows,'total_enquiries'), total_test_drives:sum(rows,'total_test_drives'), total_os:sum(rows,'total_os'), total_orders:sum(rows,'total_orders')};
   row.td_ratio = row.total_enquiries ? row.total_test_drives/row.total_enquiries : 0;
   row.os_ratio = row.total_enquiries ? row.total_os/row.total_enquiries : 0;
   row.orders_ratio = row.total_enquiries ? row.total_orders/row.total_enquiries : 0;
   return row;
+}
+// vs-last-year badge, used on the Sales Funnel card of both Site Summary and
+// CDA Summary - "Enquiries +N% / Orders +N% vs LY".
+function yoyPctLabel(cur, prev){
+  if(!prev) return null;
+  const change = (cur-prev)/prev;
+  const pctText = `${change>=0?'+':''}${Math.round(change*100)}%`;
+  const cls = change>=0?'positive':'negative';
+  return `<span class="yoy-pct ${cls}">${pctText}</span>`;
+}
+function yoyFunnelLine(actRow, actLyRow){
+  if(!actRow || !actLyRow) return '';
+  const enqYoy = yoyPctLabel(actRow.total_enquiries, actLyRow.total_enquiries);
+  const ordYoy = yoyPctLabel(actRow.total_orders, actLyRow.total_orders);
+  if(!enqYoy && !ordYoy) return '';
+  return `<div class="note" style="margin-top:2px">Enquiries ${enqYoy||'-'} &middot; Orders ${ordYoy||'-'} <span class="mini">vs LY</span></div>`;
 }
 // Group (whole-company) ratio for a metric, summed across whichever CDA rows
 // exist (their sites partition the company exactly, Lexus-style outliers
@@ -820,6 +838,7 @@ function renderCdaSummary(){
   const fleetRow = (DATA.q3_fleet||[]).find(r=>r.centre===cda);
   const orderRow = cdaOrderRow(cda);
   const actRow = cdaActivityRow(cda);
+  const actLyRow = cdaActivityRow(cda, DATA.dashboard_activity_ly);
 
   const regMonthCell = siteMonthCell(regRow ? regRow[month+'_total'] : null, regRow ? regRow[month+'_target'] : null, 'target');
   regMonthCell.groupNote = groupDeltaNote(regMonthCell.pct, groupRatioFromCdaRows(DATA.q3_regs, month+'_total', month+'_target'));
@@ -861,6 +880,7 @@ function renderCdaSummary(){
     <div class="label">Sales Funnel</div>
     <div class="value" style="font-size:40px;font-weight:950;letter-spacing:-.05em;margin:8px 0">${actRow?fmt(actRow.total_enquiries):'-'}</div>
     <div class="note">enquiries</div>
+    ${yoyFunnelLine(actRow, actLyRow)}
     <div class="kpi-footer-strip" style="grid-template-columns:repeat(3,1fr)">
       <div><span>Test Drive %</span><strong>${actRow?pct(actRow.td_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.td_ratio, groupActivityRatio('total_test_drives')):''}</div>
       <div><span>Offer Sheet %</span><strong>${actRow?pct(actRow.os_ratio):'-'}</strong>${actRow?groupDeltaNote(actRow.os_ratio, groupActivityRatio('total_os')):''}</div>
