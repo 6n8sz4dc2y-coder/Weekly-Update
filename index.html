@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20260922-footerlabelalign-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q2">Q2 Reference</button><button data-target="q4fwd">Q4 Forward Orders</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q2">Q2 Reference</button><button data-target="ytd">YTD Reference</button><button data-target="q4fwd">Q4 Forward Orders</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -85,6 +85,7 @@
 <div id="cdaSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 </div></section>
 <section id="q2" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q2 Registrations Reference</h2><input class="search" data-filter="q2RegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2RegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q2 Used Reference</h2><input class="search" data-filter="q2UsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2UsedTable"></table></div></div></div></section>
+<section id="ytd" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>YTD Registrations · Q1-Q3</h2><input class="search" data-filter="ytdRegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdRegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>YTD Used Cars · Q1-Q3</h2><input class="search" data-filter="ytdUsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdUsedTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>YTD Non-Counting Fleet · Q1-Q3</h2><input class="search" data-filter="ytdNonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdNonTable"></table></div></div></div></section>
 <section id="q4fwd" class="section"><div class="grid">
 <div class="card wide"><div class="toolbar"><h2>Q4 Forward Orders</h2></div></div>
 <div id="q4Cards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -139,7 +140,7 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20260925-funnelblocks-1"></script>
+<script src="./app.js?v=20261003-ytdref-1"></script>
 <script>
 (function(){
   var header = document.querySelector('header');
