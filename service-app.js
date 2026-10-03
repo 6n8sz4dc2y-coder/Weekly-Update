@@ -19,9 +19,9 @@
 
 const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v2';
 
-const PERIODS = ['ytd','q3'];
-const PERIOD_LABEL = { ytd: 'Year to Date', q3: 'Q3 (Current Quarter)' };
-let ACTIVE_PERIOD = 'q3';
+const PERIODS = ['ytd','q4','q3'];
+const PERIOD_LABEL = { ytd: 'Year to Date', q4: 'Q4 (Current Quarter)', q3: 'Q3 Reference' };
+let ACTIVE_PERIOD = 'q4';
 
 function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
 
@@ -299,7 +299,7 @@ function renderPillarCards(q3Data, ytdData, containerId){
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3.svo)}</div><div class="note note-target"><strong>${displayVal(name,q3.actual)}</strong> / <strong>${displayVal(name,q3.target)}</strong> target</div><div class="note">${gapLabel(name,q3.actual,q3.target)}</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytd.svo)}</div><div class="note note-target"><strong>${displayVal(name,ytd.actual)}</strong> / <strong>${displayVal(name,ytd.target)}</strong> target</div><div class="note">${gapLabel(name,ytd.actual,ytd.target)}</div></div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name, q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name, ytd.svo)}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${statusPillFor(name, q3.svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name, ytd.svo)}</strong></div></div>
     </div>`;
   }).join('');
 }
@@ -374,13 +374,13 @@ function rewardBandFor(achieved){
   if(achieved===null||achieved===undefined) return null;
   return achieved>=1 ? 0.12 : achieved>=0.9 ? 0.09 : 0.05;
 }
-// Toyota's own "Total" row annualises to the full year - its Target
-// includes Q4's target, and its Forecast extrapolates the whole year's
-// run rate past Q3 - but Q4 hasn't started and doesn't count yet, so
-// "year to date" here means literally Q1 + Q2 + Q3 (built directly from
-// those rows rather than trusting the export's own Total row).
-function tradePartsYtdThroughQ3(data){
-  const quarters = ['Q1','Q2','Q3'].map(p=>tradePartsRow(data,p)).filter(Boolean);
+// Toyota's own "Total" row annualises to the full year, extrapolating a
+// run rate that doesn't match what's actually happened yet, so "year to
+// date" here means literally Q1 + Q2 + Q3 + Q4 (built directly from those
+// rows rather than trusting the export's own Total row). Any quarter not
+// yet in the export is simply skipped (filter(Boolean)).
+function tradePartsYtdThroughQ4(data){
+  const quarters = ['Q1','Q2','Q3','Q4'].map(p=>tradePartsRow(data,p)).filter(Boolean);
   if(!quarters.length) return null;
   const forecast = quarters.reduce((a,r)=>a+(Number(r['SMROE Sales Out (Forecast)*'])||0),0);
   const target = quarters.reduce((a,r)=>a+(Number(r['SMROE Target'])||0),0);
@@ -415,15 +415,15 @@ function tradePartsGapLabel(forecast, target){
   return `<span class="variance-cell ${cls}">${text}</span>`;
 }
 // Appends a 5th summary card into the same top grid as the 4 VCF pillar
-// cards - This Quarter (Q3 row) and Year to Date (Q1+Q2+Q3, see
-// tradePartsYtdThroughQ3), both read off the forecast (the headline metric
+// cards - This Quarter (Q4 row) and Year to Date (Q1+Q2+Q3+Q4, see
+// tradePartsYtdThroughQ4), both read off the forecast (the headline metric
 // the source export itself uses for an in-progress quarter) rather than
 // the partial to-date actual.
 function renderTradePartsCard(containerId, data){
   const el = document.getElementById(containerId);
   if(!el) return;
-  const q3 = tradePartsRow(data, 'Q3');
-  const ytd = tradePartsYtdThroughQ3(data);
+  const q3 = tradePartsRow(data, 'Q4');
+  const ytd = tradePartsYtdThroughQ4(data);
   if(!q3 && !ytd){ el.innerHTML = ''; return; }
   const cell = (row) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
@@ -444,14 +444,14 @@ function renderTradePartsCard(containerId, data){
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
       <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
     </div>
-    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
   </div>`;
 }
 // CDA + Lexus breakdown of Group Trade Parts, one box per CDA laid out like
 // the VCF pillar cards rather than a ranked list - This Quarter always
 // reads the forecast (the export's own headline metric for an in-progress
-// quarter, not the partial to-date actual), Year to Date is Q1+Q2+Q3 only
-// (see tradePartsYtdThroughQ3 - Q4 hasn't started and doesn't count yet).
+// quarter, not the partial to-date actual), Year to Date is Q1+Q2+Q3+Q4
+// (see tradePartsYtdThroughQ4).
 // Each column also shows the reward band (5/9/12%) that forecast is
 // currently tracking to earn.
 // Fixed display order rather than upload order (multi-file selection order
@@ -481,8 +481,8 @@ function renderTradePartsCdaCards(containerId, cdaList){
     };
   };
   el.innerHTML = cdaList.map((c,i)=>{
-    const q3Cell = cell(tradePartsRow(c, 'Q3'));
-    const ytdCell = cell(tradePartsYtdThroughQ3(c));
+    const q3Cell = cell(tradePartsRow(c, 'Q4'));
+    const ytdCell = cell(tradePartsYtdThroughQ4(c));
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
       <div class="label">${c.cda}</div>
@@ -490,12 +490,12 @@ function renderTradePartsCdaCards(containerId, cdaList){
         <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div><div class="note">Reward band <strong>${q3Cell.reward}</strong></div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div><div class="note">Reward band <strong>${ytdCell.reward}</strong></div></div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
     </div>`;
   }).join('');
 }
-// Individual-site Trade Parts league - one ranked list per period (Q3
-// forecast, Year to Date = Q1+Q2+Q3) rather than a single toggled list, so
+// Individual-site Trade Parts league - one ranked list per period (Q4
+// forecast, Year to Date = Q1+Q2+Q3+Q4) rather than a single toggled list, so
 // both are visible together. Sites are ranked by achieved %, same
 // leader-row style as the WRR/VCF rankings; unlike the fixed CDA card
 // order, a league is meant to be sorted by performance.
@@ -513,7 +513,7 @@ function renderTradePartsSiteLeague(containerId, sitesList, periodRow){
   el.innerHTML = ranked.map((r,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="centre">${r.site}<div class="mini">${fmtGbp(r.forecast)} / ${fmtGbp(r.target)} · ${tradePartsGapLabel(r.forecast,r.target)}</div></div><div class="pct ${svoClass(r.achieved)}">${pct(r.achieved)}</div>${progressBar(r.achieved)}</div>`).join('');
 }
 
-// WRR: two separate workbooks (Q3, YTD), each a flat per-centre row with a
+// WRR: two separate workbooks (Q4, YTD), each a flat per-centre row with a
 // Total row already computed - same "This Quarter / Year to Date" framing
 // as the VCF pillar cards, reading straight off each workbook's Total row.
 function renderWrrCard(containerId, q3Data, ytdData){
@@ -540,7 +540,7 @@ function renderWrrCard(containerId, q3Data, ytdData){
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div></div>
       <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div></div>
     </div>
-    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
   </div>`;
 }
 // WRR has its own dedicated tab now (not sharing a row with the 4 VCF
@@ -598,9 +598,9 @@ function renderWrrTable(data){
 let SITE_SUMMARY_SELECTED = null;
 function allKnownSites(){
   const set = new Set();
-  ['q3','ytd'].forEach(p=>{ (DATA.centre[p] && DATA.centre[p].rows || []).forEach(r=>set.add(r.centre)); });
+  ['q4','q3','ytd'].forEach(p=>{ (DATA.centre[p] && DATA.centre[p].rows || []).forEach(r=>set.add(r.centre)); });
   (DATA.tradePartsSites||[]).forEach(s=>set.add(s.site));
-  ['q3','ytd'].forEach(p=>{ (DATA.wrr[p] && DATA.wrr[p].rows || []).forEach(r=>set.add(r['Centre Name'])); });
+  ['q4','q3','ytd'].forEach(p=>{ (DATA.wrr[p] && DATA.wrr[p].rows || []).forEach(r=>set.add(r['Centre Name'])); });
   return Array.from(set).sort();
 }
 // Shared shape for the Trade Parts and WRR summary cards - both are a single
@@ -612,7 +612,7 @@ function renderSiteSummaryTwinCard(label, accent, q3Cell, ytdCell){
       <div><div class="mini-label">This Quarter</div><div class="value">${q3Cell.value}</div><div class="note note-target">${q3Cell.note}</div><div class="note">${q3Cell.gap}</div>${q3Cell.groupNote||''}</div>
       <div><div class="mini-label">Year to Date</div><div class="value">${ytdCell.value}</div><div class="note note-target">${ytdCell.note}</div><div class="note">${ytdCell.gap}</div>${ytdCell.groupNote||''}</div>
     </div>
-    <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
+    <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${q3Cell.statusHtml}</strong></div><div><span>Status (YTD)</span><strong>${ytdCell.statusHtml}</strong></div></div>
   </div>`;
 }
 // vs-group-average delta line, used only on the CDA Summary (Site Summary's
@@ -648,8 +648,8 @@ function renderSiteSummary(){
   const site = SITE_SUMMARY_SELECTED;
   if(!site){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
 
-  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
-  const q3Row = DATA.centre.q3 && DATA.centre.q3.rows.find(r=>r.centre===site);
+  const pillars = (groupData('q4') && groupData('q4').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Row = DATA.centre.q4 && DATA.centre.q4.rows.find(r=>r.centre===site);
   const ytdRow = DATA.centre.ytd && DATA.centre.ytd.rows.find(r=>r.centre===site);
   const vcfCards = pillars.map((name,i)=>{
     const q3v = q3Row && q3Row.values[name], ytdv = ytdRow && ytdRow.values[name];
@@ -662,7 +662,7 @@ function renderSiteSummary(){
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div></div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div></div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
     </div>`;
   }).join('');
 
@@ -672,9 +672,9 @@ function renderSiteSummary(){
     const forecast = row['SMROE Sales Out (Forecast)*'], target = row['SMROE Target'], achieved = row['Target % Achieved (Forecast)*'];
     return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target) };
   };
-  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card', tpCell(siteTp && tradePartsRow(siteTp,'Q3')), tpCell(siteTp && tradePartsYtdThroughQ3(siteTp)));
+  const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card', tpCell(siteTp && tradePartsRow(siteTp,'Q4')), tpCell(siteTp && tradePartsYtdThroughQ4(siteTp)));
 
-  const wrrQ3Row = DATA.wrr.q3 && DATA.wrr.q3.rows.find(r=>r['Centre Name']===site);
+  const wrrQ3Row = DATA.wrr.q4 && DATA.wrr.q4.rows.find(r=>r['Centre Name']===site);
   const wrrYtdRow = DATA.wrr.ytd && DATA.wrr.ytd.rows.find(r=>r['Centre Name']===site);
   const wrrCell = (row) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
@@ -706,14 +706,14 @@ function renderCdaSummary(){
   const cda = CDA_SUMMARY_SELECTED;
   if(!cda){ el.innerHTML = '<div class="card wide"><div class="note-box">No data loaded yet. Use Admin Update to upload the workbooks.</div></div>'; return; }
 
-  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
-  const q3Row = DATA.cda.q3 && DATA.cda.q3.rows.find(r=>r.centre===cda);
+  const pillars = (groupData('q4') && groupData('q4').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Row = DATA.cda.q4 && DATA.cda.q4.rows.find(r=>r.centre===cda);
   const ytdRow = DATA.cda.ytd && DATA.cda.ytd.rows.find(r=>r.centre===cda);
   const vcfCards = pillars.map((name,i)=>{
     const q3v = q3Row && q3Row.values[name], ytdv = ytdRow && ytdRow.values[name];
     const q3Svo = q3v ? (q3v.svo ?? (q3v.target ? q3v.actual/q3v.target : null)) : null;
     const ytdSvo = ytdv ? (ytdv.svo ?? (ytdv.target ? ytdv.actual/ytdv.target : null)) : null;
-    const q3GroupNote = groupDeltaNote(q3Svo, pillarTotals(groupData('q3'), name).svo);
+    const q3GroupNote = groupDeltaNote(q3Svo, pillarTotals(groupData('q4'), name).svo);
     const ytdGroupNote = groupDeltaNote(ytdSvo, pillarTotals(groupData('ytd'), name).svo);
     const accent = CARD_ACCENTS[i % CARD_ACCENTS.length];
     return `<div class="card kpi kpi-progress-card ${accent}">
@@ -722,7 +722,7 @@ function renderCdaSummary(){
         <div><div class="mini-label">This Quarter</div><div class="value">${pct(q3Svo)}</div><div class="note note-target">${q3v?`<strong>${displayVal(name,q3v.actual)}</strong> / <strong>${displayVal(name,q3v.target)}</strong> target`:'No data'}</div><div class="note">${q3v?gapLabel(name,q3v.actual,q3v.target):''}</div>${q3GroupNote}</div>
         <div><div class="mini-label">Year to Date</div><div class="value">${pct(ytdSvo)}</div><div class="note note-target">${ytdv?`<strong>${displayVal(name,ytdv.actual)}</strong> / <strong>${displayVal(name,ytdv.target)}</strong> target`:'No data'}</div><div class="note">${ytdv?gapLabel(name,ytdv.actual,ytdv.target):''}</div>${ytdGroupNote}</div>
       </div>
-      <div class="kpi-footer-strip two-up"><div><span>Status (Q3)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
+      <div class="kpi-footer-strip two-up"><div><span>Status (Q4)</span><strong>${statusPillFor(name,q3Svo)}</strong></div><div><span>Status (YTD)</span><strong>${statusPillFor(name,ytdSvo)}</strong></div></div>
     </div>`;
   }).join('');
 
@@ -733,16 +733,16 @@ function renderCdaSummary(){
     return { value: pct(achieved), note: `<strong>${fmtGbp(forecast)}</strong> / <strong>${fmtGbp(target)}</strong> target`, gap: tradePartsGapLabel(forecast,target), statusHtml: tradePartsStatusPill(forecast,target), groupNote: groupDeltaNote(achieved, groupTradePartsRatio(groupRow)) };
   };
   const tpCard = renderSiteSummaryTwinCard('Trade Parts', 'green-card',
-    tpCell(cdaTp && tradePartsRow(cdaTp,'Q3'), tradePartsRow(DATA.tradeParts,'Q3')),
-    tpCell(cdaTp && tradePartsYtdThroughQ3(cdaTp), tradePartsYtdThroughQ3(DATA.tradeParts)));
+    tpCell(cdaTp && tradePartsRow(cdaTp,'Q4'), tradePartsRow(DATA.tradeParts,'Q4')),
+    tpCell(cdaTp && tradePartsYtdThroughQ4(cdaTp), tradePartsYtdThroughQ4(DATA.tradeParts)));
 
-  const wrrQ3Group = wrrGroupRollup(DATA.wrr.q3 && DATA.wrr.q3.rows).find(g=>g.group===cda);
+  const wrrQ3Group = wrrGroupRollup(DATA.wrr.q4 && DATA.wrr.q4.rows).find(g=>g.group===cda);
   const wrrYtdGroup = wrrGroupRollup(DATA.wrr.ytd && DATA.wrr.ytd.rows).find(g=>g.group===cda);
   const wrrCell = (row, periodData) => {
     if(!row) return { value:'-', note:'No data', gap:'', statusHtml:'<span class="status">No data</span>' };
     return { value: pct(row.achieved), note: `<strong>${fmt(row.actual)}</strong> / <strong>${fmt(row.target)}</strong> target`, gap: wrrGapLabel(row.actual,row.target), statusHtml: row.achieved===null||row.achieved===undefined ? '<span class="status">No data</span>' : statusPill(row.achieved), groupNote: groupDeltaNote(row.achieved, groupWrrRatio(periodData)) };
   };
-  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Group, DATA.wrr.q3), wrrCell(wrrYtdGroup, DATA.wrr.ytd));
+  const wrrCard = renderSiteSummaryTwinCard('WRR', 'blue-card', wrrCell(wrrQ3Group, DATA.wrr.q4), wrrCell(wrrYtdGroup, DATA.wrr.ytd));
 
   el.innerHTML = vcfCards + tpCard + wrrCard;
 }
@@ -762,17 +762,17 @@ function renderPeriodToggle(){
 function build(){
   renderPeriodToggle();
   // VCF tab
-  renderPillarCards(groupData('q3'), groupData('ytd'), 'pillarCards');
+  renderPillarCards(groupData('q4'), groupData('ytd'), 'pillarCards');
   renderLeaderboards(DATA.centre[ACTIVE_PERIOD], 'pillarLeaderboards');
   renderLeaderboards(DATA.cda[ACTIVE_PERIOD], 'cdaLeaderboards');
   // Trade Parts tab
   renderTradePartsCard('tradePartsCard', DATA.tradeParts);
   renderTradePartsCdaCards('tradePartsCdaCards', DATA.tradePartsCda);
-  renderTradePartsSiteLeague('tradePartsSitesQ3', DATA.tradePartsSites, s=>tradePartsRow(s,'Q3'));
-  renderTradePartsSiteLeague('tradePartsSitesYtd', DATA.tradePartsSites, s=>tradePartsYtdThroughQ3(s));
+  renderTradePartsSiteLeague('tradePartsSitesQ3', DATA.tradePartsSites, s=>tradePartsRow(s,'Q4'));
+  renderTradePartsSiteLeague('tradePartsSitesYtd', DATA.tradePartsSites, s=>tradePartsYtdThroughQ4(s));
   renderTradeParts(DATA.tradeParts);
   // WRR tab
-  renderWrrCard('wrrCard', DATA.wrr.q3, DATA.wrr.ytd);
+  renderWrrCard('wrrCard', DATA.wrr.q4, DATA.wrr.ytd);
   renderWrrRankingCard('wrrLeaderboard', DATA.wrr[ACTIVE_PERIOD]);
   renderWrrCdaRankingCard('wrrCdaLeaderboard', DATA.wrr[ACTIVE_PERIOD]);
   renderWrrTable(DATA.wrr[ACTIVE_PERIOD]);
@@ -784,9 +784,9 @@ function build(){
 
 // --- Data bootstrap -------------------------------------------------------
 let DATA = {
-  centre: { q3: window.SERVICE_DATA_CENTRE_Q3 || null, ytd: window.SERVICE_DATA_CENTRE_YTD || null },
-  cda: { q3: window.SERVICE_DATA_CDA_Q3 || null, ytd: window.SERVICE_DATA_CDA_YTD || null },
-  wrr: { q3: window.SERVICE_DATA_WRR_Q3 || null, ytd: window.SERVICE_DATA_WRR_YTD || null },
+  centre: { q4: window.SERVICE_DATA_CENTRE_Q4 || null, q3: window.SERVICE_DATA_CENTRE_Q3 || null, ytd: window.SERVICE_DATA_CENTRE_YTD || null },
+  cda: { q4: window.SERVICE_DATA_CDA_Q4 || null, q3: window.SERVICE_DATA_CDA_Q3 || null, ytd: window.SERVICE_DATA_CDA_YTD || null },
+  wrr: { q4: window.SERVICE_DATA_WRR_Q4 || null, q3: window.SERVICE_DATA_WRR_Q3 || null, ytd: window.SERVICE_DATA_WRR_YTD || null },
   tradeParts: window.SERVICE_DATA_TRADE_PARTS || null,
   tradePartsCda: window.SERVICE_DATA_TRADE_PARTS_CDA || null,
   tradePartsSites: window.SERVICE_DATA_TRADE_PARTS_SITES || null,
@@ -799,13 +799,16 @@ let PENDING_DATA = null;
 
 // --- Admin: import / publish / backup / reset -----------------------------
 const IMPORT_SLOTS = [
-  { level:'centre', period:'q3', fileId:'centreQ3File', label:'Centre - Q3' },
+  { level:'centre', period:'q4', fileId:'centreQ4File', label:'Centre - Q4' },
+  { level:'centre', period:'q3', fileId:'centreQ3File', label:'Centre - Q3 Reference' },
   { level:'centre', period:'ytd', fileId:'centreYtdFile', label:'Centre - YTD' },
-  { level:'cda', period:'q3', fileId:'cdaQ3File', label:'CDA - Q3' },
+  { level:'cda', period:'q4', fileId:'cdaQ4File', label:'CDA - Q4' },
+  { level:'cda', period:'q3', fileId:'cdaQ3File', label:'CDA - Q3 Reference' },
   { level:'cda', period:'ytd', fileId:'cdaYtdFile', label:'CDA - YTD' },
 ];
 const WRR_SLOTS = [
-  { period:'q3', fileId:'wrrQ3File', label:'WRR - Q3' },
+  { period:'q4', fileId:'wrrQ4File', label:'WRR - Q4' },
+  { period:'q3', fileId:'wrrQ3File', label:'WRR - Q3 Reference' },
   { period:'ytd', fileId:'wrrYtdFile', label:'WRR - YTD' },
 ];
 function readFileAsArrayBuffer(file){
@@ -941,13 +944,16 @@ function downloadOne(filename, varName, data){
   URL.revokeObjectURL(a.href);
 }
 function downloadDataBackup(){
+  downloadOne('service-data-q4.js', 'SERVICE_DATA_CENTRE_Q4', DATA.centre.q4);
   downloadOne('service-data.js', 'SERVICE_DATA_CENTRE_Q3', DATA.centre.q3);
   downloadOne('service-data-ytd.js', 'SERVICE_DATA_CENTRE_YTD', DATA.centre.ytd);
+  downloadOne('service-cda-data-q4.js', 'SERVICE_DATA_CDA_Q4', DATA.cda.q4);
   downloadOne('service-cda-data.js', 'SERVICE_DATA_CDA_Q3', DATA.cda.q3);
   downloadOne('service-cda-data-ytd.js', 'SERVICE_DATA_CDA_YTD', DATA.cda.ytd);
   downloadOne('service-trade-parts-data.js', 'SERVICE_DATA_TRADE_PARTS', DATA.tradeParts);
   downloadOne('service-trade-parts-cda-data.js', 'SERVICE_DATA_TRADE_PARTS_CDA', DATA.tradePartsCda);
   downloadOne('service-trade-parts-sites-data.js', 'SERVICE_DATA_TRADE_PARTS_SITES', DATA.tradePartsSites);
+  downloadOne('service-wrr-data-q4.js', 'SERVICE_DATA_WRR_Q4', DATA.wrr.q4);
   downloadOne('service-wrr-data.js', 'SERVICE_DATA_WRR_Q3', DATA.wrr.q3);
   downloadOne('service-wrr-data-ytd.js', 'SERVICE_DATA_WRR_YTD', DATA.wrr.ytd);
 }
@@ -1075,10 +1081,10 @@ async function exportServiceBoardPack(){
   pptx.theme = { headFontFace:'Aptos Display', bodyFontFace:'Aptos', lang:'en-GB' };
 
   const periodLabel = `${PERIOD_LABEL[ACTIVE_PERIOD]} · ${servicePptDate()}`;
-  const pillars = (groupData('q3') && groupData('q3').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
-  const q3Group = groupData('q3'), ytdGroup = groupData('ytd');
-  const tpQ3 = tradePartsRow(DATA.tradeParts, 'Q3'), tpYtd = tradePartsYtdThroughQ3(DATA.tradeParts);
-  const wrrQ3Total = DATA.wrr.q3 && DATA.wrr.q3.total, wrrYtdTotal = DATA.wrr.ytd && DATA.wrr.ytd.total;
+  const pillars = (groupData('q4') && groupData('q4').pillars) || (groupData('ytd') && groupData('ytd').pillars) || [];
+  const q3Group = groupData('q4'), ytdGroup = groupData('ytd');
+  const tpQ3 = tradePartsRow(DATA.tradeParts, 'Q4'), tpYtd = tradePartsYtdThroughQ4(DATA.tradeParts);
+  const wrrQ3Total = DATA.wrr.q4 && DATA.wrr.q4.total, wrrYtdTotal = DATA.wrr.ytd && DATA.wrr.ytd.total;
 
   // Cover
   let slide = pptx.addSlide();
@@ -1108,9 +1114,9 @@ async function exportServiceBoardPack(){
     const t = pillarTotals(q3Group, name);
     addServiceMetricCard(slide, 0.35 + i*(cardW+0.35), 0.9, cardW, 1.35, name, pct(t.svo), `${displayVal(name,t.actual)} / ${displayVal(name,t.target)} target`, cardColors[i % cardColors.length]);
   });
-  addServiceMetricCard(slide, 0.35, 2.55, 4.05, 1.05, 'Group Trade Parts (Q3)', pct(tpQ3 ? tpQ3['Target % Achieved (Forecast)*'] : null), tpQ3 ? `${fmtGbp(tpQ3['SMROE Sales Out (Forecast)*'])} / ${fmtGbp(tpQ3['SMROE Target'])} target` : 'No data', '15803D');
+  addServiceMetricCard(slide, 0.35, 2.55, 4.05, 1.05, 'Group Trade Parts (Q4)', pct(tpQ3 ? tpQ3['Target % Achieved (Forecast)*'] : null), tpQ3 ? `${fmtGbp(tpQ3['SMROE Sales Out (Forecast)*'])} / ${fmtGbp(tpQ3['SMROE Target'])} target` : 'No data', '15803D');
   addServiceMetricCard(slide, 4.65, 2.55, 4.05, 1.05, 'Group Trade Parts (YTD)', pct(tpYtd ? tpYtd['Target % Achieved (Forecast)*'] : null), tpYtd ? `${fmtGbp(tpYtd['SMROE Sales Out (Forecast)*'])} / ${fmtGbp(tpYtd['SMROE Target'])} target` : 'No data', '15803D');
-  addServiceMetricCard(slide, 8.95, 2.55, 3.75, 1.05, 'WRR (Q3)', pct(wrrQ3Total ? wrrQ3Total['Centre % Achieved'] : null), wrrQ3Total ? `${fmt(wrrQ3Total['CPUS Unique'])} / ${fmt(wrrQ3Total['Target'])} target` : 'No data', '2563EB');
+  addServiceMetricCard(slide, 8.95, 2.55, 3.75, 1.05, 'WRR (Q4)', pct(wrrQ3Total ? wrrQ3Total['Centre % Achieved'] : null), wrrQ3Total ? `${fmt(wrrQ3Total['CPUS Unique'])} / ${fmt(wrrQ3Total['Target'])} target` : 'No data', '2563EB');
   slide.addShape(servicePptShape('roundRect'), { x:0.35, y:4.0, w:6.25, h:2.8, rectRadius:0.08, fill:{color:'FFFFFF'}, line:{color:'D9DEE8'} });
   slide.addText('Highlights', { x:0.6, y:4.2, w:5.75, h:0.3, fontSize:15, bold:true, color:'111827', margin:0 });
   const centreRows = (DATA.centre[ACTIVE_PERIOD] && DATA.centre[ACTIVE_PERIOD].rows) || [];
@@ -1152,25 +1158,25 @@ async function exportServiceBoardPack(){
   // Trade Parts CDA + Lexus
   addServiceTableSlide(pptx.addSlide(), 'Group Trade Parts - CDA & Lexus', safeServiceRows(DATA.tradePartsCda), [
     {label:'CDA',value:r=>r.cda,w:1.9},
-    {label:'Q3 %',value:r=>{ const row=tradePartsRow(r,'Q3'); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
-    {label:'Q3 Forecast',value:r=>{ const row=tradePartsRow(r,'Q3'); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.7},
-    {label:'Q3 Target',value:r=>{ const row=tradePartsRow(r,'Q3'); return fmtGbp(row?row['SMROE Target']:null); },w:1.6},
-    {label:'YTD %',value:r=>{ const row=tradePartsYtdThroughQ3(r); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
-    {label:'YTD Forecast',value:r=>{ const row=tradePartsYtdThroughQ3(r); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.8},
-    {label:'YTD Target',value:r=>{ const row=tradePartsYtdThroughQ3(r); return fmtGbp(row?row['SMROE Target']:null); },w:1.7},
-    {label:'YTD Reward',value:r=>{ const row=tradePartsYtdThroughQ3(r); return pct(row?row['Target Reward %*']:null); },w:1.4},
+    {label:'Q4 %',value:r=>{ const row=tradePartsRow(r,'Q4'); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
+    {label:'Q4 Forecast',value:r=>{ const row=tradePartsRow(r,'Q4'); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.7},
+    {label:'Q4 Target',value:r=>{ const row=tradePartsRow(r,'Q4'); return fmtGbp(row?row['SMROE Target']:null); },w:1.6},
+    {label:'YTD %',value:r=>{ const row=tradePartsYtdThroughQ4(r); return pct(row?row['Target % Achieved (Forecast)*']:null); },w:1.1},
+    {label:'YTD Forecast',value:r=>{ const row=tradePartsYtdThroughQ4(r); return fmtGbp(row?row['SMROE Sales Out (Forecast)*']:null); },w:1.8},
+    {label:'YTD Target',value:r=>{ const row=tradePartsYtdThroughQ4(r); return fmtGbp(row?row['SMROE Target']:null); },w:1.7},
+    {label:'YTD Reward',value:r=>{ const row=tradePartsYtdThroughQ4(r); return pct(row?row['Target Reward %*']:null); },w:1.4},
   ], periodLabel);
 
   // Trade Parts Site League
   const siteRanked = safeServiceRows(DATA.tradePartsSites).map(s=>{
-    const q3Row = tradePartsRow(s,'Q3'), ytdRow = tradePartsYtdThroughQ3(s);
+    const q3Row = tradePartsRow(s,'Q4'), ytdRow = tradePartsYtdThroughQ4(s);
     return { site:s.site, q3Row, ytdRow, ytdAchieved: ytdRow ? ytdRow['Target % Achieved (Forecast)*'] : null };
   }).sort((a,b)=>(b.ytdAchieved??-Infinity)-(a.ytdAchieved??-Infinity));
   addServiceTableSlide(pptx.addSlide(), 'Group Trade Parts - Site League', siteRanked, [
     {label:'Site',value:r=>r.site,w:2.1},
-    {label:'Q3 %',value:r=>pct(r.q3Row?r.q3Row['Target % Achieved (Forecast)*']:null),w:1.1},
-    {label:'Q3 Forecast',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Sales Out (Forecast)*']:null),w:1.7},
-    {label:'Q3 Target',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Target']:null),w:1.6},
+    {label:'Q4 %',value:r=>pct(r.q3Row?r.q3Row['Target % Achieved (Forecast)*']:null),w:1.1},
+    {label:'Q4 Forecast',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Sales Out (Forecast)*']:null),w:1.7},
+    {label:'Q4 Target',value:r=>fmtGbp(r.q3Row?r.q3Row['SMROE Target']:null),w:1.6},
     {label:'YTD %',value:r=>pct(r.ytdRow?r.ytdRow['Target % Achieved (Forecast)*']:null),w:1.1},
     {label:'YTD Forecast',value:r=>fmtGbp(r.ytdRow?r.ytdRow['SMROE Sales Out (Forecast)*']:null),w:1.8},
     {label:'YTD Target',value:r=>fmtGbp(r.ytdRow?r.ytdRow['SMROE Target']:null),w:1.7},
