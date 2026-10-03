@@ -385,7 +385,13 @@ function renderEfficiencyTable(rows){
 function renderYoyBySite(ty, ly, elId='yoyBySite'){
   const el=document.getElementById(elId);
   if(!el) return;
-  const metrics=[{key:'new_enquiries',label:'New'},{key:'used_enquiries',label:'Used'},{key:'total_enquiries',label:'Total'}];
+  // Two groups (Enquiries, Orders), each split New / Used / Total - same
+  // breakdown for both, so growth in new-vehicle vs used-vehicle business
+  // is visible at a glance rather than buried in one blended total.
+  const groupDefs=[
+    { label:'Enquiries', items:[{key:'new_enquiries',label:'New'},{key:'used_enquiries',label:'Used'},{key:'total_enquiries',label:'Total'}] },
+    { label:'Orders', items:[{key:'new_orders',label:'New'},{key:'used_orders',label:'Used'},{key:'total_orders',label:'Total'}] },
+  ];
   const yoyChangeHtml=change=>{
     const pctText=change===null ? '-' : `${change>0?'+':''}${Math.round(change*100)}%`;
     const pctClass=change===null ? '' : (change>=0?'positive':'negative');
@@ -395,24 +401,28 @@ function renderYoyBySite(ty, ly, elId='yoyBySite'){
   const rows=centres.map(centre=>{
     const tyRow=(ty||[]).find(r=>r.centre===centre);
     const lyRow=(ly||[]).find(r=>r.centre===centre);
-    const data=metrics.map(m=>{
-      const tyVal=Number(tyRow&&tyRow[m.key])||0;
-      const lyVal=Number(lyRow&&lyRow[m.key])||0;
-      return { label:m.label, tyVal, lyVal, change: lyVal ? (tyVal-lyVal)/lyVal : null };
-    });
-    const ordersTy=Number(tyRow&&tyRow.total_orders)||0;
-    const ordersLy=Number(lyRow&&lyRow.total_orders)||0;
-    const ordersChange=ordersLy ? (ordersTy-ordersLy)/ordersLy : null;
-    return { centre, data, ordersTy, ordersLy, ordersChange, totalChange:data[2].change, hasData: data.some(d=>d.tyVal||d.lyVal)||ordersTy||ordersLy };
+    const groups=groupDefs.map(g=>({
+      label:g.label,
+      items:g.items.map(m=>{
+        const tyVal=Number(tyRow&&tyRow[m.key])||0;
+        const lyVal=Number(lyRow&&lyRow[m.key])||0;
+        return { label:m.label, tyVal, lyVal, change: lyVal ? (tyVal-lyVal)/lyVal : null };
+      })
+    }));
+    const totalChange=groups[0].items[2].change; // Enquiries > Total, the ranking basis
+    const hasData=groups.some(g=>g.items.some(d=>d.tyVal||d.lyVal));
+    return { centre, groups, totalChange, hasData };
   }).filter(r=>r.hasData).sort((a,b)=>(b.totalChange===null?-Infinity:b.totalChange)-(a.totalChange===null?-Infinity:a.totalChange));
   el.innerHTML=rows.map((r,i)=>{
-    const metricsHtml=r.data.map(d=>{
-      const {pctText,pctClass}=yoyChangeHtml(d.change);
-      return `<div class="yoy-metric"><div class="yoy-metric-head"><span>${d.label}</span><span class="yoy-pct ${pctClass}">${pctText}</span></div><div class="yoy-orders-row"><span>CY</span><strong>${fmt(d.tyVal)}</strong></div><div class="yoy-orders-row"><span>LY</span><strong>${fmt(d.lyVal)}</strong></div></div>`;
+    const {pctText,pctClass}=yoyChangeHtml(r.totalChange);
+    const groupsHtml=r.groups.map(g=>{
+      const itemsHtml=g.items.map(d=>{
+        const {pctText:ip,pctClass:ic}=yoyChangeHtml(d.change);
+        return `<div class="yoy-metric-item"><span>${d.label}</span><strong class="yoy-pct ${ic}">${ip}</strong><small>${fmt(d.tyVal)} / ${fmt(d.lyVal)} LY</small></div>`;
+      }).join('');
+      return `<div class="yoy-metric-group"><div class="yoy-metric-group-label">${g.label}</div><div class="yoy-metric-group-items">${itemsHtml}</div></div>`;
     }).join('');
-    const {pctText:ordersPctText,pctClass:ordersPctClass}=yoyChangeHtml(r.ordersChange);
-    const ordersHtml=`<div class="yoy-orders"><div class="yoy-metric-head"><span>Orders</span><span class="yoy-pct ${ordersPctClass}">${ordersPctText}</span></div><div class="yoy-orders-row"><span>CY</span><strong>${fmt(r.ordersTy)}</strong></div><div class="yoy-orders-row"><span>LY</span><strong>${fmt(r.ordersLy)}</strong></div></div>`;
-    return `<div class="yoy-row"><div class="yoy-centre"><span class="rank">${i+1}</span> ${siteLabel(r.centre)}</div><div class="yoy-metrics">${metricsHtml}</div>${ordersHtml}</div>`;
+    return `<div class="yoy-row"><div class="yoy-row-head"><div class="yoy-centre"><span class="rank">${i+1}</span> ${siteLabel(r.centre)}</div><div class="yoy-pct yoy-total-pct ${pctClass}">${pctText}</div></div>${progress(r.totalChange||0, (r.totalChange||0)>=0?1:0)}<div class="yoy-metrics">${groupsHtml}</div></div>`;
   }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
 }
 function cdaOrderRows(){

@@ -201,26 +201,22 @@ table{border-collapse:separate;border-spacing:0}
 
 /* Enquiries vs Last Year by Site (Sales Funnel tab). */
 .yoy-grid{display:grid;gap:10px;margin-top:10px}
-.yoy-row{display:grid;grid-template-columns:110px 1fr 120px;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-row{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-row-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
 .yoy-centre{font-weight:900}
-.yoy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.yoy-metric{display:flex;flex-direction:column;gap:5px}
-.yoy-metric-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-
-
-
-
-
-
-
+.yoy-row .progress{margin-bottom:14px}
+.yoy-metrics{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.yoy-metric-group-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.yoy-metric-group-items{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.yoy-metric-item{display:flex;flex-direction:column;gap:2px}
+.yoy-metric-item span{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.yoy-metric-item strong{font-size:13px}
+.yoy-metric-item small{font-size:10px;color:var(--muted);font-weight:700}
 .yoy-pct{font-weight:900;font-size:12px}
 .yoy-pct.positive{color:var(--green)}
 .yoy-pct.negative{color:var(--red)}
-.yoy-orders{display:flex;flex-direction:column;gap:5px;border-left:1px solid var(--line);padding-left:14px}
-.yoy-orders-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
-.yoy-orders-row span{width:20px}
-.yoy-orders-row strong{color:var(--ink);font-weight:900}
-@media(max-width:900px){.yoy-row{grid-template-columns:1fr}.yoy-metrics{grid-template-columns:1fr;gap:12px}.yoy-orders{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:10px}}
+.yoy-total-pct{font-size:20px}
+@media(max-width:900px){.yoy-metrics{grid-template-columns:1fr}}
 
 /* Pace/status now sits directly beneath the centre name. */
 .centre-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:125px}
