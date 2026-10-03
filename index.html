@@ -7,10 +7,10 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Dashboard</title>
-<link rel="stylesheet" href="./styles.css?v=20260922-footerlabelalign-1">
+<link rel="stylesheet" href="./styles.css?v=20261003-headerminimize-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · new registrations, used cars and fleet</div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q4 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q3ref">Q3 Reference</button><button data-target="ytd">YTD Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · new registrations, used cars and fleet</div></div><div class="header-actions"><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div><button class="header-minimize-btn" id="headerMinimizeBtn" type="button">Minimize</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q4 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q3ref">Q3 Reference</button><button data-target="ytd">YTD Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
@@ -139,19 +139,18 @@
 <script>
 (function(){
   var header = document.querySelector('header');
-  if(!header) return;
-  var lastY = window.scrollY, ticking = false;
-  window.addEventListener('scroll', function(){
-    if(ticking) return;
-    ticking = true;
-    requestAnimationFrame(function(){
-      var y = window.scrollY;
-      if(y > lastY && y > 80) header.classList.add('header-hidden');
-      else header.classList.remove('header-hidden');
-      lastY = y;
-      ticking = false;
-    });
-  }, {passive:true});
+  var btn = document.getElementById('headerMinimizeBtn');
+  if(!header || !btn) return;
+  var KEY = 'rrgHeaderMinimized';
+  function setState(minimized){
+    header.classList.toggle('header-minimized', minimized);
+    btn.textContent = minimized ? 'Expand' : 'Minimize';
+    try{ localStorage.setItem(KEY, minimized ? '1' : '0'); }catch(e){}
+  }
+  var saved = false;
+  try{ saved = localStorage.getItem(KEY) === '1'; }catch(e){}
+  setState(saved);
+  btn.addEventListener('click', function(){ setState(!header.classList.contains('header-minimized')); });
 })();
 </script>
 </body></html>

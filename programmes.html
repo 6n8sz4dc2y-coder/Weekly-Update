@@ -7,10 +7,10 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>RRG Group Programmes Hub</title>
-<link rel="stylesheet" href="./styles.css?v=20260922-footerlabelalign-1">
+<link rel="stylesheet" href="./styles.css?v=20261003-headerminimize-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="header-actions"><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div><button class="header-minimize-btn" id="headerMinimizeBtn" type="button">Minimize</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
 <main>
 <section id="vcf" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -144,19 +144,18 @@
 <script>
 (function(){
   var header = document.querySelector('header');
-  if(!header) return;
-  var lastY = window.scrollY, ticking = false;
-  window.addEventListener('scroll', function(){
-    if(ticking) return;
-    ticking = true;
-    requestAnimationFrame(function(){
-      var y = window.scrollY;
-      if(y > lastY && y > 80) header.classList.add('header-hidden');
-      else header.classList.remove('header-hidden');
-      lastY = y;
-      ticking = false;
-    });
-  }, {passive:true});
+  var btn = document.getElementById('headerMinimizeBtn');
+  if(!header || !btn) return;
+  var KEY = 'rrgHeaderMinimized';
+  function setState(minimized){
+    header.classList.toggle('header-minimized', minimized);
+    btn.textContent = minimized ? 'Expand' : 'Minimize';
+    try{ localStorage.setItem(KEY, minimized ? '1' : '0'); }catch(e){}
+  }
+  var saved = false;
+  try{ saved = localStorage.getItem(KEY) === '1'; }catch(e){}
+  setState(saved);
+  btn.addEventListener('click', function(){ setState(!header.classList.contains('header-minimized')); });
 })();
 </script>
 </body></html>
