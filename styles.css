@@ -201,7 +201,7 @@ table{border-collapse:separate;border-spacing:0}
 
 /* Enquiries vs Last Year by Site (Sales Funnel tab). */
 .yoy-grid{display:grid;gap:10px;margin-top:10px}
-.yoy-row{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.yoy-row{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}.yoy-row-group{background:var(--lightblue);border-color:#bfdbfe;border-width:2px}.yoy-row-group .yoy-centre{color:#1e3a8a}
 .yoy-row-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
 .yoy-centre{font-weight:900}
 .yoy-row .progress{margin-bottom:14px}

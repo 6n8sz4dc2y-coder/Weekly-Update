@@ -412,8 +412,18 @@ function renderYoyBySite(ty, ly, elId='yoyBySite'){
     const totalChange=groups[0].items[2].change; // Enquiries > Total, the ranking basis
     const hasData=groups.some(g=>g.items.some(d=>d.tyVal||d.lyVal));
     return { centre, groups, totalChange, hasData };
-  }).filter(r=>r.hasData).sort((a,b)=>(b.totalChange===null?-Infinity:b.totalChange)-(a.totalChange===null?-Infinity:a.totalChange));
-  el.innerHTML=rows.map((r,i)=>{
+  }).filter(r=>r.hasData && !String(r.centre||'').toUpperCase().includes('CDA') && String(r.centre||'').toUpperCase()!=='TOTAL')
+    .sort((a,b)=>(b.totalChange===null?-Infinity:b.totalChange)-(a.totalChange===null?-Infinity:a.totalChange));
+  const groupRow={ centre:'Group', groups: groupDefs.map((g,gi)=>({
+    label:g.label,
+    items:g.items.map((m,mi)=>{
+      const tyVal=rows.reduce((a,r)=>a+r.groups[gi].items[mi].tyVal,0);
+      const lyVal=rows.reduce((a,r)=>a+r.groups[gi].items[mi].lyVal,0);
+      return { label:m.label, tyVal, lyVal, change: lyVal ? (tyVal-lyVal)/lyVal : null };
+    })
+  })) };
+  groupRow.totalChange=groupRow.groups[0].items[2].change;
+  const renderRow=(r,rankLabel)=>{
     const {pctText,pctClass}=yoyChangeHtml(r.totalChange);
     const groupsHtml=r.groups.map(g=>{
       const itemsHtml=g.items.map(d=>{
@@ -422,8 +432,12 @@ function renderYoyBySite(ty, ly, elId='yoyBySite'){
       }).join('');
       return `<div class="yoy-metric-group"><div class="yoy-metric-group-label">${g.label}</div><div class="yoy-metric-group-items">${itemsHtml}</div></div>`;
     }).join('');
-    return `<div class="yoy-row"><div class="yoy-row-head"><div class="yoy-centre"><span class="rank">${i+1}</span> ${siteLabel(r.centre)}</div><div class="yoy-pct yoy-total-pct ${pctClass}">${pctText}</div></div>${progress(r.totalChange||0, (r.totalChange||0)>=0?1:0)}<div class="yoy-metrics">${groupsHtml}</div></div>`;
-  }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
+    const rankHtml=rankLabel!==null ? `<span class="rank">${rankLabel}</span> ` : '';
+    const rowClass=rankLabel===null ? 'yoy-row yoy-row-group' : 'yoy-row';
+    return `<div class="${rowClass}"><div class="yoy-row-head"><div class="yoy-centre">${rankHtml}${siteLabel(r.centre)}</div><div class="yoy-pct yoy-total-pct ${pctClass}">${pctText}</div></div>${progress(r.totalChange||0, (r.totalChange||0)>=0?1:0)}<div class="yoy-metrics">${groupsHtml}</div></div>`;
+  };
+  if(!rows.length){ el.innerHTML='<div class="mini">No last-year data loaded yet.</div>'; return; }
+  el.innerHTML = renderRow(groupRow, null) + rows.map((r,i)=>renderRow(r, i+1)).join('');
 }
 function cdaOrderRows(){
   return CDA_TOTALS.map(g=>{
