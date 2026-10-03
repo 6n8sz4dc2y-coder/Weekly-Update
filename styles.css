@@ -206,13 +206,13 @@ table{border-collapse:separate;border-spacing:0}
 .yoy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .yoy-metric{display:flex;flex-direction:column;gap:5px}
 .yoy-metric-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.yoy-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:800}
-.yoy-bar-row span:first-child{width:20px}
-.yoy-bar-track{flex:1;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
-.yoy-bar-fill{height:100%;border-radius:999px}
-.yoy-bar-fill.ty{background:var(--blue)}
-.yoy-bar-fill.ly{background:#94a3b8}
-.yoy-bar-value{width:34px;text-align:right;color:var(--ink)}
+
+
+
+
+
+
+
 .yoy-pct{font-weight:900;font-size:12px}
 .yoy-pct.positive{color:var(--green)}
 .yoy-pct.negative{color:var(--red)}
