@@ -10,32 +10,32 @@
 <link rel="stylesheet" href="./styles.css?v=20260922-footerlabelalign-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q3 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q2">Q2 Reference</button><button data-target="ytd">YTD Reference</button><button data-target="q4fwd">Q4 Forward Orders</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
+<header><div class="header-row"><div><h1>RRG Group Dashboard</h1><div class="subtitle">Weekly performance dashboard · H2 active · new registrations, used cars and fleet</div><div id="h2Period" class="period-row"></div></div><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span><br><button class="admin-btn primary-btn header-export-btn" id="exportPdfHeader" type="button">Export PDF</button><button class="admin-btn primary-btn header-export-btn" id="exportPptHeader" type="button">Export PowerPoint</button></div></div><nav><button class="active" data-target="dashboard">Dashboard</button><button data-target="q3regs">Q4 Registrations</button><button data-target="used">Used Cars</button><button data-target="fleet">Fleet</button><button data-target="orders">Orders</button><button data-target="activity">Sales Funnel</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="q3ref">Q3 Reference</button><button data-target="ytd">YTD Reference</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./programmes.html">Programmes Hub &rarr;</a></nav></header>
 <main>
 <section id="dashboard" class="section active"><div class="grid">
 <div class="card kpi primary kpi-progress-card blue-card">
-  <div class="label">Q3 New Registrations</div>
+  <div class="label">Q4 New Registrations</div>
   <div class="kpi-split-main">
     <div><div class="mini-label">Month to date</div><div class="value" id="q3MonthPct">-</div><div class="note"><strong id="q3MonthCurrent">-</strong> / <strong id="q3MonthTarget">-</strong> target</div></div>
-    <div><div class="mini-label">Q3 total</div><div class="value" id="q3Pct">-</div><div class="note"><strong id="q3Current">-</strong> / <strong id="q3Target">-</strong> target</div></div>
+    <div><div class="mini-label">Q4 total</div><div class="value" id="q3Pct">-</div><div class="note"><strong id="q3Current">-</strong> / <strong id="q3Target">-</strong> target</div></div>
   </div>
   <div class="month-progress-grid">
-    <div><span>Jul</span><strong id="q3JulPct">-</strong><small id="q3JulVol">-</small></div>
-    <div><span>Aug</span><strong id="q3AugPct">-</strong><small id="q3AugVol">-</small></div>
-    <div><span>Sep</span><strong id="q3SepPct">-</strong><small id="q3SepVol">-</small></div>
+    <div><span>Oct</span><strong id="q3OctPct">-</strong><small id="q3OctVol">-</small></div>
+    <div><span>Nov</span><strong id="q3NovPct">-</strong><small id="q3NovVol">-</small></div>
+    <div><span>Dec</span><strong id="q3DecPct">-</strong><small id="q3DecVol">-</small></div>
   </div>
   <div class="kpi-footer-strip two-up"><div><span>Remaining</span><strong id="q3Remaining">-</strong></div><div><span>Run rate required</span><strong><span id="q3RunRate">-</span> / week</strong></div></div>
 </div>
 <div class="card kpi primary kpi-progress-card green-card">
-  <div class="label">Q3 Used Cars</div>
+  <div class="label">Q4 Used Cars</div>
   <div class="kpi-split-main">
     <div><div class="mini-label">Month to date</div><div class="value" id="usedMonthPct">-</div><div class="note"><strong id="usedMonthCurrent">-</strong> / <strong id="usedMonthTarget">-</strong> target</div></div>
-    <div><div class="mini-label">Q3 total</div><div class="value" id="usedPct">-</div><div class="note"><strong id="usedCurrent">-</strong> / <strong id="usedTarget">-</strong> target</div></div>
+    <div><div class="mini-label">Q4 total</div><div class="value" id="usedPct">-</div><div class="note"><strong id="usedCurrent">-</strong> / <strong id="usedTarget">-</strong> target</div></div>
   </div>
   <div class="month-progress-grid">
-    <div><span>Jul</span><strong id="usedJulPct">-</strong><small id="usedJulVol">-</small></div>
-    <div><span>Aug</span><strong id="usedAugPct">-</strong><small id="usedAugVol">-</small></div>
-    <div><span>Sep</span><strong id="usedSepPct">-</strong><small id="usedSepVol">-</small></div>
+    <div><span>Oct</span><strong id="usedOctPct">-</strong><small id="usedOctVol">-</small></div>
+    <div><span>Nov</span><strong id="usedNovPct">-</strong><small id="usedNovVol">-</small></div>
+    <div><span>Dec</span><strong id="usedDecPct">-</strong><small id="usedDecVol">-</small></div>
   </div>
   <div class="kpi-footer-strip"><div><span>Remaining</span><strong id="usedRemaining">-</strong></div><div><span>Run rate required</span><strong><span id="usedRunRate">-</span> / week</strong></div><div class="forecast-wide"><span>Group forecast</span><strong id="usedGroupForecast">-</strong><small id="usedForecastDelta">-</small></div></div>
 </div>
@@ -43,21 +43,21 @@
   <div class="label">Non-Counting Fleet</div>
   <div class="kpi-split-main">
     <div><div class="mini-label">Month to date</div><div class="value" id="nonFleetMonthPct">-</div><div class="note"><strong id="nonFleetMonthCurrent">-</strong> / <strong id="nonFleetMonthBudget">-</strong> budget</div></div>
-    <div><div class="mini-label">Q3 total</div><div class="value" id="nonFleetPct">-</div><div class="note"><strong id="nonFleetCurrent">-</strong> / <strong id="nonFleetBudget">-</strong> budget</div></div>
+    <div><div class="mini-label">Q4 total</div><div class="value" id="nonFleetPct">-</div><div class="note"><strong id="nonFleetCurrent">-</strong> / <strong id="nonFleetBudget">-</strong> budget</div></div>
   </div>
   <div class="month-progress-grid">
-    <div><span>Jul</span><strong id="nonFleetJulPct">-</strong><small id="nonFleetJulVol">-</small></div>
-    <div><span>Aug</span><strong id="nonFleetAugPct">-</strong><small id="nonFleetAugVol">-</small></div>
-    <div><span>Sep</span><strong id="nonFleetSepPct">-</strong><small id="nonFleetSepVol">-</small></div>
+    <div><span>Oct</span><strong id="nonFleetOctPct">-</strong><small id="nonFleetOctVol">-</small></div>
+    <div><span>Nov</span><strong id="nonFleetNovPct">-</strong><small id="nonFleetNovVol">-</small></div>
+    <div><span>Dec</span><strong id="nonFleetDecPct">-</strong><small id="nonFleetDecVol">-</small></div>
   </div>
   <div class="kpi-footer-strip two-up"><div><span>Remaining / over</span><strong id="nonFleetRemaining">-</strong></div><div><span>Budget run rate</span><strong><span id="nonFleetRunRate">-</span> / week</strong></div></div>
 </div>
 <div class="card kpi overview-card order-overview">
   <div class="overview-main"><div class="label" style="margin:0">Order Bank</div><div class="overview-status" id="orderBankStatus">-</div></div>
   <div class="month-progress-grid" style="margin-top:12px">
-    <div><span>Jul</span><strong id="orderBankJulPct">-</strong><small id="orderBankJulVol">-</small></div>
-    <div><span>Aug</span><strong id="orderBankAugPct">-</strong><small id="orderBankAugVol">-</small></div>
-    <div><span>Sep</span><strong id="orderBankSepPct">-</strong><small id="orderBankSepVol">-</small></div>
+    <div><span>Oct</span><strong id="orderBankOctPct">-</strong><small id="orderBankOctVol">-</small></div>
+    <div><span>Nov</span><strong id="orderBankNovPct">-</strong><small id="orderBankNovVol">-</small></div>
+    <div><span>Dec</span><strong id="orderBankDecPct">-</strong><small id="orderBankDecVol">-</small></div>
   </div>
 </div>
 <div class="card kpi overview-card fleet-overview">
@@ -72,25 +72,20 @@
     <tr><td>Used</td><td id="usedEnquiries">-</td><td id="usedEnquiriesLY">-</td><td id="usedTdPct">-</td><td id="usedOsPct">-</td><td id="usedConvPct">-</td><td id="usedOrdersStat">-</td><td id="usedOrdersLY">-</td></tr>
     <tr class="total-row"><td>Total</td><td id="totalEnquiriesSplit">-</td><td id="totalEnquiriesLY">-</td><td id="totalTdPct">-</td><td id="totalOsPct">-</td><td id="totalConvPct">-</td><td id="totalOrdersStat">-</td><td id="totalOrdersLY">-</td></tr>
   </tbody></table></div>
-</div><div class="card half"><h3>Q3 Registration CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Order Summary</h3><div id="cdaOrderSummary" class="leader"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card half"><h3>Q3 CDA Used Summary</h3><div id="cdaUsedSummary" class="leader"></div></div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card wide"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half" style="display:none"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
-<section id="q3regs" class="section"><div class="card wide"><div class="toolbar"><h2>Q3 Registrations</h2><input class="search" data-filter="q3Table" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3Table"></table></div></div></section>
+</div><div class="card half"><h3>Q4 Registration CDA Summary</h3><div id="cdaSummary" class="leader"></div></div><div class="card half"><h3>Q4 CDA Order Summary</h3><div id="cdaOrderSummary" class="leader"></div></div><div class="card half"><h3>Non-Counting Fleet Snapshot</h3><div id="nonFleetSummary" class="leader"></div></div><div class="card half"><h3>Q4 CDA Used Summary</h3><div id="cdaUsedSummary" class="leader"></div></div><div class="card half"><h3>Centre Registration Targets</h3><div id="leaderboard" class="leader"></div></div><div class="card half"><h3>Used Car Snapshot</h3><div id="usedSummary" class="leader"></div></div><div class="card wide"><h3>Highlights</h3><div id="highlights" class="note-box"></div></div><div class="card half" style="display:none"><h3>Executive Note</h3><div class="note-box" id="execNote"></div></div></div></section>
+<section id="q3regs" class="section"><div class="card wide"><div class="toolbar"><h2>Q4 Registrations</h2><input class="search" data-filter="q3Table" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3Table"></table></div></div></section>
 <section id="used" class="section"><div class="card wide"><div class="toolbar"><h2>Used Counting Volume</h2><input class="search" data-filter="usedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="usedTable"></table></div></div></section>
 <section id="fleet" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Centre Fleet BCH</h2><input class="search" data-filter="fleetTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="fleetTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Non-Counting Fleet</h2><input class="search" data-filter="nonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="nonTable"></table></div></div></div></section>
 <section id="orders" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Order Bank Targets</h2><input class="search" data-filter="orderBankTable" placeholder="Search centre..."></div><div class="table-wrap"><table id="orderBankTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Monthly Order Bank Detail · H1 Actuals + H2 Targets</h2><input class="search" data-filter="monthlyOrderTable" placeholder="Search centre..."></div><div class="table-wrap"><table id="monthlyOrderTable"></table></div></div></div></section>
 <section id="activity" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Enquiries vs Last Year by Site</h2></div><div class="hint">Total enquiries this year (CY) vs the same period last year (LY), by centre.</div><div id="yoyBySite" class="yoy-grid"></div></div><div class="card wide"><div class="toolbar"><h2>Sales Funnel Activity</h2><input class="search" data-filter="activityTable" placeholder="Search centre..."></div><div class="hint">OS = offer sheets presented. Conversion ratios are shown exactly as exported. This volume table is ranked by total orders.</div><div class="table-wrap"><table id="activityTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Sales Funnel Efficiency League</h2><input class="search" data-filter="efficiencyTable" placeholder="Search centre..."></div><div class="hint">Efficiency score is weighted: Test Drive Rate 25%, Offer Sheet Rate 35%, Conversion 40%. This ranks how effectively centres convert their enquiries, not just who has the most volume.</div><div id="efficiencyAwards" class="award-grid"></div><div class="table-wrap"><table id="efficiencyTable"></table></div></div></div></section>
 <section id="siteSummary" class="section"><div class="grid">
-<div class="card wide"><h2>Site Summary</h2><div class="hint">Pick a site to see Q3 Registrations, Used Cars, Non-Counting Fleet, Fleet BCH, Order Bank and Sales Funnel all in one place.</div><select id="siteSummarySelect" class="search" style="max-width:360px"></select></div>
+<div class="card wide"><h2>Site Summary</h2><div class="hint">Pick a site to see Q4 Registrations, Used Cars, Non-Counting Fleet, Fleet BCH, Order Bank and Sales Funnel all in one place.</div><select id="siteSummarySelect" class="search" style="max-width:360px"></select></div>
 <div id="siteSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 <div class="card wide"><h2>CDA Summary</h2><div class="hint">Same figures, rolled up to NORTH / WY / SOUTH CDA level.</div><select id="cdaSummarySelect" class="search" style="max-width:360px"></select></div>
 <div id="cdaSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 </div></section>
-<section id="q2" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q2 Registrations Reference</h2><input class="search" data-filter="q2RegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2RegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q2 Used Reference</h2><input class="search" data-filter="q2UsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q2UsedTable"></table></div></div></div></section>
+<section id="q3ref" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Q3 Registrations Reference</h2><input class="search" data-filter="q3RefRegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3RefRegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q3 Used Reference</h2><input class="search" data-filter="q3RefUsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3RefUsedTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q3 Centre Fleet BCH Reference</h2><input class="search" data-filter="q3RefFleetTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3RefFleetTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Q3 Non-Counting Fleet Reference</h2><input class="search" data-filter="q3RefNonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="q3RefNonTable"></table></div></div></div></section>
 <section id="ytd" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>YTD Registrations · Q1-Q3</h2><input class="search" data-filter="ytdRegTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdRegTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>YTD Used Cars · Q1-Q3</h2><input class="search" data-filter="ytdUsedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdUsedTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>YTD Non-Counting Fleet · Q1-Q3</h2><input class="search" data-filter="ytdNonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="ytdNonTable"></table></div></div></div></section>
-<section id="q4fwd" class="section"><div class="grid">
-<div class="card wide"><div class="toolbar"><h2>Q4 Forward Orders</h2></div></div>
-<div id="q4Cards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
-<div class="card wide"><h3>Centre Q4 Order Targets</h3><div id="q4Leaderboard" class="leader"></div></div>
-</div></section>
 
 
 
@@ -106,7 +101,7 @@
   <div class="card third">
     <h3>1. Weekly Update.xlsx</h3>
     <input id="weeklyFile" type="file" accept=".xlsx,.xls" class="search">
-    <div class="hint">Updates registrations, used cars, non-counting fleet and fleet BCH. If the workbook has a "2026 - Q4" sheet (same shape as "2026 - Q3"), Q4 Forward Orders picks it up automatically too.</div>
+    <div class="hint">Updates registrations, used cars, non-counting fleet and fleet BCH for the current quarter from the "2026 - Q4" sheet. The "2026 - Q3" sheet (same shape) is also read, feeding the separate Q3 Reference tab.</div>
   </div>
   <div class="card third">
     <h3>2. Sales Activity.xls</h3>
@@ -140,7 +135,7 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20261003-ytdref-1"></script>
+<script src="./app.js?v=20261003-q4live-1"></script>
 <script>
 (function(){
   var header = document.querySelector('header');
