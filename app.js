@@ -418,6 +418,28 @@ function renderYoyBySite(ty, ly, elId='yoyBySite'){
     return `<div class="yoy-row"><div class="yoy-centre">${siteLabel(r.centre)}</div><div class="yoy-metrics">${metricsHtml}</div>${ordersHtml}</div>`;
   }).join('') || '<div class="mini">No last-year data loaded yet.</div>';
 }
+// YTD Sales Funnel leaderboard - ranked by enquiries growth YoY (Jan-Sep CY
+// vs Jan-Sep LY), replacing the Activity table/bar-chart on the Sales Funnel
+// tab while the live Q4 sales-activity export is still empty. Reuses
+// leaderRows() for the rank/centre/pct/bar layout, with a custom colorFn
+// since paceStatusClass's 90%/100%-of-target thresholds don't apply to a
+// YoY growth rate - green for any growth, red for any decline.
+function renderYtdSalesLeaderboard(cy, ly, containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  const centres=Array.from(new Set([...(cy||[]).map(r=>r.centre), ...(ly||[]).map(r=>r.centre)]));
+  const rows=centres.map(centre=>{
+    const cyRow=(cy||[]).find(r=>r.centre===centre);
+    const lyRow=(ly||[]).find(r=>r.centre===centre);
+    const cyEnq=Number(cyRow&&cyRow.total_enquiries)||0, lyEnq=Number(lyRow&&lyRow.total_enquiries)||0;
+    const cyOrd=Number(cyRow&&cyRow.total_orders)||0, lyOrd=Number(lyRow&&lyRow.total_orders)||0;
+    return { centre, yoy: lyEnq ? (cyEnq-lyEnq)/lyEnq : 0, cyEnq, lyEnq, cyOrd, lyOrd, hasData: cyEnq||lyEnq };
+  }).filter(r=>r.hasData);
+  el.innerHTML = rows.length ? leaderRows(rows, r=>r.yoy,
+    r=>`Enquiries ${fmt(r.cyEnq)} / ${fmt(r.lyEnq)} LY &middot; Orders ${fmt(r.cyOrd)} / ${fmt(r.lyOrd)} LY`,
+    r=>r.yoy>=0?1:0
+  ) : '<div class="mini">No data loaded yet.</div>';
+}
 
 function cdaOrderRows(){
   return CDA_TOTALS.map(g=>{
@@ -572,9 +594,8 @@ function build(){
   {label:'Nov Target',key:'nov_target',num:true},{label:'Nov Done',value:r=>orderDoneFor(r,'nov'),num:true},{label:'Nov Diff',key:'nov_diff',format:'variance',num:true},
   {label:'Dec Target',key:'dec_target',num:true},{label:'Dec Done',value:r=>orderDoneFor(r,'dec'),num:true},{label:'Dec Diff',key:'dec_diff',format:'variance',num:true}
 ],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
- makeTable('activityTable',[{label:'Rank',value:(r)=>((DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)).findIndex(x=>x.centre===r.centre)+1),num:true},{label:'Centre',key:'centre'},{label:'Enquiries',key:'total_enquiries',num:true},{label:'Test Drives',key:'total_test_drives',num:true},{label:'OS',key:'total_os',num:true},{label:'Orders',key:'total_orders',num:true},{label:'TD %',key:'td_ratio',format:'pct',num:true},{label:'Order %',key:'orders_ratio',format:'pct',num:true},{label:'OS %',key:'os_ratio',format:'pct',num:true},{label:'New Enq',key:'new_enquiries',num:true},{label:'New TD',key:'new_test_drives',num:true},{label:'New OS',key:'new_os',num:true},{label:'New Orders',key:'new_orders',num:true},{label:'Used Enq',key:'used_enquiries',num:true},{label:'Used TD',key:'used_test_drives',num:true},{label:'Used OS',key:'used_os',num:true},{label:'Used Orders',key:'used_orders',num:true},{label:'Delivered',key:'delivered',num:true},{label:'Lost Opp',key:'lost_opportunities',num:true}],(DATA.dashboard_activity||[]).slice().sort((a,b)=>(b.total_orders||0)-(a.total_orders||0)));
  renderEfficiencyTable(DATA.dashboard_activity||[]);
- renderYoyBySite(DATA.dashboard_activity||[], DATA.dashboard_activity_ly||[]);
+ renderYtdSalesLeaderboard(DATA.ytd_sales_cy||[], DATA.ytd_sales_ly||[], 'ytdSalesLeaderboard');
  makeTable('q3RefRegTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_total)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_total)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_total)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q3ref_regs);
  makeTable('q3RefUsedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_counting)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_counting)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_counting)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q3ref_used);
  makeTable('q3RefFleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Achievement',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'pct',num:true}],DATA.q3ref_fleet);

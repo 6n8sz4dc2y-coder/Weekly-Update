@@ -53,7 +53,7 @@
   <div class="kpi-footer-strip two-up"><div><span>Remaining / over</span><strong id="nonFleetRemaining">-</strong></div><div><span>Budget run rate</span><strong><span id="nonFleetRunRate">-</span> / week</strong></div></div>
 </div>
 <div class="card kpi overview-card order-overview">
-  <div class="overview-main"><div class="label" style="margin:0">Order Bank</div><div class="overview-status" id="orderBankStatus">-</div></div>
+  <div class="overview-main"><div class="label" style="margin:0">Q4 Order Bank</div><div class="overview-status" id="orderBankStatus">-</div></div>
   <div class="month-progress-grid" style="margin-top:12px">
     <div><span>Oct</span><strong id="orderBankOctPct">-</strong><small id="orderBankOctVol">-</small></div>
     <div><span>Nov</span><strong id="orderBankNovPct">-</strong><small id="orderBankNovVol">-</small></div>
@@ -61,11 +61,11 @@
   </div>
 </div>
 <div class="card kpi overview-card fleet-overview">
-  <div class="overview-main"><div class="label" style="margin:0">Centre Fleet BCH</div><div class="overview-status" id="fleetBchStatus">-</div></div>
+  <div class="overview-main"><div class="label" style="margin:0">Q4 Centre Fleet BCH</div><div class="overview-status" id="fleetBchStatus">-</div></div>
   <div class="month-progress-grid" style="margin-top:12px;grid-template-columns:repeat(4,1fr)"><div><span>Regs</span><strong id="fleetBchRegs">-</strong></div><div><span>Target</span><strong id="fleetBchTarget">-</strong></div><div><span>Active orders</span><strong id="fleetBchOrders">-</strong></div><div><span>Expected achievement</span><strong id="fleetBchExpected">-</strong></div></div>
 </div>
 <div class="card kpi overview-card enquiry-overview">
-  <div class="label">Sales Funnel</div>
+  <div class="label">Q4 Sales Funnel</div>
   <div class="overview-main"><div class="value" id="totalEnquiries">-</div><div class="overview-caption">enquiries</div></div>
   <div class="funnel-split-wrap"><table class="funnel-split"><thead><tr><th></th><th>Enq</th><th>LY %</th><th>TD</th><th>OS</th><th>Conv</th><th>Ord</th><th>LY %</th></tr></thead><tbody>
     <tr><td>New</td><td id="newEnquiries">-</td><td id="newEnquiriesLY">-</td><td id="newTdPct">-</td><td id="newOsPct">-</td><td id="newConvPct">-</td><td id="newOrdersStat">-</td><td id="newOrdersLY">-</td></tr>
@@ -77,7 +77,7 @@
 <section id="used" class="section"><div class="card wide"><div class="toolbar"><h2>Used Counting Volume</h2><input class="search" data-filter="usedTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="usedTable"></table></div></div></section>
 <section id="fleet" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Centre Fleet BCH</h2><input class="search" data-filter="fleetTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="fleetTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Non-Counting Fleet</h2><input class="search" data-filter="nonTable" placeholder="Search centre or CDA..."></div><div class="table-wrap"><table id="nonTable"></table></div></div></div></section>
 <section id="orders" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Order Bank Targets</h2><input class="search" data-filter="orderBankTable" placeholder="Search centre..."></div><div class="table-wrap"><table id="orderBankTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Monthly Order Bank Detail · H1 Actuals + H2 Targets</h2><input class="search" data-filter="monthlyOrderTable" placeholder="Search centre..."></div><div class="table-wrap"><table id="monthlyOrderTable"></table></div></div></div></section>
-<section id="activity" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>Enquiries vs Last Year by Site</h2></div><div class="hint">Total enquiries this year (CY) vs the same period last year (LY), by centre.</div><div id="yoyBySite" class="yoy-grid"></div></div><div class="card wide"><div class="toolbar"><h2>Sales Funnel Activity</h2><input class="search" data-filter="activityTable" placeholder="Search centre..."></div><div class="hint">OS = offer sheets presented. Conversion ratios are shown exactly as exported. This volume table is ranked by total orders.</div><div class="table-wrap"><table id="activityTable"></table></div></div><div class="card wide"><div class="toolbar"><h2>Sales Funnel Efficiency League</h2><input class="search" data-filter="efficiencyTable" placeholder="Search centre..."></div><div class="hint">Efficiency score is weighted: Test Drive Rate 25%, Offer Sheet Rate 35%, Conversion 40%. This ranks how effectively centres convert their enquiries, not just who has the most volume.</div><div id="efficiencyAwards" class="award-grid"></div><div class="table-wrap"><table id="efficiencyTable"></table></div></div></div></section>
+<section id="activity" class="section"><div class="grid"><div class="card wide"><div class="toolbar"><h2>YTD Sales Funnel Leaderboard · Jan-Sep vs Last Year</h2></div><div class="hint">Ranked by enquiries growth year-on-year (Jan-Sep 2026 vs Jan-Sep 2025). The live Q4 Sales Funnel figures reset to zero until a new current-quarter export is uploaded.</div><div id="ytdSalesLeaderboard" class="leader"></div></div><div class="card wide"><div class="toolbar"><h2>Sales Funnel Efficiency League</h2><input class="search" data-filter="efficiencyTable" placeholder="Search centre..."></div><div class="hint">Efficiency score is weighted: Test Drive Rate 25%, Offer Sheet Rate 35%, Conversion 40%. This ranks how effectively centres convert their enquiries, not just who has the most volume.</div><div id="efficiencyAwards" class="award-grid"></div><div class="table-wrap"><table id="efficiencyTable"></table></div></div></div></section>
 <section id="siteSummary" class="section"><div class="grid">
 <div class="card wide"><h2>Site Summary</h2><div class="hint">Pick a site to see Q4 Registrations, Used Cars, Non-Counting Fleet, Fleet BCH, Order Bank and Sales Funnel all in one place.</div><select id="siteSummarySelect" class="search" style="max-width:360px"></select></div>
 <div id="siteSummaryContent" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -135,7 +135,7 @@
 </div></section>
 <div class="footer-note">RRG Group Dashboard · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./app.js?v=20261003-ytdsales-1"></script>
+<script src="./app.js?v=20261003-salesleaderboard-1"></script>
 <script>
 (function(){
   var header = document.querySelector('header');
