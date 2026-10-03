@@ -20,9 +20,9 @@
 <section id="tradeParts" class="section"><div class="grid">
 <div id="tradePartsCard" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
 <div id="tradePartsCdaCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
-<div class="card half"><h3>Site League &middot; Q3</h3><div id="tradePartsSitesQ3" class="leader"></div></div>
+<div class="card half"><h3>Site League &middot; Q4</h3><div id="tradePartsSitesQ3" class="leader"></div></div>
 <div class="card half"><h3>Site League &middot; Year to Date</h3><div id="tradePartsSitesYtd" class="leader"></div></div>
-<div class="card wide"><h3>Group Trade Parts</h3><div class="hint">SMROE sales out by quarter, Group-level. Q3 is in progress - Forecast projects the full quarter from days elapsed; To Date is the confirmed total so far. Status is based on the forecast.</div><div class="table-wrap"><table id="tradePartsTable"></table></div></div>
+<div class="card wide"><h3>Group Trade Parts</h3><div class="hint">SMROE sales out by quarter, Group-level. Q4 is in progress - Forecast projects the full quarter from days elapsed; To Date is the confirmed total so far. Status is based on the forecast.</div><div class="table-wrap"><table id="tradePartsTable"></table></div></div>
 </div></section>
 <section id="wrr" class="section"><div class="grid">
 <div id="wrrCard" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -39,59 +39,74 @@
 <section id="admin" class="section"><div class="grid">
   <div class="card wide">
     <h2>Admin Update</h2>
-    <div class="hint">This hub reads workbooks uploaded to GitHub, each with an "Export" sheet: four VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date and Q3; one Group Trade Parts export (a flat quarterly table, Group-level); a Group Trade Parts CDA breakdown (one file per CDA - select all of them at once, the CDA name is read automatically from each file); one Group Trade Parts Lexus export (same shape, reported separately from the geographic CDAs); a Group Trade Parts site breakdown (one file per site - select all of them at once, the site name is read automatically from each file, feeds the Q3 and Year to Date site leagues); and two WRR exports (a flat per-centre table, Q3 and Year to Date). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
+    <div class="hint">This hub reads workbooks uploaded to GitHub, each with an "Export" sheet: six VCF exports (a Centre or CDA column, followed by pillar groups of Actual / Target / SvO columns) for Centre and CDA level, each for Year to Date, Q4 (current quarter) and Q3 Reference (captured at quarter close - update it if Toyota reissues the Q3 figures, otherwise leave it alone); one Group Trade Parts export (a flat quarterly table, Group-level, with one row per quarter - Q3 stays in this same table once Q4 is added, so there's nothing separate to upload for it); a Group Trade Parts CDA breakdown (one file per CDA - select all of them at once, the CDA name is read automatically from each file); one Group Trade Parts Lexus export (same shape, reported separately from the geographic CDAs); a Group Trade Parts site breakdown (one file per site - select all of them at once, the site name is read automatically from each file, feeds the Q4 and Year to Date site leagues); and three WRR exports (a flat per-centre table, Q4, Q3 Reference and Year to Date). Replace whichever file(s) changed each period, commit, and refresh the dashboard. The VCF parser is dynamic, so new or changed pillars in any export are picked up automatically.</div>
   </div>
   <div class="card wide version-card">
     <div><strong>Data last updated</strong><br><span id="adminDataUpdated">-</span></div>
     <div><strong>Cache status</strong><br><span>Versioned assets active</span></div>
   </div>
   <div class="card third">
-    <h3>1. Centre - Q3.xlsx</h3>
-    <input id="centreQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <h3>1. Centre - Q4.xlsx</h3>
+    <input id="centreQ4File" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Current-quarter figures by centre.</div>
   </div>
   <div class="card third">
-    <h3>2. Centre - YTD.xlsx</h3>
+    <h3>2. Centre - Q3 Reference.xlsx</h3>
+    <input id="centreQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Q3 closed - only re-upload if Toyota reissues the Q3 figures.</div>
+  </div>
+  <div class="card third">
+    <h3>3. Centre - YTD.xlsx</h3>
     <input id="centreYtdFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Year-to-date figures by centre.</div>
   </div>
   <div class="card third">
-    <h3>3. CDA - Q3.xlsx</h3>
-    <input id="cdaQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <h3>4. CDA - Q4.xlsx</h3>
+    <input id="cdaQ4File" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Current-quarter figures rolled up by CDA.</div>
   </div>
   <div class="card third">
-    <h3>4. CDA - YTD.xlsx</h3>
+    <h3>5. CDA - Q3 Reference.xlsx</h3>
+    <input id="cdaQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Q3 closed - only re-upload if Toyota reissues the Q3 figures.</div>
+  </div>
+  <div class="card third">
+    <h3>6. CDA - YTD.xlsx</h3>
     <input id="cdaYtdFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Year-to-date figures rolled up by CDA.</div>
   </div>
   <div class="card third">
-    <h3>5. Group Trade Parts.xlsx</h3>
+    <h3>7. Group Trade Parts.xlsx</h3>
     <input id="tradePartsFile" type="file" accept=".xlsx,.xls" class="search">
-    <div class="hint">Quarterly SMROE sales out, target and reward - Group-level only.</div>
+    <div class="hint">Quarterly SMROE sales out, target and reward - Group-level only. One row per quarter, so this single file carries Q3 and Q4 together.</div>
   </div>
   <div class="card third">
-    <h3>6. Group Trade Parts - CDA.xlsx</h3>
+    <h3>8. Group Trade Parts - CDA.xlsx</h3>
     <input id="tradePartsCdaFile" type="file" accept=".xlsx,.xls" class="search" multiple>
     <div class="hint">Per-CDA SMROE breakdown - select all CDA export files at once, the CDA name is read from each file automatically.</div>
   </div>
   <div class="card third">
-    <h3>7. Group Trade Parts - Lexus.xlsx</h3>
+    <h3>9. Group Trade Parts - Lexus.xlsx</h3>
     <input id="tradePartsLexusFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">SMROE breakdown for Lexus, reported separately from the geographic CDAs but included in the Group total.</div>
   </div>
   <div class="card third">
-    <h3>8. Group Trade Parts - Sites.xlsx</h3>
+    <h3>10. Group Trade Parts - Sites.xlsx</h3>
     <input id="tradePartsSitesFile" type="file" accept=".xlsx,.xls" class="search" multiple>
     <div class="hint">Per-site SMROE breakdown - select all site export files at once, the site name is read from each file automatically.</div>
   </div>
   <div class="card third">
-    <h3>9. WRR - Q3.xlsx</h3>
-    <input id="wrrQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <h3>11. WRR - Q4.xlsx</h3>
+    <input id="wrrQ4File" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Current-quarter CPUS Unique vs Target by centre.</div>
   </div>
   <div class="card third">
-    <h3>10. WRR - YTD.xlsx</h3>
+    <h3>12. WRR - Q3 Reference.xlsx</h3>
+    <input id="wrrQ3File" type="file" accept=".xlsx,.xls" class="search">
+    <div class="hint">Q3 closed - only re-upload if Toyota reissues the Q3 figures.</div>
+  </div>
+  <div class="card third">
+    <h3>13. WRR - YTD.xlsx</h3>
     <input id="wrrYtdFile" type="file" accept=".xlsx,.xls" class="search">
     <div class="hint">Year-to-date CPUS Unique vs Target by centre.</div>
   </div>
@@ -113,16 +128,19 @@
 </div></section>
 <div class="footer-note">RRG Group Programmes Hub · <span id="footerDataUpdated">Data last updated -</span><br>Tables are wide, searchable and scrollable. This is plain HTML/CSS/JS so it works on GitHub Pages.</div></main>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="./service-data.js?v=8"></script>
+<script src="./service-data-q4.js?v=1"></script>
+<script src="./service-data.js?v=9-q3ref"></script>
 <script src="./service-data-ytd.js?v=8"></script>
-<script src="./service-cda-data.js?v=8"></script>
+<script src="./service-cda-data-q4.js?v=1"></script>
+<script src="./service-cda-data.js?v=9-q3ref"></script>
 <script src="./service-cda-data-ytd.js?v=8"></script>
 <script src="./service-trade-parts-data.js?v=7"></script>
 <script src="./service-trade-parts-cda-data.js?v=10"></script>
 <script src="./service-trade-parts-sites-data.js?v=16"></script>
-<script src="./service-wrr-data.js?v=6"></script>
+<script src="./service-wrr-data-q4.js?v=1"></script>
+<script src="./service-wrr-data.js?v=7-q3ref"></script>
 <script src="./service-wrr-data-ytd.js?v=6"></script>
-<script src="./service-app.js?v=30-cdasummary"></script>
+<script src="./service-app.js?v=31-q4live"></script>
 <script>
 (function(){
   var header = document.querySelector('header');
