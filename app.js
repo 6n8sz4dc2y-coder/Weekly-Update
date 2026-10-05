@@ -386,6 +386,21 @@ function renderEfficiencyTable(rows){
     {label:'Biggest Opportunity', key:'efficiency_opportunity'}
   ], valid);
 }
+// Combines the frozen Jan-Sep sales-activity totals with whatever the live
+// Q4 sales-activity.xls/-ly.xls export currently holds, so the YTD leaderboard
+// grows automatically each time a fresh (cumulative, not incremental) Q4
+// export is uploaded - no manual recalculation of the "annual" figure needed.
+const SALES_ACTIVITY_SUM_FIELDS=['new_enquiries','new_test_drives','new_os','new_orders','used_enquiries','used_test_drives','used_os','used_orders','total_enquiries','total_test_drives','total_os','total_orders','lost_op_req','confirmed_orders','delivered','lost_opportunities'];
+function combineSalesActivity(frozen, live){
+  const centres=Array.from(new Set([...(frozen||[]).map(r=>r.centre), ...(live||[]).map(r=>r.centre)]));
+  return centres.map(centre=>{
+    const f=(frozen||[]).find(r=>r.centre===centre);
+    const l=(live||[]).find(r=>r.centre===centre);
+    const row={centre};
+    SALES_ACTIVITY_SUM_FIELDS.forEach(k=>{ row[k]=(Number(f&&f[k])||0)+(Number(l&&l[k])||0); });
+    return row;
+  });
+}
 function renderYoyBySite(ty, ly, elId='yoyBySite'){
   const el=document.getElementById(elId);
   if(!el) return;
@@ -596,7 +611,7 @@ function build(){
   {label:'Dec Target',key:'dec_target',num:true},{label:'Dec Done',value:r=>orderDoneFor(r,'dec'),num:true},{label:'Dec Diff',key:'dec_diff',format:'variance',num:true}
 ],(DATA.dashboard_orders||[]).slice().sort((a,b)=>orderDoneFor(b,currentOrderMonth())-orderDoneFor(a,currentOrderMonth())));
  renderEfficiencyTable(DATA.dashboard_activity||[]);
- renderYoyBySite(DATA.ytd_sales_cy||[], DATA.ytd_sales_ly||[], 'ytdSalesLeaderboard');
+ renderYoyBySite(combineSalesActivity(DATA.ytd_sales_cy, DATA.dashboard_activity), combineSalesActivity(DATA.ytd_sales_ly, DATA.dashboard_activity_ly), 'ytdSalesLeaderboard');
  makeTable('q3RefRegTable',[{label:'Centre',key:'centre'},{label:'Jul Total',key:'jul_total',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_total)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Total',key:'aug_total',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_total)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Total',key:'sep_total',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_total)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Total',key:'qtr_total',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_total/r.qtr_target:0,format:'progress'},{label:'%',key:'regs_v_target',format:'pct',num:true},{label:'To Go',key:'to_go',num:true}],DATA.q3ref_regs);
  makeTable('q3RefUsedTable',[{label:'Centre',key:'centre'},{label:'Jul Used',key:'jul_counting',num:true},{label:'Jul Target',key:'jul_target',num:true},{label:'Jul Variance',value:r=>(Number(r.jul_counting)||0)-(Number(r.jul_target)||0),format:'variance',num:true},{label:'Aug Used',key:'aug_counting',num:true},{label:'Aug Target',key:'aug_target',num:true},{label:'Aug Variance',value:r=>(Number(r.aug_counting)||0)-(Number(r.aug_target)||0),format:'variance',num:true},{label:'Sep Used',key:'sep_counting',num:true},{label:'Sep Target',key:'sep_target',num:true},{label:'Sep Variance',value:r=>(Number(r.sep_counting)||0)-(Number(r.sep_target)||0),format:'variance',num:true},{label:'QTR Used',key:'qtr_counting',num:true},{label:'QTR Target',key:'qtr_target',num:true},{label:'Progress',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'progress'},{label:'%',value:r=>r.qtr_target?r.qtr_counting/r.qtr_target:0,format:'pct',num:true}],DATA.q3ref_used);
  makeTable('q3RefFleetTable',[{label:'Centre',key:'centre'},{label:'Regs',key:'regs',num:true},{label:'Target',key:'target',num:true},{label:'Active Orders',key:'active_orders',num:true},{label:'Achievement',value:r=>r.target?((Number(r.regs)||0)+(Number(r.active_orders)||0))/r.target:0,format:'pct',num:true}],DATA.q3ref_fleet);
@@ -605,7 +620,7 @@ function build(){
  makeTable('ytdRegTable',ytdCols,DATA.ytd_regs);
  makeTable('ytdUsedTable',ytdCols,DATA.ytd_used);
  makeTable('ytdNonTable',ytdCols,DATA.ytd_non);
- renderYoyBySite(DATA.ytd_sales_cy||[], DATA.ytd_sales_ly||[], 'ytdYoyBySite');
+ renderYoyBySite(combineSalesActivity(DATA.ytd_sales_cy, DATA.dashboard_activity), combineSalesActivity(DATA.ytd_sales_ly, DATA.dashboard_activity_ly), 'ytdYoyBySite');
  renderSiteSummary();
  renderCdaSummary();
 }
