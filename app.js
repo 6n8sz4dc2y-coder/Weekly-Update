@@ -313,9 +313,11 @@ function updateProgressKpi(prefix, rows, config){
  setText(prefix+'MonthPct', pct(monthTarget ? monthValue/monthTarget : 0));
  setText(prefix+'MonthCurrent', fmt(monthValue));
  setText(prefix+'MonthTarget', fmt(monthTarget));
+ setText(prefix+'MonthBudget', fmt(monthTarget));
  setText(prefix+'Pct', pct(qtrTarget ? qtrValue/qtrTarget : 0));
  setText(prefix+'Current', fmt(qtrValue));
  setText(prefix+'Target', fmt(qtrTarget));
+ setText(prefix+'Budget', fmt(qtrTarget));
  months.forEach(m=>{
    const mv=sum(rows, m+'_'+valueKey);
    const mt=sum(rows, m+'_'+targetKey);
