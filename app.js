@@ -24,16 +24,11 @@ const CDA_TOTALS = [
   { label:'WY CDA', items:WY_SITES },
   { label:'SOUTH CDA', items:SOUTH_SITES }
 ];
-// Fixed Q1+Q2+Q3 registration carry-over adjustment per CDA. Toyota's own CDA SvO
-// report hasn't been reissued for the Q3->Q4 rollover yet, so this is the Q1+Q2
-// carry-over (42/0/10) plus Q3's own over/under-achievement vs its own target
-// (NORTH +87, WY +37, SOUTH +29, from the closed "2026 - Q3" sheet) - replace
-// with Toyota's real figures once the next CDA SvO report lands.
-const CDA_REG_ADJUSTMENT = { 'NORTH CDA':129, 'WY CDA':37, 'SOUTH CDA':39 };
-// Order bank over-achievement carried in from the start of Q4. Same manual
-// calculation: the start-of-Q3 carry-over (241/150/229) plus Q3's own
-// actual-vs-target (NORTH +73, WY +48, SOUTH -19, from order-bank.xlsx's Jul-Sep
-// actuals against q3_target) - replace once the next CDA SvO report lands.
+// Registration carry-over adjustment per CDA, from Toyota's reissued CDA SvO
+// report (the "Adjustment" column) - replaces the earlier manual Q1-Q3 estimate.
+const CDA_REG_ADJUSTMENT = { 'NORTH CDA':130, 'WY CDA':39, 'SOUTH CDA':38 };
+// Order bank carry-over per CDA, from Toyota's reissued CDA SvO report (the
+// "Previous Month Carry Over" column) - matches the earlier manual estimate exactly.
 const CDA_ORDER_ADJUSTMENT = { 'NORTH CDA':314, 'WY CDA':198, 'SOUTH CDA':210 };
 function hasAnyValues(row, fields){ return fields.some(f => Number(row && row[f]) || 0); }
 function isKnownCentreLabel(label){
