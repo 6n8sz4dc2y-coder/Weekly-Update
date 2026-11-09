@@ -760,6 +760,7 @@ function renderPeriodToggle(){
 }
 
 function build(){
+  window.DATA = DATA; // expose for cross-page reads (e.g. the Toyota programme deck)
   renderPeriodToggle();
   // VCF tab
   renderPillarCards(groupData('q4'), groupData('ytd'), 'pillarCards');

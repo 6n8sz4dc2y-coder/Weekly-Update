@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RRG Group – Toyota Programme Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#16202e;--light:#f5f4f0;--card:#fdfcfa;--panel:#24324a;--line:#e2e0da;--muted:#5b6472;--red:#c8102e;
+--g:#2e9e5b;--gt:#1e7a45;--a:#e0a020;--at:#a8650a;--r:#c8412f;--rt:#b42318;--hg:#6fd39a;--ha:#f2b45c;--s:0.5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Arial,sans-serif;background:#e9e8e4;color:var(--navy)}
+.bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 20px;background:var(--navy);color:var(--light)}
+.bar h1{font-family:'Space Grotesk',Arial,sans-serif;font-size:18px;font-weight:600;margin-right:auto}
+.bar button,.bar label,.bar a{font:600 14px Inter,Arial,sans-serif;background:var(--light);color:var(--navy);border:0;border-radius:8px;padding:9px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.bar a{background:transparent;color:var(--light);border:1px solid #3a475c}
+.bar button.primary{background:var(--ha);color:#3a2600}
+.bar button:disabled{opacity:.6;cursor:default}
+.bar button:focus-visible,.bar label:focus-within,.bar a:focus-visible{outline:3px solid var(--ha);outline-offset:2px}
+.bar input[type=file]{display:none}
+.updateStatus{font-size:12px;color:#c9ced6;width:100%;order:9}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;padding:24px;max-width:1500px;margin:0 auto}
+.wrap.editing{grid-template-columns:380px minmax(0,1fr)}
+#form{display:none;background:#fff;border-radius:12px;padding:20px;align-self:start;position:sticky;top:76px;max-height:calc(100vh - 100px);overflow:auto}
+.editing #form{display:block}
+#form h2{font:600 15px 'Space Grotesk',Arial,sans-serif;margin:18px 0 8px}
+#form h2:first-child{margin-top:0}
+#form .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+#form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+#form input,#form textarea,#form select{font:14px Inter,Arial,sans-serif;padding:7px 8px;border:1px solid #cfccc4;border-radius:6px;color:var(--navy);width:100%}
+#form textarea{min-height:56px;resize:vertical}
+#form .full{grid-column:1/-1}
+#form .hint{font-size:11px;color:var(--muted);grid-column:1/-1;margin:-4px 0 4px}
+.slides{display:flex;flex-direction:column;gap:24px}
+.frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 2px 10px rgba(22,32,46,.15);position:relative}
+.slide{width:1920px;height:1080px;transform:scale(var(--s));transform-origin:top left;position:absolute;top:0;left:0;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px}
+.slide.light{background:var(--light);color:var(--navy)}
+.slide.dark{background:var(--navy);color:var(--light);gap:40px}
+.slide h2{font:600 64px/1.1 'Space Grotesk',Arial,sans-serif}
+.foot{position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:var(--muted)}
+.dark .foot{color:#9aa3b0}
+.cards{display:flex;gap:40px}
+.card{flex:1;display:flex;flex-direction:column;gap:20px;background:var(--card);padding:56px;border:1px solid var(--line);border-radius:20px;color:var(--navy)}
+.lbl{font-size:28px;font-weight:600;color:var(--muted)}
+.big{font:600 140px/1 'Space Grotesk',Arial,sans-serif}
+.p{font-size:32px;line-height:1.4}
+.pill{align-self:flex-start;font-size:24px;font-weight:600;padding:8px 20px;border-radius:999px}
+.pill.g{background:#d8f0dc;color:#1e5e33}.pill.a{background:#fdeccb;color:#7a4b06}.pill.r{background:#f9d6d3;color:#8a1f17}
+.tiles{display:flex;gap:24px}
+.tile{flex:1;display:flex;flex-direction:column;gap:12px;background:var(--card);padding:36px 32px;border-radius:16px;border-top:10px solid var(--g);color:var(--navy)}
+.tile.a{border-top-color:var(--a)}.tile.r{border-top-color:var(--r)}
+.tile .name{font-size:28px;font-weight:600;line-height:1.3}
+.tile .num{font:600 120px/1 'Space Grotesk',Arial,sans-serif}
+.st{font-size:24px;font-weight:700}.st.g{color:var(--gt)}.st.a{color:var(--at)}.st.r{color:var(--rt)}
+.panel{background:var(--panel);padding:32px 36px;border-radius:16px;border-left:8px solid var(--ha);font-size:28px;line-height:1.4;color:var(--light)}
+.cover{justify-content:center;gap:40px}
+.cover .acc{width:120px;height:8px;background:var(--red)}
+.cover h1{font:600 112px/1.05 'Space Grotesk',Arial,sans-serif}
+.cover .sub{font-size:40px;color:#c9ced6}.cover .org{font-size:32px;font-weight:600;color:#c9ced6}
+.bch{font-size:28px;line-height:1.5}
+@media (max-width:900px){.wrap.editing{grid-template-columns:1fr}#form{position:static;max-height:none}}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  body{background:none}.bar,#form{display:none!important}
+  .wrap,.wrap.editing{display:block;padding:0;max-width:none}
+  .slides{gap:0}.frame{width:1920px;height:1080px;aspect-ratio:auto;border-radius:0;box-shadow:none;page-break-after:always;break-after:page}
+  .slide{transform:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Toyota programme presentation</h1>
+  <button id="updateBtn" class="primary">Update figures from dashboard</button>
+  <button id="editBtn" aria-pressed="false">Edit figures</button>
+  <button id="printBtn">Save as PDF</button>
+  <button id="exportBtn">Download figures</button>
+  <label>Load figures<input id="importFile" type="file" accept=".json,application/json"></label>
+  <a href="./index.html">&larr; Weekly Update</a>
+  <a href="./programmes.html">Programmes Hub &rarr;</a>
+  <span class="updateStatus" id="updateStatus"></span>
+</div>
+<div class="wrap" id="wrap">
+  <form id="form" onsubmit="return false"></form>
+  <div class="slides" id="slides"></div>
+</div>
+<script>
+const KEY = 'rrgToyotaPresentation';
+// Figures as at November 2026. Update via "Update figures from dashboard", or override via "Edit figures".
+const DEFAULTS = {
+  period: 'Year to date 2026', regsCutoff: '31 October 2026', toyotaCutoff: '3 November 2026', q4CutoffMonth: 10,
+  regs: { actual: 3744, target: 3519, ly: 3655 },
+  orders: { actual: 4040, target: 3567, ly: 3495 },
+  nonCounting: { actual: 2659, target: 2318, ly: 2785 },
+  bch: [ { q: 'Q3', regs: 28, target: 66 }, { q: 'Q4 to date', regs: 18, target: 58 }, { q: '', regs: '', target: '' }, { q: '', regs: '', target: '' } ],
+  bchNote: 'Fleet BCH tracked from Q3 2026.',
+  parts: { actual: 7596492, target: 7937159 },
+  accessories: { actual: 1532991, target: 1407440 },
+  used: { actual: 5204, target: 5604 },
+  spp: { actual: 3675, target: 3897 },
+  vcfSummary: 'Accessories 9% ahead of target. Parts, used and Service Plans Plus all within 7% of target.',
+  wrr: { actual: 40232, target: 44069, ly: 40713, bonus: 818773 },
+  tp: { salesOut: 2453900, forecast: 3046241, target: 2934819, reward: 343509, lySalesOut: 2300514, lyForecastPct: 74 },
+  tpNote: 'Trade parts compared at the same working day of the quarter.'
+};
+
+let data = load();
+function load(){
+  try { const s = localStorage.getItem(KEY); if (s) return Object.assign(structuredClone(DEFAULTS), JSON.parse(s)); } catch(e){}
+  return structuredClone(DEFAULTS);
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){} }
+
+const n = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+const fmt = v => n(v) == null ? '–' : Math.round(n(v)).toLocaleString('en-GB');
+const gbp = v => n(v) == null ? '–' : '£' + Math.round(n(v)).toLocaleString('en-GB');
+const gbpM = v => n(v) == null ? '–' : '£' + (n(v)/1e6).toFixed(2) + 'm';
+const pct = (a,t) => (n(a)==null || !n(t)) ? null : Math.round(n(a)/n(t)*100);
+const signed = (v, f=fmt) => v == null ? '–' : (v >= 0 ? '+' : '−') + f(Math.abs(v)).replace('£','£');
+const signedGbp = v => v == null ? '–' : (v >= 0 ? '+' : '−') + gbp(Math.abs(v));
+const status = p => p == null ? ['r','No data'] : p >= 100 ? ['g','Ahead of target'] : p >= 95 ? ['a','Close to target'] : ['r','Behind target'];
+function yoy(a, ly){
+  if (n(a)==null || !n(ly)) return '';
+  const c = Math.round((n(a)-n(ly))/n(ly)*100);
+  return `${c >= 0 ? 'Up' : 'Down'} ${Math.abs(c)}% on last year (${fmt(ly)})`;
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function kpiCard(label, o, targetWord='target'){
+  const p = pct(o.actual, o.target), [c, word] = status(p);
+  const gap = (n(o.actual)!=null && n(o.target)!=null) ? n(o.actual)-n(o.target) : null;
+  return `<div class="card"><p class="lbl">${label}</p><p class="big">${p==null?'–':p+'%'}</p>
+    <p class="pill ${c}">${word}</p>
+    <p class="p">${fmt(o.actual)} v ${fmt(o.target)} ${targetWord} · <b>${signed(gap)}</b></p>
+    ${yoy(o.actual, o.ly) ? `<p class="p">${yoy(o.actual, o.ly)}</p>` : ''}</div>`;
+}
+function vcfTile(name, o, money){
+  const p = pct(o.actual, o.target), [c, word] = status(p);
+  const f = money ? gbp : fmt;
+  const gap = (n(o.actual)!=null && n(o.target)!=null) ? n(o.actual)-n(o.target) : null;
+  return `<div class="tile ${c}"><p class="name">${name}</p><p class="num">${p==null?'–':p+'%'}</p>
+    <p class="st ${c}">${word}</p>
+    <p class="p" style="font-size:28px">Actual ${f(o.actual)}<br>Target ${f(o.target)}<br><b>Gap ${money ? signedGbp(gap) : signed(gap)}</b></p></div>`;
+}
+
+function render(){
+  const d = data;
+  const regsP = pct(d.regs.actual, d.regs.target), ordP = pct(d.orders.actual, d.orders.target);
+  const ncP = pct(d.nonCounting.actual, d.nonCounting.target);
+  const bchRows = d.bch.filter(r => r.q && n(r.target));
+  const bchA = bchRows.reduce((s,r)=>s+(n(r.regs)||0),0), bchT = bchRows.reduce((s,r)=>s+(n(r.target)||0),0);
+  const bchP = pct(bchA, bchT), [bc, bw] = status(bchP);
+  const tpP = pct(d.tp.forecast, d.tp.target), [tc, tw] = status(tpP);
+  const tpYoy = (n(d.tp.salesOut)!=null && n(d.tp.lySalesOut)) ? Math.round((d.tp.salesOut - d.tp.lySalesOut)/d.tp.lySalesOut*100) : null;
+  const wrrP = pct(d.wrr.actual, d.wrr.target), [wc, ww] = status(wrrP);
+  const wrrGap = (n(d.wrr.actual)!=null && n(d.wrr.target)!=null) ? d.wrr.actual - d.wrr.target : null;
+
+  const both = (a,b) => a >= 100 && b >= 100;
+  const ncTitle = ncP >= 100 ? 'non-counting ahead' : 'non-counting behind';
+  const slides = [
+    `<div class="slide dark cover"><div class="acc"></div><p class="org">RRG Group</p>
+      <h1>Toyota programme<br>performance</h1><p class="sub">${esc(d.period)} · Group level</p>
+      <p class="foot">Registrations and order bank to ${esc(d.regsCutoff)} · VCF, WRR and trade parts from Toyota export, ${esc(d.toyotaCutoff)}</p></div>`,
+
+    `<div class="slide light"><h2>New cars: ${both(regsP,ordP) ? 'ahead on registrations and orders' : 'registrations and orders against target'}</h2>
+      <div class="cards">${kpiCard('Registrations', d.regs)}${kpiCard('Order bank', d.orders)}</div>
+      <p class="foot">${esc(d.period)} to ${esc(d.regsCutoff)}. Registrations include counting fleet.</p></div>`,
+
+    `<div class="slide light"><h2>Fleet: ${ncTitle}${bchRows.length ? (bchP >= 100 ? ', BCH ahead' : ', BCH building') : ''}</h2>
+      <div class="cards">${kpiCard('Non-counting fleet', d.nonCounting, 'budget')}
+      <div class="card"><p class="lbl">Fleet BCH</p><p class="big">${bchP==null?'–':bchP+'%'}</p><p class="pill ${bc}">${bw}</p>
+      <p class="p">${fmt(bchA)} v ${fmt(bchT)} target · <b>${signed(bchA-bchT)}</b></p>
+      <p class="bch">${bchRows.map(r=>`${esc(r.q)}: ${fmt(r.regs)} v ${fmt(r.target)}`).join(' · ')}</p></div></div>
+      <p class="foot">Non-counting to ${esc(d.regsCutoff)}, registered and unregistered units. ${esc(d.bchNote)}</p></div>`,
+
+    `<div class="slide dark"><h2>VCF programme</h2>
+      <div class="tiles">${vcfTile('Part purchases', d.parts, true)}${vcfTile('Accessory purchases', d.accessories, true)}${vcfTile('Used vehicles', d.used)}${vcfTile('Service Plans Plus', d.spp)}</div>
+      ${d.vcfSummary ? `<div class="panel">${esc(d.vcfSummary)}</div>` : ''}
+      <p class="foot">Toyota VCF export, year to date as of ${esc(d.toyotaCutoff)}. SvO = sales v objective.</p></div>`,
+
+    `<div class="slide light"><h2>Aftersales: trade parts and WRR</h2>
+      <div class="cards">
+      <div class="card"><p class="lbl">Trade parts (forecast)</p><p class="big">${tpP==null?'–':tpP+'%'}</p><p class="pill ${tc}">${tw}</p>
+        <p class="p">${gbpM(d.tp.forecast)} forecast v ${gbpM(d.tp.target)} target</p>
+        <p class="p">Sales out ${gbpM(d.tp.salesOut)}${tpYoy==null?'':`, ${tpYoy>=0?'up':'down'} ${Math.abs(tpYoy)}% on last year`}.${n(d.tp.lyForecastPct)!=null?` Same point last year: ${d.tp.lyForecastPct}% forecast.`:''}</p>
+        <p class="p">Reward payable <b>${gbp(d.tp.reward)}</b></p></div>
+      <div class="card"><p class="lbl">WRR (CPUS unique)</p><p class="big">${wrrP==null?'–':wrrP+'%'}</p><p class="pill ${wc}">${ww}</p>
+        <p class="p">${fmt(d.wrr.actual)} v ${fmt(d.wrr.target)} target · <b>${signed(wrrGap)}</b></p>
+        ${yoy(d.wrr.actual, d.wrr.ly) ? `<p class="p">${yoy(d.wrr.actual, d.wrr.ly)}</p>` : ''}
+        <p class="p">Bonus payable <b>${gbp(d.wrr.bonus)}</b></p></div></div>
+      <p class="foot">Toyota export, year to date as of ${esc(d.toyotaCutoff)}. ${esc(d.tpNote)}</p></div>`
+  ];
+  document.getElementById('slides').innerHTML = slides.map(s => `<div class="frame">${s}</div>`).join('');
+  scale();
+}
+
+function scale(){
+  const f = document.querySelector('.frame');
+  if (f) document.documentElement.style.setProperty('--s', f.clientWidth / 1920);
+}
+addEventListener('resize', scale);
+
+// Edit form
+const FIELDS = [
+  ['General', [
+    ['period','Period label'],['regsCutoff','Regs cut-off (auto)'],['toyotaCutoff','Toyota export date (auto)'],
+    ['q4CutoffMonth','YTD cutoff month','full','select',[[10,'October'],[11,'November'],[12,'December']]],
+  ]],
+  ['Registrations (auto - LY manual)', [['regs.actual','Actual'],['regs.target','Target'],['regs.ly','Last year']]],
+  ['Order bank (auto - LY manual)', [['orders.actual','Actual'],['orders.target','Target'],['orders.ly','Last year']]],
+  ['Non-counting fleet (auto - LY manual)', [['nonCounting.actual','Actual'],['nonCounting.target','Budget'],['nonCounting.ly','Last year']]],
+  ['Fleet BCH (manual - leave a quarter blank to hide it)', [0,1,2,3].flatMap(i => [[`bch.${i}.q`,'Quarter'],[`bch.${i}.regs`,'Regs'],[`bch.${i}.target`,'Target']]).concat([['bchNote','Note','full']])],
+  ['VCF (auto)', [['parts.actual','Parts actual £'],['parts.target','Parts target £'],[null],['accessories.actual','Accessories actual £'],['accessories.target','Accessories target £'],[null],['used.actual','Used actual'],['used.target','Used target'],[null],['spp.actual','SPP actual'],['spp.target','SPP target'],[null],['vcfSummary','Summary line (manual)','full','area']]],
+  ['WRR (auto - LY manual)', [['wrr.actual','CPUS actual'],['wrr.target','Target'],['wrr.ly','Last year'],['wrr.bonus','Bonus payable £']]],
+  ['Trade parts (auto - LY manual)', [['tp.salesOut','Sales out £'],['tp.forecast','Forecast £'],['tp.target','Target £'],['tp.reward','Reward payable £'],['tp.lySalesOut','LY sales out £'],['tp.lyForecastPct','LY forecast %'],['tpNote','Note (manual)','full']]]
+];
+const get = p => p.split('.').reduce((o,k)=>o?.[k], data);
+function set(p, v){
+  const ks = p.split('.'); let o = data;
+  ks.slice(0,-1).forEach(k => o = o[k]);
+  const last = ks[ks.length-1], old = o[last];
+  o[last] = (typeof old === 'number' || (old === '' && /regs|target/.test(last))) && v !== '' && !isNaN(+v) ? +v : v;
+}
+function buildForm(){
+  const f = document.getElementById('form');
+  f.innerHTML = FIELDS.map(([h, fs]) => `<h2>${h}</h2><div class="row">${fs.map(([p,l,cls,type,opts]) => {
+    if (!p) return '<span></span>';
+    const v = esc(get(p));
+    if (type === 'select') return `<label class="${cls||''}">${l}<select data-p="${p}">${opts.map(([ov,ol])=>`<option value="${ov}"${+get(p)===ov?' selected':''}>${ol}</option>`).join('')}</select></label>`;
+    if (type === 'area') return `<label class="${cls||''}">${l}<textarea data-p="${p}">${v}</textarea></label>`;
+    return `<label class="${cls||''}">${l}<input data-p="${p}" value="${v}"></label>`;
+  }).join('')}</div>`).join('')
+    + `<p class="hint">Fields marked "auto" are overwritten each time you click "Update figures from dashboard" above. Fields marked "manual" are never touched by it.</p>`
+    + `<h2>Reset</h2><button type="button" id="resetBtn" style="font:600 13px Inter;padding:8px 12px;border-radius:6px;border:1px solid #cfccc4;background:#fff;cursor:pointer">Restore November 2026 figures</button>`;
+  f.querySelectorAll('[data-p]').forEach(el => {
+    const handler = () => { set(el.dataset.p, el.value.replace(/[£,\s]/g, m => el.tagName==='TEXTAREA'||el.tagName==='SELECT'||/period|Cutoff|q$|Note/.test(el.dataset.p) ? m : '')); save(); render(); };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+  document.getElementById('resetBtn').onclick = () => { if (confirm('Replace your figures with the November 2026 set?')) { data = structuredClone(DEFAULTS); save(); buildForm(); render(); } };
+}
+
+document.getElementById('editBtn').onclick = e => {
+  const on = document.getElementById('wrap').classList.toggle('editing');
+  e.target.setAttribute('aria-pressed', on); e.target.textContent = on ? 'Done editing' : 'Edit figures';
+  setTimeout(scale, 0);
+};
+document.getElementById('printBtn').onclick = () => window.print();
+document.getElementById('exportBtn').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}));
+  a.download = `toyota-presentation-figures-${new Date().toISOString().slice(0,10)}.json`; a.click();
+};
+document.getElementById('importFile').onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  file.text().then(t => { data = Object.assign(structuredClone(DEFAULTS), JSON.parse(t)); save(); buildForm(); render(); })
+    .catch(() => alert('That file isn’t a figures file from this page.'));
+};
+
+// --- Live update from the Weekly Update dashboard and Programmes Hub ---
+const USER_SITES = ['Bolton','Bury','Rochdale','SQ','Bradford','Huddersfield','Silsden','Denton','Altrincham','Stockport','Macclesfield'];
+const CDAS = ['NORTH CDA','WY CDA','SOUTH CDA'];
+const Q4_MONTHS = ['oct','nov','dec'];
+const ALL_MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+function sumSite(rows, key){ return (rows||[]).filter(r=>USER_SITES.includes(r.centre)).reduce((a,r)=>a+(Number(r[key])||0),0); }
+function sumCda(rows, key){ return (rows||[]).filter(r=>CDAS.includes((r.centre||'').toUpperCase())).reduce((a,r)=>a+(Number(r[key])||0),0); }
+
+function loadFrame(url, isReady, timeoutMs=20000){
+  return new Promise((resolve, reject)=>{
+    const f = document.createElement('iframe');
+    f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px';
+    let done = false;
+    const timer = setTimeout(()=>{ if(!done){ done=true; cleanup(); reject(new Error(url+' took too long to load')); } }, timeoutMs);
+    function cleanup(){ clearTimeout(timer); }
+    function poll(){
+      if (done) return;
+      let w = null;
+      try { w = f.contentWindow; } catch(e){}
+      if (w && w.DATA) {
+        let ready = false;
+        try { ready = isReady(w.DATA); } catch(e){}
+        if (ready) { done = true; cleanup(); resolve({ win:w, el:f }); return; }
+      }
+      setTimeout(poll, 250);
+    }
+    f.onload = () => poll();
+    f.onerror = () => { if(!done){ done=true; cleanup(); reject(new Error('Failed to load '+url)); } };
+    f.src = url;
+    document.body.appendChild(f);
+  });
+}
+
+async function updateFromDashboard(){
+  const btn = document.getElementById('updateBtn');
+  const statusEl = document.getElementById('updateStatus');
+  btn.disabled = true; btn.textContent = 'Updating…'; statusEl.textContent = '';
+  const frames = [];
+  try{
+    const [dash, prog] = await Promise.all([
+      loadFrame('./index.html', d => Array.isArray(d.dashboard_orders) && d.dashboard_orders.length > 0),
+      loadFrame('./programmes.html', d => d.centre && d.centre.ytd && d.wrr && d.wrr.ytd && d.tradeParts),
+    ]);
+    frames.push(dash.el, prog.el);
+    const dashData = dash.win.DATA, progData = prog.win.DATA;
+
+    const cutoffMonth = Number(data.q4CutoffMonth) || 10;
+    const cutoffIdx = Q4_MONTHS.indexOf({10:'oct',11:'nov',12:'dec'}[cutoffMonth]);
+    const q4Months = Q4_MONTHS.slice(0, cutoffIdx+1);
+
+    // Registrations: frozen Q1-Q3 total + selected Q4 months
+    let regsActual = sumSite(dashData.ytd_regs, 'total'), regsTarget = sumSite(dashData.ytd_regs, 'target');
+    q4Months.forEach(m => { regsActual += sumSite(dashData.q3_regs, m+'_total'); regsTarget += sumSite(dashData.q3_regs, m+'_target'); });
+
+    // Non-counting fleet: CDA rows only, frozen Q1-Q3 + selected Q4 months
+    let ncActual = sumCda(dashData.ytd_non, 'total'), ncTarget = sumCda(dashData.ytd_non, 'target');
+    q4Months.forEach(m => { ncActual += sumCda(dashData.q3_non, m+'_total'); ncTarget += sumCda(dashData.q3_non, m+'_budget'); });
+
+    // Orders: full-year monthly array, sum Jan through the cutoff month
+    const orderMonths = ALL_MONTHS.slice(0, cutoffMonth);
+    let ordersActual = 0, ordersTarget = 0;
+    orderMonths.forEach(m => { ordersActual += sumSite(dashData.dashboard_orders, m+'_orders'); ordersTarget += sumSite(dashData.dashboard_orders, m+'_target'); });
+
+    // VCF / WRR / Trade Parts: Group "Total" rows already computed by the Programmes Hub
+    const vcf = progData.centre.ytd.total.values;
+    const wrr = progData.wrr.ytd.total;
+    const tpTotal = (progData.tradeParts.rows||[]).find(r=>r.Period==='Total') || {};
+
+    data.regs.actual = regsActual; data.regs.target = regsTarget;
+    data.orders.actual = ordersActual; data.orders.target = ordersTarget;
+    data.nonCounting.actual = ncActual; data.nonCounting.target = ncTarget;
+    data.parts.actual = Math.round(vcf['Part Purchases'].actual); data.parts.target = Math.round(vcf['Part Purchases'].target);
+    data.accessories.actual = Math.round(vcf['Accessory Purchases'].actual); data.accessories.target = Math.round(vcf['Accessory Purchases'].target);
+    data.used.actual = Math.round(vcf['Used Vehicles'].actual); data.used.target = Math.round(vcf['Used Vehicles'].target);
+    data.spp.actual = Math.round(vcf['Service Plans Plus'].actual); data.spp.target = Math.round(vcf['Service Plans Plus'].target);
+    data.wrr.actual = wrr['CPUS Unique']; data.wrr.target = Math.round(wrr['Target']); data.wrr.bonus = Math.round(wrr['Bonus Payable']);
+    data.tp.salesOut = Math.round(tpTotal['SMROE Sales Out To Date*']||0);
+    data.tp.forecast = Math.round(tpTotal['SMROE Sales Out (Forecast)*']||0);
+    data.tp.target = Math.round(tpTotal['SMROE Target']||0);
+    data.tp.reward = Math.round(tpTotal['Reward Payable*']||0);
+
+    const year = new Date().getFullYear();
+    data.regsCutoff = new Date(year, cutoffMonth, 0).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    const importedTimes = [progData.centre.ytd.importedAt, progData.wrr.ytd.importedAt, (progData.tradeParts||{}).importedAt]
+      .filter(Boolean).map(t=>new Date(t).getTime()).filter(t=>!isNaN(t));
+    if (importedTimes.length) {
+      data.toyotaCutoff = new Date(Math.min(...importedTimes)).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    }
+
+    save(); buildForm(); render();
+    statusEl.textContent = 'Updated from dashboard just now.';
+  } catch(err){
+    console.error(err);
+    statusEl.textContent = 'Update failed: ' + err.message + '. Figures unchanged.';
+  } finally {
+    frames.forEach(f => f.remove());
+    btn.disabled = false; btn.textContent = 'Update figures from dashboard';
+  }
+}
+document.getElementById('updateBtn').onclick = updateFromDashboard;
+
+buildForm(); render();
+</script>
+</body>
+</html>

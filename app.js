@@ -464,6 +464,7 @@ function cdaOrderRows(){
 }
 
 function build(){
+ window.DATA = DATA; // expose for cross-page reads (e.g. the Toyota programme deck)
  updateVersionDisplays();
  const regs=DATA.dashboard_regs, used=DATA.dashboard_used, non=DATA.q3_non, acts=DATA.dashboard_activity;
  const regTarget=sum(regs,'qtr_target'), regCurrent=sum(regs,'qtr_total'), regToGo=regTarget-regCurrent;
