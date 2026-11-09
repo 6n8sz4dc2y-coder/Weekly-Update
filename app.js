@@ -906,7 +906,10 @@ function renderCdaSummary(){
 function cloneData(){ return JSON.parse(JSON.stringify(DATA)); }
 function normCentreName(v){
   const s=String(v||'').trim().replace(/^RRG Toyota\s+/i,'').replace(/^RRG\s+/i,'');
-  if(/salford quays/i.test(s)) return 'SQ';
+  // Toyota's export sometimes shortens "Salford Quays" to plain "Salford" -
+  // both mean the same site, and every rollup (ALL_DASHBOARD_SITES etc.)
+  // keys on 'SQ', so both forms normalise the same way here.
+  if(/^salford( quays)?$/i.test(s)) return 'SQ';
   return s;
 }
 function nval(v){
@@ -983,7 +986,9 @@ function parseQuarterSheet(ws, months, dest){
     patch[m1+'_reg']=nval(r[1]); patch[m1+'_unreg']=nval(r[2]); patch[m1+'_total']=nval(r[3]); patch[m1+'_budget']=nval(r[4]);
     patch[m2+'_reg']=nval(r[5]); patch[m2+'_unreg']=nval(r[6]); patch[m2+'_total']=nval(r[7]); patch[m2+'_budget']=nval(r[8]);
     patch[m3+'_reg']=nval(r[9]); patch[m3+'_unreg']=nval(r[10]); patch[m3+'_total']=nval(r[11]); patch[m3+'_budget']=nval(r[12]);
-    updateRow(dest.non, centre, patch);
+    // Non-counting fleet keeps the 'Salford' label (not 'SQ') - that's what
+    // the rest of the non-counting fleet code (nonFleetSummary etc.) expects.
+    updateRow(dest.non, centre==='SQ' ? 'Salford' : centre, patch);
   });
   parseBetween(findSection('USED COUNTING VOLUME'), (r, centre)=>{
     const patch={qtr_counting:nval(r[10]), qtr_target:nval(r[11])};
