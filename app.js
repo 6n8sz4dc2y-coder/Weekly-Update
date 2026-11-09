@@ -96,7 +96,10 @@ recomputeDashboardSets(DATA);
 
 const fmt=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n)};
 const pct=n=>{if(n===null||n===undefined||Number.isNaN(n))return "-";return Math.round(n*100)+"%"};
-const siteLabel=c=>c==='SQ'?'SQ':c;
+// Toyota's export retired the 'SQ' code in favour of plain 'Salford' - we
+// still match/store under the internal key 'SQ' (see normCentreName) so
+// every CDA rollup keeps working, but display it as 'Salford' everywhere.
+const siteLabel=c=>c==='SQ'?'Salford':c;
 function activityOrdersFor(centre){const normal=x=>String(x||'').trim().toLowerCase().replace('salford quays','sq');const row=(DATA.dashboard_activity||[]).find(r=>normal(r.centre)===normal(centre));return row ? (Number(row.total_orders)||0) : 0;}
 function orderDoneFor(row, month){const v=row ? row[month+'_orders'] : null;return (v===null||v===undefined||v==='') ? 0 : (Number(v)||0);}
 function currentOrderMonth(){const m=new Date().getMonth();return ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][m] || 'jul';}
@@ -108,7 +111,7 @@ const status=n=>`<span class="status ${statusClass(n)}">${n>=1?'On / Ahead':n>=.
 const paceStatus=n=>`<span class="status ${paceStatusClass(n)}">${n>=1?'On pace':n>=.9?'Slightly behind':'Behind pace'}</span>`;
 const variance=n=>{const v=Number(n)||0;return `<span class="variance-cell ${v>=0?'positive':'negative'}">${v>0?'+':''}${fmt(v)}</span>`};
 const yoyPct=(ty,ly)=>{ty=Number(ty)||0;ly=Number(ly)||0;if(!ly)return '<span class="variance-cell">-</span>';const d=(ty-ly)/ly;return `<span class="variance-cell ${d>=0?'positive':'negative'}">${d>0?'+':''}${Math.round(d*100)}%</span>`};
-function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);if(col.format==='variance')return variance(v);return col.num?fmt(v):(v??'-')}
+function cell(val,col,row){let v=typeof col.value==='function'?col.value(row):row[col.key];if(col.format==='pct')return pct(v);if(col.format==='progress')return progress(v,col.colorValue?col.colorValue(row):undefined);if(col.format==='paceProgress')return paceProgress(v);if(col.format==='status')return status(v);if(col.format==='paceStatus')return paceStatus(v);if(col.format==='variance')return variance(v);if(col.key==='centre')return siteLabel(v)??'-';return col.num?fmt(v):(v??'-')}
 
 const TABLE_SORT_STATE = {};
 function rawCellValue(col,row){
@@ -955,10 +958,18 @@ function parseQuarterSheet(ws, months, dest){
   const a = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
   const findSection = (txt)=>a.findIndex(r=>String(r && r[0] || '').toUpperCase().includes(txt));
   const nextSection = (start)=>{
+    // Stop at the first row whose column A holds a real label that isn't a
+    // site/CDA name or the section's own TOTAL row - i.e. the next section
+    // header, whatever it's called. Matching only a fixed list of known
+    // header strings (REGISTRATIONS/USED COUNTING/CENTRE FLEET) let parsing
+    // run past an unrecognised header (e.g. a new 'FLEET PLAN UNITS' block)
+    // and silently pick up its rows as if they belonged to the section above.
     let next=a.length;
     for(let i=start+1;i<a.length;i++){
-      const label=String(a[i] && a[i][0] || '').toUpperCase();
-      if(label.includes('REGISTRATIONS') || label.includes('USED COUNTING') || label.includes('CENTRE FLEET')){ next=i; break; }
+      const raw=a[i] && a[i][0];
+      const label=String(raw||'').trim();
+      if(!label || label.toUpperCase()==='TOTAL' || isKnownCentreLabel(raw)) continue;
+      next=i; break;
     }
     return next;
   };
@@ -1368,7 +1379,7 @@ function fmtPpt(n){ return Math.round(Number(n)||0).toLocaleString('en-GB'); }
 function pctPpt(n){ return `${Math.round((Number(n)||0)*100)}%`; }
 function safeRows(rows){ return Array.isArray(rows) ? rows : []; }
 function sumPpt(rows, key){ return safeRows(rows).reduce((a,r)=>a+asNum(r && r[key]),0); }
-function siteDisplay(name){ return name === 'SQ' ? 'Salford Quays' : (name || '-'); }
+function siteDisplay(name){ return name === 'SQ' ? 'Salford' : (name || '-'); }
 function currentWeekLabel(){
   try { if(typeof rrgISOWeek === 'function') return rrgISOWeek(new Date()); } catch(e){}
   const d = new Date();
