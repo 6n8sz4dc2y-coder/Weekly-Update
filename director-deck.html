@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RRG Group – Director's Monthly Call Deck</title>
+<title>RRG Group – Monthly Sales and Marketing Meeting Deck</title>
 <style>
 :root{--bg:#f5f7fb;--card:#ffffff;--ink:#111827;--muted:#6b7280;--line:#d9dee8;--head:#0f172a;--blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#b91c1c;--lightblue:#eff6ff;--lightgreen:#ecfdf5;--lightamber:#fffbeb;--lightred:#fef2f2;--s:0.5}
 *{box-sizing:border-box}
@@ -77,6 +77,12 @@ body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"S
 .status.amber{background:var(--lightamber);color:var(--amber)}
 .status.red{background:var(--lightred);color:var(--red)}
 .footnote{position:absolute;bottom:6px;left:28px;right:28px;font-size:10px;color:#94a3b8}
+.extra-line{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.extra-line strong{color:var(--ink)}
+.variance{font-weight:800}
+.variance.positive{color:var(--green)}
+.variance.negative{color:var(--red)}
+.cda-card .extra-line{margin-top:6px;padding-top:6px;font-size:11px}
 
 /* Cover slide */
 .cover{background:var(--head);color:#fff}
@@ -103,7 +109,7 @@ body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"S
 </head>
 <body>
 <div class="bar">
-  <h1>Director's Monthly Call Deck</h1>
+  <h1>Monthly Sales and Marketing Meeting Deck</h1>
   <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Month
     <select id="monthSelect"></select>
   </label>
@@ -183,7 +189,7 @@ function loadFrame(url, isReady, timeoutMs=20000){
 
 // --- Generic dual-period card builders (Month/Quarter, or Quarter/YTD) ----
 function dualCard(opts){
-  // opts: {label, accent, p1Label, p1, p2Label, p2, note1, note2}
+  // opts: {label, accent, p1Label, p1, p2Label, p2, note1, note2, extra}
   const one = opts.p2 ? '' : ' one';
   return `<div class="card group-card" style="border-top-color:${opts.accent}">
     <div class="label">${esc(opts.label)}</div>
@@ -191,6 +197,7 @@ function dualCard(opts){
       <div><div class="mini-label" style="color:${opts.accent}">${opts.p1Label}</div><div class="value">${pct(plainPct(opts.p1))}</div><div class="note"><strong>${fmt(opts.p1.actual)}</strong> / <strong>${fmt(opts.p1.target)}</strong>${opts.unit||' target'}</div>${pill(opts.p1.pace!==undefined?opts.p1.pace:plainPct(opts.p1))}</div>
       ${opts.p2 ? `<div><div class="mini-label" style="color:${opts.accent}">${opts.p2Label}</div><div class="value">${pct(plainPct(opts.p2))}</div><div class="note"><strong>${fmt(opts.p2.actual)}</strong> / <strong>${fmt(opts.p2.target)}</strong>${opts.unit||' target'}</div>${pill(opts.p2.pace!==undefined?opts.p2.pace:plainPct(opts.p2))}</div>` : ''}
     </div>
+    ${opts.extra||''}
   </div>`;
 }
 function cdaCard(opts){
@@ -201,7 +208,40 @@ function cdaCard(opts){
       <div><div class="mini-label" style="color:${opts.accent}">${opts.p1Label}</div><div class="value">${pct(plainPct(opts.p1))}</div><div class="note"><strong>${fmt(opts.p1.actual)}</strong> / ${fmt(opts.p1.target)}</div>${pill(opts.p1.pace!==undefined?opts.p1.pace:plainPct(opts.p1))}</div>
       ${opts.p2 ? `<div><div class="mini-label" style="color:${opts.accent}">${opts.p2Label}</div><div class="value">${pct(plainPct(opts.p2))}</div><div class="note"><strong>${fmt(opts.p2.actual)}</strong> / ${fmt(opts.p2.target)}</div>${pill(opts.p2.pace!==undefined?opts.p2.pace:plainPct(opts.p2))}</div>` : ''}
     </div>
+    ${opts.extra||''}
   </div>`;
+}
+// Quarter (Oct-Dec) week math, matching the main dashboard's own
+// q3TotalWeeks/q3WeeksElapsed/q3WeeksRemaining functions exactly, for the
+// "per week needed" and used-car forecast figures.
+function q3TotalWeeksLocal(){
+  const y = new Date().getFullYear();
+  const start = new Date(y,9,1,0,0,0), end = new Date(y,11,31,23,59,59);
+  return Math.max(1, (end-start)/(7*24*60*60*1000));
+}
+function q3WeeksElapsedLocal(){
+  const now = new Date(), y = now.getFullYear();
+  const start = new Date(y,9,1,0,0,0), end = new Date(y,11,31,23,59,59);
+  let ratio = 0;
+  if(now>start) ratio = Math.min(1, (now-start)/(end-start));
+  return Math.max(0.01, ratio*q3TotalWeeksLocal());
+}
+function q3WeeksRemainingLocal(){
+  const now = new Date(), end = new Date(now.getFullYear(),11,31,23,59,59);
+  if(now>end) return 1;
+  return Math.max(1, Math.ceil((end-now)/(7*24*60*60*1000)));
+}
+function perWeekLine(actual, target){
+  const perWeek = Math.ceil(Math.max(0,target-actual)/q3WeeksRemainingLocal());
+  return `<div class="extra-line">Need <strong>${fmt(perWeek)}</strong> / week to hit Q4 target</div>`;
+}
+function forecastLine(actual, target){
+  const runRate = actual/q3WeeksElapsedLocal();
+  const forecast = Math.round(runRate*q3TotalWeeksLocal());
+  const gap = forecast-target;
+  const cls = gap>=0?'positive':'negative';
+  const arrow = gap>=0?'&#9650;':'&#9660;';
+  return `<div class="extra-line">Forecast <strong>${fmt(forecast)}</strong> / ${fmt(target)} &middot; <span class="variance ${cls}">${arrow} ${fmt(Math.abs(gap))} ${gap>=0?'over':'short'}</span></div>`;
 }
 function leagueRow(i, centre, mPct, mActual, mTarget, qActual, qTarget, qPct, qPace, highlight){
   const togo = qTarget - qActual;
@@ -233,18 +273,25 @@ function renderStandardSlide(m){
   let groupMonth = null;
   if(m.showMonth){ groupMonth = { actual: cdaRows.reduce((a,r)=>a+r.pMonth.actual,0), target: cdaRows.reduce((a,r)=>a+r.pMonth.target,0) }; groupMonth.pace = m.paceFn(groupMonth.actual, groupMonth.target, 'month'); }
 
+  // "Per week needed" is always useful at Group/CDA level; the used-car
+  // forecast (run-rate projected to quarter end) is specific to Used Cars.
+  // Forecast is only shown on the Group card - a second extra line on every
+  // CDA card as well doesn't fit the card height, and Group is the figure
+  // that matters most for "are we going to miss target".
+  const extraFor = (actual,target,withForecast) => perWeekLine(actual,target) + (withForecast && m.showForecast ? forecastLine(actual,target) : '');
+
   let leftHtml, rightRows, rightTitle;
   if(filterSite){
     const site = sitesAll.find(s=>s.centre===filterSite);
     const cda = CDAS.find(c=>c.sites.includes(filterSite));
     const cdaRow = cdaRows.find(r=>r.centre===cda.key);
-    leftHtml = dualCard({label:siteDisplay(filterSite), accent:m.accent, p1Label:'Month to date', p1:site?site.pMonth:null, p2Label:'Quarter to date', p2:site?site.pQtr:null, unit:m.unit})
-      + cdaCard({label:cda.key, accent:m.accent, p1Label:'Month', p1:cdaRow.pMonth, p2Label:'Quarter', p2:cdaRow.pQtr});
+    leftHtml = dualCard({label:siteDisplay(filterSite), accent:m.accent, p1Label:'Month to date', p1:site?site.pMonth:null, p2Label:'Quarter to date', p2:site?site.pQtr:null, unit:m.unit, extra:site?extraFor(site.pQtr.actual,site.pQtr.target,true):''})
+      + cdaCard({label:cda.key, accent:m.accent, p1Label:'Month', p1:cdaRow.pMonth, p2Label:'Quarter', p2:cdaRow.pQtr, extra:extraFor(cdaRow.pQtr.actual,cdaRow.pQtr.target)});
     rightRows = sitesAll.filter(s=>s.pQtr.target || (m.showMonth && s.pMonth.target));
     rightTitle = 'By Site &middot; ' + siteDisplay(filterSite) + ' highlighted';
   } else {
-    leftHtml = dualCard({label:'Group', accent:m.accent, p1Label:'Month to date', p1:groupMonth, p2Label:'Quarter to date', p2:groupQtr, unit:m.unit})
-      + cdaRows.map(r=>cdaCard({label:r.centre, accent:m.accent, p1Label:'Month', p1:r.pMonth, p2Label:'Quarter', p2:r.pQtr})).join('');
+    leftHtml = dualCard({label:'Group', accent:m.accent, p1Label:'Month to date', p1:groupMonth, p2Label:'Quarter to date', p2:groupQtr, unit:m.unit, extra:extraFor(groupQtr.actual,groupQtr.target,true)})
+      + cdaRows.map(r=>cdaCard({label:r.centre, accent:m.accent, p1Label:'Month', p1:r.pMonth, p2Label:'Quarter', p2:r.pQtr, extra:extraFor(r.pQtr.actual,r.pQtr.target)})).join('');
     // Some metrics (Non-Counting Fleet in particular) only apply to a
     // handful of sites - a site with no target here genuinely has no data
     // for this metric, not a 0% result, so it's left off the league table
@@ -263,7 +310,7 @@ function renderStandardSlide(m){
         <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
       </div>
     </div>
-    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; Source: Weekly Update dashboard</div>
+    <div class="footnote">RRG Group &middot; Monthly Sales and Marketing Meeting Deck &middot; Source: Weekly Update dashboard</div>
   </div>`;
 }
 
@@ -285,13 +332,13 @@ function renderFleetBchSlide(rows, paceFn){
     const cda = CDAS.find(c=>c.sites.includes(filterSite));
     const cdaRow = cdaRows.find(r=>r.centre===cda.key);
     const siteExpected = site ? site.regs+site.activeOrders : 0, siteTarget = site ? site.target : 0;
-    leftHtml = dualCard({label:siteDisplay(filterSite), accent:'#2563eb', p1Label:'Quarter to date', p1: {actual:siteExpected, target:siteTarget, pace:paceFn(siteExpected,siteTarget,'qtr')}})
-      + cdaCard({label:cda.key, accent:'#2563eb', p1Label:'Quarter', p1:{actual:cdaRow.actual, target:cdaRow.target, pace:cdaRow.pace}});
+    leftHtml = dualCard({label:siteDisplay(filterSite), accent:'#2563eb', p1Label:'Quarter to date', p1: {actual:siteExpected, target:siteTarget, pace:paceFn(siteExpected,siteTarget,'qtr')}, extra:perWeekLine(siteExpected,siteTarget)})
+      + cdaCard({label:cda.key, accent:'#2563eb', p1Label:'Quarter', p1:{actual:cdaRow.actual, target:cdaRow.target, pace:cdaRow.pace}, extra:perWeekLine(cdaRow.actual,cdaRow.target)});
     rightRows = rows;
     rightTitle = 'By Site &middot; ' + siteDisplay(filterSite) + ' highlighted';
   } else {
-    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter to date', p1:{actual:groupExpected, target:groupTarget, pace:groupPace}})
-      + cdaRows.map(r=>cdaCard({label:r.centre, accent:'#2563eb', p1Label:'Quarter', p1:{actual:r.actual, target:r.target, pace:r.pace}})).join('');
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter to date', p1:{actual:groupExpected, target:groupTarget, pace:groupPace}, extra:perWeekLine(groupExpected,groupTarget)})
+      + cdaRows.map(r=>cdaCard({label:r.centre, accent:'#2563eb', p1Label:'Quarter', p1:{actual:r.actual, target:r.target, pace:r.pace}, extra:perWeekLine(r.actual,r.target)})).join('');
     rightRows = rows;
     rightTitle = 'By Site &middot; ranked on Expected Achievement';
   }
@@ -318,7 +365,7 @@ function renderFleetBchSlide(rows, paceFn){
         <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
       </div>
     </div>
-    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; "Expected Achievement" = Regs + Active Orders vs Target, the same measure the dashboard's own Fleet BCH tile uses</div>
+    <div class="footnote">RRG Group &middot; Monthly Sales and Marketing Meeting Deck &middot; "Expected Achievement" = Regs + Active Orders vs Target, the same measure the dashboard's own Fleet BCH tile uses</div>
   </div>`;
 }
 
@@ -380,7 +427,7 @@ function renderVcfSlide(q4Data, ytdData){
         <div class="panel card"><h3>By Site &middot; SvO by pillar${filterSite?` &middot; ${siteDisplay(filterSite)} highlighted`:''}</h3>${headRow}<div class="leader">${rowsHtml}</div></div>
       </div>
     </div>
-    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; SvO = Sales vs Objective, from the Programmes Hub's own Toyota VCF export</div>
+    <div class="footnote">RRG Group &middot; Monthly Sales and Marketing Meeting Deck &middot; SvO = Sales vs Objective, from the Programmes Hub's own Toyota VCF export</div>
   </div>`;
 }
 function normSite(centre){
@@ -398,11 +445,11 @@ function renderCover(){
     <div class="cover-body cover">
       <div class="accent"></div>
       <div class="org">RRG Group</div>
-      <h1>Director's Monthly<br>Call</h1>
+      <h1>Monthly Sales &amp; Marketing<br>Meeting</h1>
       <div class="period">${m} 2026 &middot; Quarter 4</div>
       <div class="asof">As of ${todayLabel()}</div>
     </div>
-    <div class="cover-foot">RRG Group &middot; Director's Monthly Call Deck &middot; Source: Weekly Update dashboard and Programmes Hub</div>
+    <div class="cover-foot">RRG Group &middot; Monthly Sales and Marketing Meeting Deck &middot; Source: Weekly Update dashboard and Programmes Hub</div>
   </div>`;
 }
 
@@ -465,7 +512,7 @@ function render(){
       subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
     renderStandardSlide({ title:'Order Bank', accent:'#2563eb', unit:' target', showMonth:true, sites:ordersSites, paceFn,
       subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
-    renderStandardSlide({ title:'Used Cars', accent:'#15803d', unit:' target', showMonth:true, sites:usedSites, paceFn,
+    renderStandardSlide({ title:'Used Cars', accent:'#15803d', unit:' target', showMonth:true, showForecast:true, sites:usedSites, paceFn,
       subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
     prog ? renderVcfSlide(prog.DATA.centre.q4, prog.DATA.centre.ytd) : `<div class="slide"><div class="slide-body" style="align-items:center;justify-content:center;display:flex;color:#64748b">VCF data unavailable (Programmes Hub didn't load)</div></div>`,
   ];
