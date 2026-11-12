@@ -13,7 +13,12 @@ body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"S
 .bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 22px;background:var(--head);color:#fff;box-shadow:0 4px 16px rgba(15,23,42,.18)}
 .bar h1{font-size:18px;font-weight:800;margin-right:auto;letter-spacing:-.02em}
 .bar select,.bar button,.bar a{font:700 13px -apple-system,Arial,sans-serif;border-radius:999px;padding:9px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff}
-.bar select{padding:8px 10px}
+.bar select{padding:8px 10px;color-scheme:light}
+/* The select pill itself is white-on-dark to match the bar, but its
+   dropdown popup is a native OS control - without this, browsers render
+   its options using the select's own white text colour over their default
+   white popup background, so every option but the hovered one is invisible. */
+.bar select option{color:#111827;background:#fff}
 .bar button.primary{background:#fff;color:var(--head);border-color:#fff}
 .bar a{background:transparent;text-decoration:none;display:inline-flex;align-items:center}
 .bar button:disabled{opacity:.6;cursor:default}
