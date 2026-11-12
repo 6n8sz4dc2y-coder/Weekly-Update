@@ -270,11 +270,11 @@ table{border-collapse:separate;border-spacing:0}
 .dashboard-pace{display:inline-block;margin-left:7px;vertical-align:middle}
 .dashboard-pace .status{padding:4px 8px;font-size:11px;line-height:1;letter-spacing:.01em}
 
-/* Cross-hub navigation button (Weekly Update <-> Programmes Hub) */
+/* Cross-hub navigation button (Weekly Update <-> Programmes Hub) - sits
+   inline in the nav's normal flow, right after whichever button precedes
+   it, rather than being pushed out to the far right edge. */
 .hub-link-btn{display:inline-block;background:#2563eb;color:#fff!important;border:1px solid #2563eb;border-radius:999px;padding:9px 13px;font-weight:800;font-size:13px;text-decoration:none}
 .hub-link-btn:hover{background:#1d4ed8}
-nav .hub-link-btn{margin-left:auto}
-@media(max-width:900px){nav .hub-link-btn{margin-left:0}}
 
 /* Quarter-width card (4 across on a 12-col grid), and a compact leader-row
    variant for the Rankings cards at that width - the default leader-row's
