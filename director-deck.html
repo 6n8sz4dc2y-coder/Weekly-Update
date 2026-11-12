@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RRG Group – Director's Monthly Call Deck</title>
+<style>
+:root{--bg:#f5f7fb;--card:#ffffff;--ink:#111827;--muted:#6b7280;--line:#d9dee8;--head:#0f172a;--blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#b91c1c;--lightblue:#eff6ff;--lightgreen:#ecfdf5;--lightamber:#fffbeb;--lightred:#fef2f2;--s:0.5}
+*{box-sizing:border-box}
+body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+
+/* --- Control bar (page chrome, not part of the exported report) --- */
+.bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 22px;background:var(--head);color:#fff;box-shadow:0 4px 16px rgba(15,23,42,.18)}
+.bar h1{font-size:18px;font-weight:800;margin-right:auto;letter-spacing:-.02em}
+.bar select,.bar button,.bar a{font:700 13px -apple-system,Arial,sans-serif;border-radius:999px;padding:9px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff}
+.bar select{padding:8px 10px}
+.bar button.primary{background:#fff;color:var(--head);border-color:#fff}
+.bar a{background:transparent;text-decoration:none;display:inline-flex;align-items:center}
+.bar button:disabled{opacity:.6;cursor:default}
+.updateStatus{font-size:12px;color:#cbd5e1;width:100%;order:9}
+
+/* --- Slide canvas: fixed 1280x720, scaled to fit the viewport on screen --- */
+.wrap{padding:24px;max-width:1340px;margin:0 auto}
+.slides{display:flex;flex-direction:column;gap:24px}
+.frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.18);position:relative;background:var(--bg)}
+.slide{width:1280px;height:720px;transform:scale(var(--s));transform-origin:top left;position:absolute;top:0;left:0;background:var(--bg)}
+
+.bar-top{position:absolute;top:0;left:0;right:0;height:60px;background:var(--head);display:flex;align-items:center;justify-content:space-between;padding:0 32px;color:#fff}
+.bar-top .title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.bar-top .sub{font-size:13px;color:#cbd5e1;text-align:right;line-height:1.4}
+.slide-body{position:absolute;top:60px;left:0;right:0;bottom:0;padding:16px 28px 18px;display:flex;flex-direction:column}
+.cols{display:grid;grid-template-columns:380px 1fr;gap:16px;flex:1;min-height:0}
+.cols.single{grid-template-columns:1fr}
+.left-col{display:flex;flex-direction:column;gap:10px;min-height:0}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
+.group-card{padding:14px 16px;border-top:4px solid var(--blue)}
+.group-card .label{font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:900;color:#64748b}
+.kpi-split-main{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.kpi-split-main.one{grid-template-columns:1fr;max-width:320px}
+.mini-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);font-weight:900;margin-bottom:2px}
+.kpi-split-main>div:first-child{border-right:1px solid var(--line);padding-right:12px}
+.kpi-split-main.one>div:first-child{border-right:0;padding-right:0}
+.value{font-size:30px;line-height:1;font-weight:950;letter-spacing:-.04em;margin:2px 0 3px}
+.note{font-size:12px;color:var(--muted)}
+.note strong{color:var(--ink)}
+.kpi-split-main .status,.cda-split .status{margin-top:5px}
+
+.cda-card{padding:9px 14px;border-top:4px solid var(--blue);flex:1;max-height:150px;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.cda-card .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px}
+.cda-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cda-split.one{grid-template-columns:1fr;max-width:260px}
+.cda-split>div:first-child{border-right:1px solid var(--line);padding-right:10px}
+.cda-split.one>div:first-child{border-right:0;padding-right:0}
+.cda-split .mini-label{font-size:9px;margin-bottom:1px}
+.cda-split .value{font-size:20px;margin:0 0 1px}
+.cda-split .note{font-size:11px}
+
+.panel{padding:14px 18px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.panel h3{margin:0 0 8px;font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.05em;flex:0 0 auto}
+.leader{display:flex;flex-direction:column;gap:5px;flex:1;min-height:0}
+.leader-row{display:grid;grid-template-columns:26px 1fr 72px 54px 106px;gap:9px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.leader-row.vcf-row{grid-template-columns:26px 1fr repeat(4,56px) 64px}
+.rank{font-weight:900;color:#64748b;font-size:12px}
+.centre{font-weight:900;font-size:13px}
+.centre .mini{font-weight:700;color:var(--muted);font-size:10.5px;margin-top:1px}
+.togo{text-align:right;font-size:11px;color:var(--muted);font-weight:800;line-height:1.3}
+.togo strong{display:block;color:var(--ink);font-size:14px;font-weight:900}
+.pct{text-align:right;font-weight:900;font-size:16px}
+.pillarpct{text-align:center;font-weight:900;font-size:13px;border-radius:8px;padding:4px 2px}
+.pillarpct.green{background:var(--lightgreen);color:var(--green)}
+.pillarpct.amber{background:var(--lightamber);color:var(--amber)}
+.pillarpct.red{background:var(--lightred);color:var(--red)}
+.pillar-head{font-size:9px;text-align:center;text-transform:uppercase;letter-spacing:.03em}
+.status{display:inline-flex;align-items:center;justify-content:center;font-weight:800;border-radius:999px;padding:4px 9px;font-size:11px;white-space:nowrap}
+.status.green{background:var(--lightgreen);color:var(--green)}
+.status.amber{background:var(--lightamber);color:var(--amber)}
+.status.red{background:var(--lightred);color:var(--red)}
+.footnote{position:absolute;bottom:6px;left:28px;right:28px;font-size:10px;color:#94a3b8}
+
+/* Cover slide */
+.cover{background:var(--head);color:#fff}
+.cover .accent{width:70px;height:6px;background:var(--blue);border-radius:3px;margin-bottom:26px}
+.cover .org{font-size:16px;font-weight:800;color:#cbd5e1;letter-spacing:.04em;text-transform:uppercase}
+.cover h1{font-size:54px;font-weight:900;letter-spacing:-.03em;margin:10px 0 18px;line-height:1.05}
+.cover .period{font-size:22px;color:#e5e7eb;font-weight:700}
+.cover .asof{font-size:14px;color:#9aa7bb;margin-top:10px}
+.cover-body{position:absolute;top:0;left:0;right:0;bottom:0;padding:70px 72px;display:flex;flex-direction:column;justify-content:center}
+.cover-foot{position:absolute;bottom:28px;left:72px;right:72px;font-size:12px;color:#9aa7bb}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:none}
+  .bar{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .slides{gap:0}
+  .frame{width:1280px;height:720px;aspect-ratio:auto;border-radius:0;box-shadow:none}
+  .frame:not(:last-child){page-break-after:always;break-after:page}
+  .slide{transform:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Director's Monthly Call Deck</h1>
+  <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Month
+    <select id="monthSelect"></select>
+  </label>
+  <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Site
+    <select id="siteSelect"><option value="">All sites</option></select>
+  </label>
+  <button id="updateBtn" class="primary">Preview / Refresh from dashboard</button>
+  <button id="printBtn">Export to PDF</button>
+  <a href="./index.html">&larr; Weekly Update</a>
+  <a href="./programmes.html">Programmes Hub &rarr;</a>
+  <span class="updateStatus" id="updateStatus"></span>
+</div>
+<div class="wrap">
+  <div class="slides" id="slides"><div class="frame"><div class="slide" style="display:flex;align-items:center;justify-content:center;color:#64748b;font-size:18px">Click "Preview / Refresh from dashboard" to load live figures.</div></div></div>
+</div>
+
+<script>
+const fmt = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n);
+const fmtGbp = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : '£'+new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n);
+const pct = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : Math.round(n*100)+'%';
+function statusClass(p){ return p>=1?'green':p>=.9?'amber':'red'; }
+function statusLabel(p){ return p>=1?'On pace':p>=.9?'Slightly behind':'Behind pace'; }
+function pill(p){ return `<span class="status ${statusClass(p)}">${statusLabel(p)}</span>`; }
+function siteDisplay(c){ return c==='SQ' ? 'Salford' : c; }
+function plainPct(r){ return r.target ? r.actual/r.target : 0; }
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const MONTHS = [{v:'oct',l:'October'},{v:'nov',l:'November'},{v:'dec',l:'December'}];
+const NORTH_SITES = ['Bolton','Bury','Rochdale','SQ'], WY_SITES = ['Bradford','Huddersfield','Silsden'], SOUTH_SITES = ['Altrincham','Denton','Macclesfield','Stockport'];
+const ALL_SITES = [...NORTH_SITES, ...WY_SITES, ...SOUTH_SITES];
+const CDAS = [{key:'NORTH CDA', sites:NORTH_SITES},{key:'WY CDA', sites:WY_SITES},{key:'SOUTH CDA', sites:SOUTH_SITES}];
+
+function monthSelect(){ return document.getElementById('monthSelect').value || 'nov'; }
+function siteFilter(){ return document.getElementById('siteSelect').value || ''; }
+
+(function initControls(){
+  const ms = document.getElementById('monthSelect');
+  ms.innerHTML = MONTHS.map(m=>`<option value="${m.v}">${m.l}</option>`).join('');
+  const curMonthIdx = new Date().getMonth(); // 0=jan
+  const curKey = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][curMonthIdx];
+  ms.value = MONTHS.some(m=>m.v===curKey) ? curKey : 'nov';
+  const ss = document.getElementById('siteSelect');
+  ss.innerHTML = '<option value="">All sites</option>' + ALL_SITES.map(s=>`<option value="${s}">${siteDisplay(s)}</option>`).join('');
+
+  // Deep-link from the Reports tab card: ?month=nov&site=Bolton&autoload=1
+  const params = new URLSearchParams(location.search);
+  const qMonth = params.get('month'), qSite = params.get('site');
+  if(qMonth && MONTHS.some(m=>m.v===qMonth)) ms.value = qMonth;
+  if(qSite && ALL_SITES.includes(qSite)) ss.value = qSite;
+  if(params.get('autoload')==='1') setTimeout(()=>document.getElementById('updateBtn').click(), 50);
+})();
+
+function loadFrame(url, isReady, timeoutMs=20000){
+  return new Promise((resolve, reject)=>{
+    const f = document.createElement('iframe');
+    f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px';
+    let done = false;
+    const timer = setTimeout(()=>{ if(!done){ done=true; cleanup(); reject(new Error(url+' took too long to load')); } }, timeoutMs);
+    function cleanup(){ clearTimeout(timer); }
+    function poll(){
+      if (done) return;
+      let w = null;
+      try { w = f.contentWindow; } catch(e){}
+      if (w && w.DATA) {
+        let ready = false;
+        try { ready = isReady(w.DATA); } catch(e){}
+        if (ready) { done = true; cleanup(); resolve({ win:w, el:f }); return; }
+      }
+      setTimeout(poll, 250);
+    }
+    f.onload = () => poll();
+    f.onerror = () => { if(!done){ done=true; cleanup(); reject(new Error('Failed to load '+url)); } };
+    f.src = url;
+    document.body.appendChild(f);
+  });
+}
+
+// --- Generic dual-period card builders (Month/Quarter, or Quarter/YTD) ----
+function dualCard(opts){
+  // opts: {label, accent, p1Label, p1, p2Label, p2, note1, note2}
+  const one = opts.p2 ? '' : ' one';
+  return `<div class="card group-card" style="border-top-color:${opts.accent}">
+    <div class="label">${esc(opts.label)}</div>
+    <div class="kpi-split-main${one}">
+      <div><div class="mini-label" style="color:${opts.accent}">${opts.p1Label}</div><div class="value">${pct(plainPct(opts.p1))}</div><div class="note"><strong>${fmt(opts.p1.actual)}</strong> / <strong>${fmt(opts.p1.target)}</strong>${opts.unit||' target'}</div>${pill(opts.p1.pace!==undefined?opts.p1.pace:plainPct(opts.p1))}</div>
+      ${opts.p2 ? `<div><div class="mini-label" style="color:${opts.accent}">${opts.p2Label}</div><div class="value">${pct(plainPct(opts.p2))}</div><div class="note"><strong>${fmt(opts.p2.actual)}</strong> / <strong>${fmt(opts.p2.target)}</strong>${opts.unit||' target'}</div>${pill(opts.p2.pace!==undefined?opts.p2.pace:plainPct(opts.p2))}</div>` : ''}
+    </div>
+  </div>`;
+}
+function cdaCard(opts){
+  const one = opts.p2 ? '' : ' one';
+  return `<div class="card cda-card" style="border-top-color:${opts.accent}">
+    <div class="label">${esc(opts.label)}</div>
+    <div class="cda-split${one}">
+      <div><div class="mini-label" style="color:${opts.accent}">${opts.p1Label}</div><div class="value">${pct(plainPct(opts.p1))}</div><div class="note"><strong>${fmt(opts.p1.actual)}</strong> / ${fmt(opts.p1.target)}</div>${pill(opts.p1.pace!==undefined?opts.p1.pace:plainPct(opts.p1))}</div>
+      ${opts.p2 ? `<div><div class="mini-label" style="color:${opts.accent}">${opts.p2Label}</div><div class="value">${pct(plainPct(opts.p2))}</div><div class="note"><strong>${fmt(opts.p2.actual)}</strong> / ${fmt(opts.p2.target)}</div>${pill(opts.p2.pace!==undefined?opts.p2.pace:plainPct(opts.p2))}</div>` : ''}
+    </div>
+  </div>`;
+}
+function leagueRow(i, centre, mPct, mActual, mTarget, qActual, qTarget, qPct, qPace, highlight){
+  const togo = qTarget - qActual;
+  return `<div class="leader-row"${highlight?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
+    <div class="rank">${i+1}</div>
+    <div class="centre">${esc(siteDisplay(centre))}<div class="mini">${mPct===null?'':`Month ${pct(mPct)} (${fmt(mActual)}/${fmt(mTarget)}) &middot; `}Qtr ${fmt(qActual)}/${fmt(qTarget)}</div></div>
+    <div class="togo"><strong>${fmt(Math.max(togo,0))}</strong>to go</div>
+    <div class="pct">${pct(qPct)}</div>
+    ${pill(qPace!==undefined?qPace:qPct)}
+  </div>`;
+}
+
+// --- Standard slide (Registrations / Orders / Non-Counting Fleet / Used Cars) ---
+// metric: {title, accent, unit, sites:[{centre,pMonth:{actual,target,pace},pQtr:{actual,target,pace}}], showMonth:bool}
+function renderStandardSlide(m){
+  const filterSite = siteFilter();
+  const sitesAll = m.sites;
+  const cdaRows = CDAS.map(c=>{
+    const rows = sitesAll.filter(s=>c.sites.includes(s.centre));
+    const sum = (key,field) => rows.reduce((a,r)=>a+(Number(r[key][field])||0),0);
+    const pQtr = { actual: sum('pQtr','actual'), target: sum('pQtr','target') };
+    pQtr.pace = m.paceFn(pQtr.actual, pQtr.target, 'qtr');
+    let pMonth = null;
+    if(m.showMonth){ pMonth = { actual: sum('pMonth','actual'), target: sum('pMonth','target') }; pMonth.pace = m.paceFn(pMonth.actual, pMonth.target, 'month'); }
+    return { centre: c.key, pQtr, pMonth };
+  });
+  const groupQtr = { actual: cdaRows.reduce((a,r)=>a+r.pQtr.actual,0), target: cdaRows.reduce((a,r)=>a+r.pQtr.target,0) };
+  groupQtr.pace = m.paceFn(groupQtr.actual, groupQtr.target, 'qtr');
+  let groupMonth = null;
+  if(m.showMonth){ groupMonth = { actual: cdaRows.reduce((a,r)=>a+r.pMonth.actual,0), target: cdaRows.reduce((a,r)=>a+r.pMonth.target,0) }; groupMonth.pace = m.paceFn(groupMonth.actual, groupMonth.target, 'month'); }
+
+  let leftHtml, rightRows, rightTitle;
+  if(filterSite){
+    const site = sitesAll.find(s=>s.centre===filterSite);
+    const cda = CDAS.find(c=>c.sites.includes(filterSite));
+    const cdaRow = cdaRows.find(r=>r.centre===cda.key);
+    leftHtml = dualCard({label:siteDisplay(filterSite), accent:m.accent, p1Label:'Month to date', p1:site?site.pMonth:null, p2Label:'Quarter to date', p2:site?site.pQtr:null, unit:m.unit})
+      + cdaCard({label:cda.key, accent:m.accent, p1Label:'Month', p1:cdaRow.pMonth, p2Label:'Quarter', p2:cdaRow.pQtr});
+    rightRows = sitesAll.filter(s=>s.pQtr.target || (m.showMonth && s.pMonth.target));
+    rightTitle = 'By Site &middot; ' + siteDisplay(filterSite) + ' highlighted';
+  } else {
+    leftHtml = dualCard({label:'Group', accent:m.accent, p1Label:'Month to date', p1:groupMonth, p2Label:'Quarter to date', p2:groupQtr, unit:m.unit})
+      + cdaRows.map(r=>cdaCard({label:r.centre, accent:m.accent, p1Label:'Month', p1:r.pMonth, p2Label:'Quarter', p2:r.pQtr})).join('');
+    // Some metrics (Non-Counting Fleet in particular) only apply to a
+    // handful of sites - a site with no target here genuinely has no data
+    // for this metric, not a 0% result, so it's left off the league table
+    // rather than shown as a false "Behind pace".
+    rightRows = sitesAll.filter(s=>s.pQtr.target || (m.showMonth && s.pMonth.target));
+    rightTitle = 'By Site &middot; ranked on Quarter %';
+  }
+  rightRows = rightRows.slice().sort((a,b)=> plainPct(b.pQtr) - plainPct(a.pQtr));
+  const rowsHtml = rightRows.map((r,i)=> leagueRow(i, r.centre, m.showMonth?plainPct(r.pMonth):null, m.showMonth?r.pMonth.actual:null, m.showMonth?r.pMonth.target:null, r.pQtr.actual, r.pQtr.target, plainPct(r.pQtr), r.pQtr.pace, r.centre===filterSite)).join('');
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">${esc(m.title)}</div><div class="sub">${m.subLine}</div></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="left-col">${leftHtml}</div>
+        <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; Source: Weekly Update dashboard</div>
+  </div>`;
+}
+
+// --- Counting Fleet (BCH): quarter-only, no month data exists for this section ---
+function renderFleetBchSlide(rows, paceFn){
+  const filterSite = siteFilter();
+  const cdaRows = CDAS.map(c=>{
+    const siteRows = rows.filter(s=>c.sites.includes(s.centre));
+    const regs = siteRows.reduce((a,r)=>a+r.regs,0), target = siteRows.reduce((a,r)=>a+r.target,0), orders = siteRows.reduce((a,r)=>a+r.activeOrders,0);
+    const expected = regs + orders;
+    return { centre: c.key, actual: expected, target, regs, orders, pace: paceFn(expected, target, 'qtr') };
+  });
+  const groupExpected = cdaRows.reduce((a,r)=>a+r.actual,0), groupTarget = cdaRows.reduce((a,r)=>a+r.target,0);
+  const groupPace = paceFn(groupExpected, groupTarget, 'qtr');
+
+  let leftHtml, rightRows, rightTitle;
+  if(filterSite){
+    const site = rows.find(s=>s.centre===filterSite);
+    const cda = CDAS.find(c=>c.sites.includes(filterSite));
+    const cdaRow = cdaRows.find(r=>r.centre===cda.key);
+    const siteExpected = site ? site.regs+site.activeOrders : 0, siteTarget = site ? site.target : 0;
+    leftHtml = dualCard({label:siteDisplay(filterSite), accent:'#2563eb', p1Label:'Quarter to date', p1: {actual:siteExpected, target:siteTarget, pace:paceFn(siteExpected,siteTarget,'qtr')}})
+      + cdaCard({label:cda.key, accent:'#2563eb', p1Label:'Quarter', p1:{actual:cdaRow.actual, target:cdaRow.target, pace:cdaRow.pace}});
+    rightRows = rows;
+    rightTitle = 'By Site &middot; ' + siteDisplay(filterSite) + ' highlighted';
+  } else {
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter to date', p1:{actual:groupExpected, target:groupTarget, pace:groupPace}})
+      + cdaRows.map(r=>cdaCard({label:r.centre, accent:'#2563eb', p1Label:'Quarter', p1:{actual:r.actual, target:r.target, pace:r.pace}})).join('');
+    rightRows = rows;
+    rightTitle = 'By Site &middot; ranked on Expected Achievement';
+  }
+  rightRows = rightRows.slice().sort((a,b)=> ((b.regs+b.activeOrders)/(b.target||1)) - ((a.regs+a.activeOrders)/(a.target||1)));
+  const rowsHtml = rightRows.map((r,i)=>{
+    const expected = r.regs + r.activeOrders;
+    const p = r.target ? expected/r.target : 0;
+    const rp = paceFn(expected, r.target, 'qtr');
+    const hl = r.centre===filterSite;
+    return `<div class="leader-row"${hl?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
+      <div class="rank">${i+1}</div>
+      <div class="centre">${esc(siteDisplay(r.centre))}<div class="mini">${fmt(r.regs)} regs + ${fmt(r.activeOrders)} active orders</div></div>
+      <div class="togo"><strong>${fmt(Math.max(r.target-expected,0))}</strong>to go</div>
+      <div class="pct">${pct(p)}</div>
+      ${pill(rp)}
+    </div>`;
+  }).join('');
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">Counting Fleet (BCH)</div><div class="sub">Quarter (Q4) 2026 &middot; no month-level data in this export<br>As of ${todayLabel()}</div></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="left-col">${leftHtml}</div>
+        <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; "Expected Achievement" = Regs + Active Orders vs Target, the same measure the dashboard's own Fleet BCH tile uses</div>
+  </div>`;
+}
+
+// --- VCF: 4 pillars, Quarter/YTD split ---
+const VCF_PILLARS = ['Part Purchases','Accessory Purchases','Used Vehicles','Service Plans Plus'];
+const VCF_ACCENTS = {'Part Purchases':'#2563eb','Accessory Purchases':'#15803d','Used Vehicles':'#7e22ce','Service Plans Plus':'#b45309'};
+const VCF_CURRENCY = {'Part Purchases':true,'Accessory Purchases':true,'Used Vehicles':false,'Service Plans Plus':false};
+function svoClass(n){ return n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red'); }
+function svoLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Slightly behind':'Behind'); }
+function vcfFmt(pillar, n){ return VCF_CURRENCY[pillar] ? fmtGbp(n) : fmt(n); }
+
+function renderVcfSlide(q4Data, ytdData){
+  const filterSite = siteFilter();
+  const pillarTotals = (data, name) => {
+    if(!data) return {actual:null,target:null,svo:null};
+    if(data.total && data.total.values[name]){
+      const v = data.total.values[name];
+      return { actual: v.actual ?? null, target: v.target ?? null, svo: v.svo ?? (v.target ? (v.actual||0)/v.target : null) };
+    }
+    const actual = data.rows.reduce((a,r)=>a+(Number(r.values[name]?.actual)||0),0);
+    const target = data.rows.reduce((a,r)=>a+(Number(r.values[name]?.target)||0),0);
+    return { actual, target, svo: target ? actual/target : null };
+  };
+  const cards = VCF_PILLARS.map(name=>{
+    const q4 = pillarTotals(q4Data, name), ytd = pillarTotals(ytdData, name);
+    const accent = VCF_ACCENTS[name];
+    return `<div class="card cda-card" style="border-top-color:${accent}">
+      <div class="label">${esc(name)}</div>
+      <div class="cda-split">
+        <div><div class="mini-label" style="color:${accent}">Quarter</div><div class="value">${q4.svo===null?'-':pct(q4.svo)}</div><div class="note">${vcfFmt(name,q4.actual)} / ${vcfFmt(name,q4.target)}</div><span class="status ${svoClass(q4.svo)}">${svoLabel(q4.svo)}</span></div>
+        <div><div class="mini-label" style="color:${accent}">YTD</div><div class="value">${ytd.svo===null?'-':pct(ytd.svo)}</div><div class="note">${vcfFmt(name,ytd.actual)} / ${vcfFmt(name,ytd.target)}</div><span class="status ${svoClass(ytd.svo)}">${svoLabel(ytd.svo)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const rowsWithAvg = (q4Data.rows||[]).map(r=>{
+    const svos = VCF_PILLARS.map(name=> r.values[name] ? (r.values[name].svo ?? (r.values[name].target ? (r.values[name].actual||0)/r.values[name].target : null)) : null);
+    const valid = svos.filter(v=>v!==null);
+    const avg = valid.length ? valid.reduce((a,b)=>a+b,0)/valid.length : null;
+    return { centre: r.centre, svos, avg, isFilter: filterSite && normSite(r.centre)===filterSite };
+  }).sort((a,b)=> (b.avg??-Infinity) - (a.avg??-Infinity));
+  const rowsHtml = rowsWithAvg.map((r,i)=>`<div class="leader-row vcf-row"${r.isFilter?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
+    <div class="rank">${i+1}</div>
+    <div class="centre">${esc(r.centre.replace(/^RRG\s+/i,''))}</div>
+    ${r.svos.map(v=>`<div class="pillarpct ${svoClass(v)}">${v===null?'-':pct(v)}</div>`).join('')}
+    <div class="pct" style="font-size:13px">${r.avg===null?'-':pct(r.avg)}</div>
+  </div>`).join('');
+  const headRow = `<div class="leader-row vcf-row" style="background:transparent;border:0;padding:0 10px">
+    <div></div><div></div>
+    ${VCF_PILLARS.map(n=>`<div class="pillar-head">${n.split(' ')[0]}</div>`).join('')}
+    <div class="pillar-head">Avg</div>
+  </div>`;
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">VCF Programme</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="slide-body">
+      <div class="cols" style="grid-template-columns:420px 1fr">
+        <div class="left-col">${cards}</div>
+        <div class="panel card"><h3>By Site &middot; SvO by pillar${filterSite?` &middot; ${siteDisplay(filterSite)} highlighted`:''}</h3>${headRow}<div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Director's Monthly Call Deck &middot; SvO = Sales vs Objective, from the Programmes Hub's own Toyota VCF export</div>
+  </div>`;
+}
+function normSite(centre){
+  const s = String(centre||'').trim().replace(/^RRG Toyota\s+/i,'').replace(/^RRG\s+/i,'');
+  if(/^salford( quays)?$/i.test(s)) return 'SQ';
+  return s;
+}
+
+function todayLabel(){ return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function monthLabel(key){ return MONTHS.find(m=>m.v===key).l; }
+
+function renderCover(){
+  const m = monthLabel(monthSelect());
+  return `<div class="slide">
+    <div class="cover-body cover">
+      <div class="accent"></div>
+      <div class="org">RRG Group</div>
+      <h1>Director's Monthly<br>Call</h1>
+      <div class="period">${m} 2026 &middot; Quarter 4</div>
+      <div class="asof">As of ${todayLabel()}</div>
+    </div>
+    <div class="cover-foot">RRG Group &middot; Director's Monthly Call Deck &middot; Source: Weekly Update dashboard and Programmes Hub</div>
+  </div>`;
+}
+
+let LAST_DASH = null, LAST_PROG = null;
+
+function buildSiteMetric(dashRows, mKey, actualKey, targetKey, qActualKey, qTargetKey, paceFn){
+  return ALL_SITES.map(centre=>{
+    const row = dashRows.find(r=>r.centre===centre) || {};
+    const pMonth = { actual: Number(row[actualKey])||0, target: Number(row[targetKey])||0 };
+    pMonth.pace = paceFn(pMonth.actual, pMonth.target, 'month');
+    const pQtr = { actual: Number(row[qActualKey])||0, target: Number(row[qTargetKey])||0 };
+    pQtr.pace = paceFn(pQtr.actual, pQtr.target, 'qtr');
+    return { centre, pMonth, pQtr };
+  });
+}
+
+function render(){
+  const dash = LAST_DASH, prog = LAST_PROG;
+  if(!dash){ return; }
+  const mKey = monthSelect();
+  const paceFn = (actual,target,period) => {
+    try {
+      if(period==='month' && typeof dash.monthPaceRatio==='function') return dash.monthPaceRatio(actual,target);
+      if(period==='qtr' && typeof dash.paceRatio==='function') return dash.paceRatio(actual,target);
+    } catch(e){}
+    return target ? actual/target : 0;
+  };
+
+  const regsSites = buildSiteMetric(dash.DATA.q3_regs, mKey, mKey+'_total', mKey+'_target', 'qtr_total', 'qtr_target', paceFn);
+  const ordersSites = ALL_SITES.map(centre=>{
+    const row = (dash.DATA.dashboard_orders||[]).find(r=>r.centre===centre) || {};
+    const pMonth = { actual: Number(row[mKey+'_orders'])||0, target: Number(row[mKey+'_target'])||0 };
+    pMonth.pace = paceFn(pMonth.actual, pMonth.target, 'month');
+    const qActual = (Number(row.oct_orders)||0)+(Number(row.nov_orders)||0)+(Number(row.dec_orders)||0);
+    const pQtr = { actual: qActual, target: Number(row.q4_target)||0 };
+    pQtr.pace = paceFn(pQtr.actual, pQtr.target, 'qtr');
+    return { centre, pMonth, pQtr };
+  });
+  const usedSites = buildSiteMetric(dash.DATA.q3_used, mKey, mKey+'_counting', mKey+'_target', 'qtr_counting', 'qtr_target', paceFn);
+  const nonSites = ALL_SITES.map(centre=>{
+    const key = centre==='SQ' ? 'Salford' : centre;
+    const row = (dash.DATA.q3_non||[]).find(r=>r.centre===key) || {};
+    const pMonth = { actual: Number(row[mKey+'_total'])||0, target: Number(row[mKey+'_budget'])||0 };
+    pMonth.pace = paceFn(pMonth.actual, pMonth.target, 'month');
+    const pQtr = { actual: Number(row.qtr_total)||0, target: Number(row.qtr_budget)||0 };
+    pQtr.pace = paceFn(pQtr.actual, pQtr.target, 'qtr');
+    return { centre, pMonth, pQtr };
+  });
+  const fleetRows = ALL_SITES.map(centre=>{
+    const row = (dash.DATA.q3_fleet||[]).find(r=>r.centre===centre) || {regs:0,target:0,active_orders:0};
+    return { centre, regs:Number(row.regs)||0, target:Number(row.target)||0, activeOrders:Number(row.active_orders)||0 };
+  });
+
+  const slides = [
+    renderCover(),
+    renderStandardSlide({ title:'Registrations', accent:'#2563eb', unit:' target', showMonth:true, sites:regsSites, paceFn,
+      subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
+    renderFleetBchSlide(fleetRows, paceFn),
+    renderStandardSlide({ title:'Non-Counting Fleet', accent:'#7e22ce', unit:' budget', showMonth:true, sites:nonSites, paceFn,
+      subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
+    renderStandardSlide({ title:'Order Bank', accent:'#2563eb', unit:' target', showMonth:true, sites:ordersSites, paceFn,
+      subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
+    renderStandardSlide({ title:'Used Cars', accent:'#15803d', unit:' target', showMonth:true, sites:usedSites, paceFn,
+      subLine:`${monthLabel(mKey)} &amp; Quarter (Q4) 2026<br>As of ${todayLabel()}` }),
+    prog ? renderVcfSlide(prog.DATA.centre.q4, prog.DATA.centre.ytd) : `<div class="slide"><div class="slide-body" style="align-items:center;justify-content:center;display:flex;color:#64748b">VCF data unavailable (Programmes Hub didn't load)</div></div>`,
+  ];
+  document.getElementById('slides').innerHTML = slides.map(s=>`<div class="frame">${s}</div>`).join('');
+  scale();
+}
+
+function scale(){
+  const f = document.querySelector('.frame');
+  if (f) document.documentElement.style.setProperty('--s', f.clientWidth / 1280);
+}
+addEventListener('resize', scale);
+
+async function updateFromDashboard(){
+  const btn = document.getElementById('updateBtn');
+  const statusEl = document.getElementById('updateStatus');
+  btn.disabled = true; btn.textContent = 'Loading…'; statusEl.textContent = '';
+  try{
+    const [dash, prog] = await Promise.all([
+      loadFrame('./index.html', d => Array.isArray(d.dashboard_orders) && d.dashboard_orders.length > 0),
+      loadFrame('./programmes.html', d => d.centre && d.centre.q4 && d.centre.ytd).catch(e=>{ console.warn('Programmes Hub load failed', e); return null; }),
+    ]);
+    LAST_DASH = dash.win;
+    LAST_PROG = prog ? prog.win : null;
+    render();
+    statusEl.textContent = 'Updated from dashboard just now.';
+    if(new URLSearchParams(location.search).get('autoprint')==='1') setTimeout(()=>window.print(), 300);
+  } catch(err){
+    console.error(err);
+    statusEl.textContent = 'Update failed: ' + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Preview / Refresh from dashboard';
+  }
+}
+document.getElementById('updateBtn').onclick = updateFromDashboard;
+document.getElementById('monthSelect').onchange = () => { if(LAST_DASH) render(); };
+document.getElementById('siteSelect').onchange = () => { if(LAST_DASH) render(); };
+document.getElementById('printBtn').onclick = () => { if(!LAST_DASH){ alert('Click "Preview / Refresh from dashboard" first.'); return; } window.print(); };
+</script>
+</body>
+</html>

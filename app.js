@@ -1384,7 +1384,24 @@ function exportWeeklyPdf(){
   setTimeout(()=>{ document.body.classList.remove('print-pack'); }, 3000);
 }
 document.getElementById('exportPdf')?.addEventListener('click', exportWeeklyPdf);
-document.getElementById('exportPdfHeader')?.addEventListener('click', exportWeeklyPdf);
+document.getElementById('exportPdfReports')?.addEventListener('click', exportWeeklyPdf);
+
+// Director's Monthly Call Deck card: month/site pickers deep-link into the
+// standalone deck page, which loads its own live data via iframe - this
+// dashboard doesn't build the deck itself.
+(function initReportsCard(){
+  const siteSel = document.getElementById('reportsSite');
+  if(siteSel) siteSel.innerHTML = '<option value="">All sites</option>' + ALL_DASHBOARD_SITES.map(s=>`<option value="${s}">${siteLabel(s)}</option>`).join('');
+  const deckUrl = (extra)=>{
+    const month = document.getElementById('reportsMonth').value;
+    const site = document.getElementById('reportsSite').value;
+    const params = new URLSearchParams({ month, autoload:'1', ...extra });
+    if(site) params.set('site', site);
+    return './director-deck.html?' + params.toString();
+  };
+  document.getElementById('reportsPreviewBtn')?.addEventListener('click', ()=>window.open(deckUrl({}), '_blank'));
+  document.getElementById('reportsExportBtn')?.addEventListener('click', ()=>window.open(deckUrl({autoprint:'1'}), '_blank'));
+})();
 
 
 // --- PowerPoint Board Pack Export ---
@@ -1564,4 +1581,4 @@ async function exportBoardPack(){
 }
 
 document.getElementById('exportPpt')?.addEventListener('click', ()=>exportBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
-document.getElementById('exportPptHeader')?.addEventListener('click', ()=>exportBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
+document.getElementById('exportPptReports')?.addEventListener('click', ()=>exportBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
