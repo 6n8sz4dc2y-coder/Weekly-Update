@@ -74,7 +74,9 @@ body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"S
 .centre{font-weight:900;font-size:13px}
 .centre .mini{font-weight:700;color:var(--muted);font-size:10.5px;margin-top:1px}
 .togo{text-align:right;font-size:11px;color:var(--muted);font-weight:800;line-height:1.3}
-.togo strong{display:block;color:var(--ink);font-size:14px;font-weight:900}
+.togo strong{display:block;font-size:14px;font-weight:900}
+.togo.ahead strong{color:var(--green)}
+.togo.behind strong{color:var(--red)}
 .pct{text-align:right;font-weight:900;font-size:16px}
 .pillarpct{text-align:center;font-weight:900;font-size:13px;border-radius:8px;padding:4px 2px}
 .pillarpct.green{background:var(--lightgreen);color:var(--green)}
@@ -135,6 +137,9 @@ body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"S
 <body>
 <div class="bar">
   <h1>Monthly Aftersales Meeting Deck</h1>
+  <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Quarter
+    <select id="quarterSelect"><option value="q4">Q4 (Current)</option><option value="q3">Q3 (Reference)</option></select>
+  </label>
   <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Site
     <select id="siteSelect"><option value="">All sites</option></select>
   </label>
@@ -156,6 +161,9 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const shortSite = c => String(c||'').replace(/^RRG\s+/i,'');
 
 function siteFilter(){ return document.getElementById('siteSelect').value || ''; }
+function quarterKey(){ return document.getElementById('quarterSelect').value === 'q3' ? 'q3' : 'q4'; }
+function quarterLabel(){ return quarterKey()==='q3' ? 'Q3' : 'Q4'; }
+function quarterPeriodLabel(){ return quarterKey()==='q3' ? 'Q3 (Reference)' : 'Q4 (Current)'; }
 
 function loadFrame(url, isReady, timeoutMs=20000){
   return new Promise((resolve, reject)=>{
@@ -191,10 +199,10 @@ function loadFrame(url, isReady, timeoutMs=20000){
 // service-app.js exactly, because its headline number is already a
 // full-quarter forecast rather than a to-date actual.
 function svoClass(n){ return n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red'); }
-function svoLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Slightly behind':'Behind'); }
+function svoLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'Ahead':n>=.9?'Slightly behind':'Behind'); }
 function svoPill(n){ return `<span class="status ${svoClass(n)}">${svoLabel(n)}</span>`; }
 function tpClass(n){ return n===null||n===undefined ? '' : (n>=1?'green':n>=.95?'amber':'red'); }
-function tpLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'Tracking ahead':n>=.95?'Tracking slightly behind':'Tracking behind'); }
+function tpLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'Ahead':n>=.95?'Slightly behind':'Behind'); }
 function tpPill(n){ return `<span class="status ${tpClass(n)}">${tpLabel(n)}</span>`; }
 
 function gapLine(actual, target, isCurrency){
@@ -202,7 +210,7 @@ function gapLine(actual, target, isCurrency){
   const gap = actual-target;
   const cls = gap>=0?'positive':'negative';
   const f = isCurrency?fmtGbp:fmt;
-  const text = gap>=0 ? `${f(gap)} over` : `${f(Math.abs(gap))} behind`;
+  const text = gap>=0 ? `${f(gap)} ahead` : `${f(Math.abs(gap))} behind`;
   return `<div class="extra-line"><span class="variance ${cls}">${text}</span></div>`;
 }
 function rewardLine(reward){
@@ -243,11 +251,12 @@ function cdaCard(opts){
 }
 function leagueRow(i, label, actual, target, ratio, pillHtml, extraMini, highlight, isCurrency){
   const f = isCurrency ? fmtGbp : fmt;
-  const togo = (target||0) - (actual||0);
+  const gap = (actual||0) - (target||0);
+  const ahead = gap >= 0;
   return `<div class="leader-row"${highlight?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
     <div class="rank">${i+1}</div>
     <div class="centre">${esc(label)}${extraMini?`<div class="mini">${extraMini}</div>`:''}</div>
-    <div class="togo"><strong>${f(Math.max(togo,0))}</strong>to go</div>
+    <div class="togo ${ahead?'ahead':'behind'}"><strong>${f(Math.abs(gap))}</strong>${ahead?'ahead':'behind'}</div>
     <div class="pct">${ratio===null||ratio===undefined?'-':pct(ratio)}</div>
     ${pillHtml}
   </div>`;
@@ -320,7 +329,7 @@ function renderVcfSlide(q4Data, ytdData){
     return `<div class="card cda-card" style="border-top-color:${accent}">
       <div class="label">${esc(name)}</div>
       <div class="cda-split">
-        <div><div class="mini-label" style="color:${accent}">Quarter</div><div class="value">${q4.svo===null?'-':pct(q4.svo)}</div><div class="note">${vcfFmt(name,q4.actual)} / ${vcfFmt(name,q4.target)}</div><span class="status ${svoClass(q4.svo)}">${svoLabel(q4.svo)}</span></div>
+        <div><div class="mini-label" style="color:${accent}">${quarterLabel()}</div><div class="value">${q4.svo===null?'-':pct(q4.svo)}</div><div class="note">${vcfFmt(name,q4.actual)} / ${vcfFmt(name,q4.target)}</div><span class="status ${svoClass(q4.svo)}">${svoLabel(q4.svo)}</span></div>
         <div><div class="mini-label" style="color:${accent}">YTD</div><div class="value">${ytd.svo===null?'-':pct(ytd.svo)}</div><div class="note">${vcfFmt(name,ytd.actual)} / ${vcfFmt(name,ytd.target)}</div><span class="status ${svoClass(ytd.svo)}">${svoLabel(ytd.svo)}</span></div>
       </div>
     </div>`;
@@ -345,7 +354,7 @@ function renderVcfSlide(q4Data, ytdData){
   </div>`;
 
   return `<div class="slide">
-    <div class="bar-top"><div class="title">VCF Programme</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="bar-top"><div class="title">VCF Programme</div><div class="sub">${quarterLabel()} (${quarterKey()==='q3'?'Reference':'Current'}) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
     <div class="slide-body">
       <div class="cols" style="grid-template-columns:420px 1fr">
         <div class="left-col">${cards}</div>
@@ -360,53 +369,54 @@ function renderVcfSlide(q4Data, ytdData){
 function renderTradePartsSlide(groupData, cdaList, sitesList){
   const filterSite = siteFilter();
   const siteCda = window.SITE_TO_CDA || {};
+  const qp = quarterLabel();
   let cdaOrdered = (cdaList||[]).slice().sort((a,b)=>{
     const ia = TRADE_PARTS_CDA_ORDER.indexOf(a.cda), ib = TRADE_PARTS_CDA_ORDER.indexOf(b.cda);
     return (ia===-1?TRADE_PARTS_CDA_ORDER.length:ia) - (ib===-1?TRADE_PARTS_CDA_ORDER.length:ib);
   });
 
-  const groupQ4 = tpCellFrom(tradePartsRow(groupData,'Q4')), groupYtd = tpCellFrom(tradePartsYtdThroughQ4(groupData));
-  const groupReward = tradePartsRow(groupData,'Q4') ? tradePartsRow(groupData,'Q4')['Target Reward %*'] : null;
+  const groupQ4 = tpCellFrom(tradePartsRow(groupData,qp)), groupYtd = tpCellFrom(tradePartsYtdThroughQ4(groupData));
+  const groupReward = tradePartsRow(groupData,qp) ? tradePartsRow(groupData,qp)['Target Reward %*'] : null;
 
   let leftHtml, rightRows, rightTitle;
   if(filterSite){
     const site = (sitesList||[]).find(s=>s.site===filterSite);
-    const siteQ4 = tpCellFrom(site ? tradePartsRow(site,'Q4') : null), siteYtd = tpCellFrom(site ? tradePartsYtdThroughQ4(site) : null);
+    const siteQ4 = tpCellFrom(site ? tradePartsRow(site,qp) : null), siteYtd = tpCellFrom(site ? tradePartsYtdThroughQ4(site) : null);
     const cdaName = siteCda[filterSite];
     const cda = cdaOrdered.find(c=>c.cda===cdaName);
-    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:'Quarter (forecast)', p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, extra:gapLine(siteQ4.actual,siteQ4.target,true)})
-      + (cda ? cdaCard({label:cda.cda, accent:CDA_ACCENTS[cda.cda]||'#2563eb', p1Label:'Quarter', p1:tpCellFrom(tradePartsRow(cda,'Q4')), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(cda))}) : '');
+    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:`${qp} (forecast)`, p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, extra:gapLine(siteQ4.actual,siteQ4.target,true)})
+      + (cda ? cdaCard({label:cda.cda, accent:CDA_ACCENTS[cda.cda]||'#2563eb', p1Label:qp, p1:tpCellFrom(tradePartsRow(cda,qp)), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(cda))}) : '');
     rightRows = sitesList||[];
     rightTitle = 'By Site &middot; ' + shortSite(filterSite) + ' highlighted';
   } else {
-    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter (forecast)', p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, extra:rewardLine(groupReward)+gapLine(groupQ4.actual,groupQ4.target,true)})
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:`${qp} (forecast)`, p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, extra:rewardLine(groupReward)+gapLine(groupQ4.actual,groupQ4.target,true)})
       + cdaOrdered.map(c=>{
-          const q4Row = tradePartsRow(c,'Q4');
-          return cdaCard({label:c.cda, accent:CDA_ACCENTS[c.cda]||'#2563eb', p1Label:'Quarter', p1:tpCellFrom(q4Row), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(c))});
+          const q4Row = tradePartsRow(c,qp);
+          return cdaCard({label:c.cda, accent:CDA_ACCENTS[c.cda]||'#2563eb', p1Label:qp, p1:tpCellFrom(q4Row), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(c))});
         }).join('');
     rightRows = sitesList||[];
-    rightTitle = 'By Site &middot; ranked on Quarter %';
+    rightTitle = `By Site &middot; ranked on ${qp} %`;
   }
   rightRows = rightRows.slice().sort((a,b)=>{
-    const ra = tradePartsRow(a,'Q4'), rb = tradePartsRow(b,'Q4');
+    const ra = tradePartsRow(a,qp), rb = tradePartsRow(b,qp);
     const va = (ra && ra['Target % Achieved (Forecast)*']) ?? -Infinity, vb = (rb && rb['Target % Achieved (Forecast)*']) ?? -Infinity;
     return vb - va;
   });
   const rowsHtml = rightRows.map((s,i)=>{
-    const row = tradePartsRow(s,'Q4');
+    const row = tradePartsRow(s,qp);
     const c = tpCellFrom(row);
     return leagueRow(i, shortSite(s.site), c.actual, c.target, c.ratio, c.pillHtml, siteCda[s.site]?`${siteCda[s.site]} CDA`:'', s.site===filterSite, true);
   }).join('');
 
   return `<div class="slide">
-    <div class="bar-top"><div class="title">Trade Parts</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="bar-top"><div class="title">Trade Parts</div><div class="sub">${qp} (${quarterKey()==='q3'?'Reference':'Current'}) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
     <div class="slide-body">
       <div class="cols">
         <div class="left-col${filterSite?'':' compact'}">${leftHtml}</div>
         <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
       </div>
     </div>
-    <div class="footnote">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; Quarter figure is the full-quarter forecast (Toyota's own headline measure); Year to Date is Q1+Q2+Q3+Q4</div>
+    <div class="footnote">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; ${qp} figure is ${quarterKey()==='q3'?"Q3's closed full-quarter total":"the full-quarter forecast (Toyota's own headline measure)"}; Year to Date is Q1+Q2+Q3+Q4</div>
   </div>`;
 }
 
@@ -414,6 +424,7 @@ function renderTradePartsSlide(groupData, cdaList, sitesList){
 function renderWrrSlide(q4Data, ytdData){
   const filterSite = siteFilter();
   const siteCda = window.SITE_TO_CDA || {};
+  const qp = quarterLabel();
   const q4Groups = wrrGroupRollup(q4Data.rows), ytdGroups = wrrGroupRollup(ytdData.rows);
   let cdaNames = Array.from(new Set(q4Groups.map(g=>g.group)));
   cdaNames = cdaNames.slice().sort((a,b)=>{
@@ -428,15 +439,15 @@ function renderWrrSlide(q4Data, ytdData){
     const siteQ4Row = q4Data.rows.find(r=>r['Centre Name']===filterSite), siteYtdRow = ytdData.rows.find(r=>r['Centre Name']===filterSite);
     const siteQ4 = wrrCellFrom(siteQ4Row), siteYtd = wrrCellFrom(siteYtdRow);
     const cdaName = siteCda[filterSite];
-    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:'Quarter to date', p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, unit:' target', extra:gapLine(siteQ4.actual,siteQ4.target,false)})
-      + (cdaName ? cdaCard({label:cdaName, accent:CDA_ACCENTS[cdaName]||'#2563eb', p1Label:'Quarter', p1:wrrCellFrom(q4Groups.find(g=>g.group===cdaName)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===cdaName))}) : '');
+    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:`${qp} to date`, p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, unit:' target', extra:gapLine(siteQ4.actual,siteQ4.target,false)})
+      + (cdaName ? cdaCard({label:cdaName, accent:CDA_ACCENTS[cdaName]||'#2563eb', p1Label:qp, p1:wrrCellFrom(q4Groups.find(g=>g.group===cdaName)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===cdaName))}) : '');
     rightRows = q4Data.rows.filter(r=>r['Centre Name']);
     rightTitle = 'By Site &middot; ' + shortSite(filterSite) + ' highlighted';
   } else {
-    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter to date', p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, unit:' target', extra:gapLine(groupQ4.actual,groupQ4.target,false)})
-      + cdaNames.map(name=>cdaCard({label:name, accent:CDA_ACCENTS[name]||'#2563eb', p1Label:'Quarter', p1:wrrCellFrom(q4Groups.find(g=>g.group===name)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===name))})).join('');
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:`${qp} to date`, p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, unit:' target', extra:gapLine(groupQ4.actual,groupQ4.target,false)})
+      + cdaNames.map(name=>cdaCard({label:name, accent:CDA_ACCENTS[name]||'#2563eb', p1Label:qp, p1:wrrCellFrom(q4Groups.find(g=>g.group===name)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===name))})).join('');
     rightRows = q4Data.rows.filter(r=>r['Centre Name']);
-    rightTitle = 'By Site &middot; ranked on Quarter %';
+    rightTitle = `By Site &middot; ranked on ${qp} %`;
   }
   rightRows = rightRows.slice().sort((a,b)=>(b['Centre % Achieved']??-Infinity)-(a['Centre % Achieved']??-Infinity));
   const rowsHtml = rightRows.map((r,i)=>{
@@ -445,7 +456,7 @@ function renderWrrSlide(q4Data, ytdData){
   }).join('');
 
   return `<div class="slide">
-    <div class="bar-top"><div class="title">WRR</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="bar-top"><div class="title">WRR</div><div class="sub">${qp} (${quarterKey()==='q3'?'Reference':'Current'}) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
     <div class="slide-body">
       <div class="cols">
         <div class="left-col">${leftHtml}</div>
@@ -495,13 +506,14 @@ function populateSiteSelect(prog){
 function render(){
   const prog = LAST_PROG;
   if(!prog) return;
+  const qk = quarterKey();
   window.SITE_TO_CDA = buildSiteToCda(prog.DATA.wrr.q4 && prog.DATA.wrr.q4.rows);
 
   const slides = [
     renderCover(),
-    renderVcfSlide(prog.DATA.centre.q4, prog.DATA.centre.ytd),
+    renderVcfSlide(prog.DATA.centre[qk], prog.DATA.centre.ytd),
     renderTradePartsSlide(prog.DATA.tradeParts, prog.DATA.tradePartsCda, prog.DATA.tradePartsSites),
-    renderWrrSlide(prog.DATA.wrr.q4, prog.DATA.wrr.ytd),
+    renderWrrSlide(prog.DATA.wrr[qk], prog.DATA.wrr.ytd),
   ];
   document.getElementById('slides').innerHTML = slides.map(s=>`<div class="frame">${s}</div>`).join('');
   scale();
@@ -533,13 +545,16 @@ async function updateFromHub(){
 }
 document.getElementById('updateBtn').onclick = updateFromHub;
 document.getElementById('siteSelect').onchange = () => { if(LAST_PROG) render(); };
+document.getElementById('quarterSelect').onchange = () => { if(LAST_PROG) render(); };
 document.getElementById('printBtn').onclick = () => { if(!LAST_PROG){ alert('Click "Preview / Refresh from hub" first.'); return; } window.print(); };
 
-// Deep-link from the Reports tab card: ?site=RRG%20Bolton&autoload=1
+// Deep-link from the Reports tab card: ?site=RRG%20Bolton&quarter=q3&autoload=1
 (function initFromQuery(){
   const params = new URLSearchParams(location.search);
   const qSite = params.get('site');
   if(qSite) PENDING_SITE = qSite;
+  const qQuarter = params.get('quarter');
+  if(qQuarter==='q3' || qQuarter==='q4') document.getElementById('quarterSelect').value = qQuarter;
   if(params.get('autoload')==='1') setTimeout(()=>document.getElementById('updateBtn').click(), 50);
 })();
 </script>

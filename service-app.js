@@ -19,7 +19,7 @@
 
 const SERVICE_DATA_KEY = 'rrgServiceDashboardData_v2';
 
-const PERIODS = ['ytd','q4','q3'];
+const PERIODS = ['ytd','q4'];
 const PERIOD_LABEL = { ytd: 'Year to Date', q4: 'Q4 (Current Quarter)', q3: 'Q3 Reference' };
 let ACTIVE_PERIOD = 'q4';
 
@@ -1018,7 +1018,8 @@ document.getElementById('exportPdf')?.addEventListener('click', ()=>window.print
   }
   const deckUrl = (extra)=>{
     const site = document.getElementById('aftersalesReportsSite').value;
-    const params = new URLSearchParams({ autoload:'1', ...extra });
+    const quarter = document.getElementById('aftersalesReportsQuarter').value;
+    const params = new URLSearchParams({ autoload:'1', quarter, ...extra });
     if(site) params.set('site', site);
     return './aftersales-deck.html?' + params.toString();
   };
