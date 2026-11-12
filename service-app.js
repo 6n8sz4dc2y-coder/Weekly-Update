@@ -1000,7 +1000,7 @@ document.getElementById('previewImport')?.addEventListener('click', previewImpor
 document.getElementById('publishImport')?.addEventListener('click', publishImport);
 document.getElementById('downloadData')?.addEventListener('click', downloadDataBackup);
 document.getElementById('resetData')?.addEventListener('click', resetSavedData);
-document.getElementById('exportPdfHeader')?.addEventListener('click', ()=>window.print());
+document.getElementById('exportPdfReports')?.addEventListener('click', ()=>window.print());
 document.getElementById('exportPdf')?.addEventListener('click', ()=>window.print());
 
 // --- PowerPoint Board Pack Export ------------------------------------------
@@ -1198,7 +1198,7 @@ async function exportServiceBoardPack(){
   setServiceExportStatus('<strong>PowerPoint ready.</strong><br>The programmes hub pack has been downloaded.');
 }
 function safeServiceRows(rows){ return Array.isArray(rows) ? rows : []; }
-document.getElementById('exportPptHeader')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
+document.getElementById('exportPptReports')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
 document.getElementById('exportPpt')?.addEventListener('click', ()=>exportServiceBoardPack().catch(e=>{console.error(e); alert('PowerPoint export failed: '+(e.message||e)); setServiceExportStatus('<strong>PowerPoint export failed.</strong><br>'+(e.message||e));}));
 
 build();
