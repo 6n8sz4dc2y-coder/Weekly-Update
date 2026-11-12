@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./styles.css?v=20261003-yoygroup-1">
 </head>
 <body>
-<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="header-actions"><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span></div><button class="header-minimize-btn" id="headerMinimizeBtn" type="button">Minimize</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="reports">Reports</button><button data-target="admin">Admin Update</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
+<header><div class="header-row"><div><h1>RRG Group Programmes Hub</h1><div class="subtitle">VCF service figures · Parts, Accessories, Used Vehicles &amp; Service Plans · by Centre and by CDA</div></div><div class="header-actions"><div class="subtitle" style="text-align:right"><span id="dataUpdatedHeader">Data last updated -</span></div><button class="header-minimize-btn" id="headerMinimizeBtn" type="button">Minimize</button></div></div><nav><button class="active" data-target="vcf">VCF</button><button data-target="tradeParts">Trade Parts</button><button data-target="wrr">WRR</button><button data-target="siteSummary">Site/CDA Summary</button><button data-target="reports">Reports</button><a class="hub-link-btn" href="./index.html">&larr; Weekly Update Hub</a><button data-target="admin">Admin Update</button></nav><div class="header-period-row"><div class="header-period-label">Reporting period<small>Click to change</small></div><div class="periodToggle"></div></div></header>
 <main>
 <section id="vcf" class="section active"><div class="grid">
 <div id="pillarCards" class="grid" style="grid-column:span 12;padding:0;border:none;box-shadow:none;background:none"></div>
@@ -38,6 +38,22 @@
 </div></section>
 <section id="reports" class="section"><div class="grid">
 <div class="card wide">
+  <h3>Monthly Aftersales Meeting Deck</h3>
+  <div class="hint">Landscape slide deck for the monthly aftersales meeting - VCF, Trade Parts and WRR, each at Group, CDA and site level, pulled live from this hub.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:800">Quarter
+      <select id="aftersalesReportsQuarter" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px">
+        <option value="q4" selected>Q4 (Current)</option><option value="q3">Q3 (Reference)</option>
+      </select>
+    </label>
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:800">Site
+      <select id="aftersalesReportsSite" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px"><option value="">All sites</option></select>
+    </label>
+    <button class="admin-btn primary-btn" id="aftersalesPreviewBtn" type="button" style="align-self:flex-end">Preview</button>
+    <button class="admin-btn" id="aftersalesExportBtn" type="button" style="align-self:flex-end">Export to PDF</button>
+  </div>
+</div>
+<div class="card wide">
   <h3>Full Hub Export</h3>
   <div class="hint">A print-friendly snapshot of every table and KPI on this hub, as currently loaded.</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
@@ -50,24 +66,6 @@
   <div class="hint">The manufacturer-facing performance deck for Toyota GB meetings - new cars, fleet, VCF and aftersales at Group level.</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
     <a class="admin-btn primary-btn" href="./toyota-programme.html" style="text-decoration:none;display:inline-flex;align-items:center">Open Toyota Programme Deck &rarr;</a>
-  </div>
-</div>
-<div class="card wide">
-  <h3>Monthly Sales and Marketing Meeting Deck</h3>
-  <div class="hint">Landscape slide deck for the monthly sales and marketing meeting, including the VCF slide built from this hub's own figures. Month/site picker and Export to PDF live on the Weekly Update dashboard's Reports tab.</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-    <a class="admin-btn primary-btn" href="./index.html" style="text-decoration:none;display:inline-flex;align-items:center">Open Weekly Update Hub &rarr; (see its Reports tab)</a>
-  </div>
-</div>
-<div class="card wide">
-  <h3>Monthly Aftersales Meeting Deck</h3>
-  <div class="hint">Landscape slide deck for the monthly aftersales meeting - VCF, Trade Parts and WRR, each at Group, CDA and site level, pulled live from this hub.</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
-    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:800">Site
-      <select id="aftersalesReportsSite" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px"><option value="">All sites</option></select>
-    </label>
-    <button class="admin-btn primary-btn" id="aftersalesPreviewBtn" type="button" style="align-self:flex-end">Preview</button>
-    <button class="admin-btn" id="aftersalesExportBtn" type="button" style="align-self:flex-end">Export to PDF</button>
   </div>
 </div>
 </div></section>
@@ -176,7 +174,7 @@
 <script src="./service-wrr-data-q4.js?v=6-nov9"></script>
 <script src="./service-wrr-data.js?v=8-q3final"></script>
 <script src="./service-wrr-data-ytd.js?v=11-nov9"></script>
-<script src="./service-app.js?v=34-aftersalesdeck"></script>
+<script src="./service-app.js?v=35-quarterpicker"></script>
 <script>
 (function(){
   var header = document.querySelector('header');
