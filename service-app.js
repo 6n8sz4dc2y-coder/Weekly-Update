@@ -1003,6 +1003,29 @@ document.getElementById('resetData')?.addEventListener('click', resetSavedData);
 document.getElementById('exportPdfReports')?.addEventListener('click', ()=>window.print());
 document.getElementById('exportPdf')?.addEventListener('click', ()=>window.print());
 
+// Monthly Aftersales Meeting Deck card: site picker deep-links into the
+// standalone deck page, which loads its own live data via iframe - this
+// hub doesn't build the deck itself.
+(function initAftersalesReportsCard(){
+  const siteSel = document.getElementById('aftersalesReportsSite');
+  if(siteSel){
+    const names = new Set();
+    ['q4','ytd'].forEach(p=>{ (DATA.centre[p] && DATA.centre[p].rows || []).forEach(r=>names.add(r.centre)); });
+    (DATA.tradePartsSites||[]).forEach(s=>names.add(s.site));
+    ['q4','ytd'].forEach(p=>{ (DATA.wrr[p] && DATA.wrr[p].rows || []).forEach(r=>{ if(r['Centre Name']) names.add(r['Centre Name']); }); });
+    const sorted = Array.from(names).sort();
+    siteSel.innerHTML = '<option value="">All sites</option>' + sorted.map(s=>`<option value="${s}">${s.replace(/^RRG\s+/i,'')}</option>`).join('');
+  }
+  const deckUrl = (extra)=>{
+    const site = document.getElementById('aftersalesReportsSite').value;
+    const params = new URLSearchParams({ autoload:'1', ...extra });
+    if(site) params.set('site', site);
+    return './aftersales-deck.html?' + params.toString();
+  };
+  document.getElementById('aftersalesPreviewBtn')?.addEventListener('click', ()=>window.open(deckUrl({}), '_blank'));
+  document.getElementById('aftersalesExportBtn')?.addEventListener('click', ()=>window.open(deckUrl({autoprint:'1'}), '_blank'));
+})();
+
 // --- PowerPoint Board Pack Export ------------------------------------------
 // Mirrors the Weekly Update dashboard's board pack export (app.js) - same
 // pptxgen.bundle.js library, loaded the same lazy way, same slide-building
