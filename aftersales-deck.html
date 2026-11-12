@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RRG Group – Monthly Aftersales Meeting Deck</title>
+<style>
+:root{--bg:#f5f7fb;--card:#ffffff;--ink:#111827;--muted:#6b7280;--line:#d9dee8;--head:#0f172a;--blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#b91c1c;--lightblue:#eff6ff;--lightgreen:#ecfdf5;--lightamber:#fffbeb;--lightred:#fef2f2;--s:0.5}
+*{box-sizing:border-box}
+body{margin:0;background:#e2e6ee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+
+/* --- Control bar (page chrome, not part of the exported report) --- */
+.bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 22px;background:var(--head);color:#fff;box-shadow:0 4px 16px rgba(15,23,42,.18)}
+.bar h1{font-size:18px;font-weight:800;margin-right:auto;letter-spacing:-.02em}
+.bar select,.bar button,.bar a{font:700 13px -apple-system,Arial,sans-serif;border-radius:999px;padding:9px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff}
+.bar select{padding:8px 10px;color-scheme:light}
+/* The select pill itself is white-on-dark to match the bar, but its
+   dropdown popup is a native OS control - without this, browsers render
+   its options using the select's own white text colour over their default
+   white popup background, so every option but the hovered one is invisible. */
+.bar select option{color:#111827;background:#fff}
+.bar button.primary{background:#fff;color:var(--head);border-color:#fff}
+.bar a{background:transparent;text-decoration:none;display:inline-flex;align-items:center}
+.bar button:disabled{opacity:.6;cursor:default}
+.updateStatus{font-size:12px;color:#cbd5e1;width:100%;order:9}
+
+/* --- Slide canvas: fixed 1280x720, scaled to fit the viewport on screen --- */
+.wrap{padding:24px;max-width:1340px;margin:0 auto}
+.slides{display:flex;flex-direction:column;gap:24px}
+.frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.18);position:relative;background:var(--bg)}
+.slide{width:1280px;height:720px;transform:scale(var(--s));transform-origin:top left;position:absolute;top:0;left:0;background:var(--bg)}
+
+.bar-top{position:absolute;top:0;left:0;right:0;height:60px;background:var(--head);display:flex;align-items:center;justify-content:space-between;padding:0 32px;color:#fff}
+.bar-top .title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.bar-top .sub{font-size:13px;color:#cbd5e1;text-align:right;line-height:1.4}
+.slide-body{position:absolute;top:60px;left:0;right:0;bottom:0;padding:16px 28px 18px;display:flex;flex-direction:column}
+.cols{display:grid;grid-template-columns:380px 1fr;gap:16px;flex:1;min-height:0}
+.cols.single{grid-template-columns:1fr}
+.left-col{display:flex;flex-direction:column;gap:10px;min-height:0}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
+.group-card{padding:14px 16px;border-top:4px solid var(--blue)}
+.group-card .label{font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:900;color:#64748b}
+.kpi-split-main{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.kpi-split-main.one{grid-template-columns:1fr;max-width:320px}
+.mini-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);font-weight:900;margin-bottom:2px}
+.kpi-split-main>div:first-child{border-right:1px solid var(--line);padding-right:12px}
+.kpi-split-main.one>div:first-child{border-right:0;padding-right:0}
+.value{font-size:30px;line-height:1;font-weight:950;letter-spacing:-.04em;margin:2px 0 3px}
+.note{font-size:12px;color:var(--muted)}
+.note strong{color:var(--ink)}
+.kpi-split-main .status,.cda-split .status{margin-top:5px}
+
+.cda-card{padding:9px 14px;border-top:4px solid var(--blue);flex:1;max-height:160px;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.cda-card .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px}
+.cda-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cda-split.one{grid-template-columns:1fr;max-width:260px}
+.cda-split>div:first-child{border-right:1px solid var(--line);padding-right:10px}
+.cda-split.one>div:first-child{border-right:0;padding-right:0}
+.cda-split .mini-label{font-size:9px;margin-bottom:1px}
+.cda-split .value{font-size:20px;margin:0 0 1px}
+.cda-split .note{font-size:11px}
+
+.panel{padding:14px 18px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.panel h3{margin:0 0 8px;font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.05em;flex:0 0 auto}
+.leader{display:flex;flex-direction:column;gap:5px;flex:1;min-height:0}
+.leader-row{display:grid;grid-template-columns:26px 1fr 64px 46px 128px;gap:9px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+/* "Tracking slightly behind" (Trade Parts) runs longer than this deck's
+   other pill labels ("On / Ahead", "Behind") - wrap it onto two lines
+   rather than let it overflow its fixed-width grid column. */
+.leader-row .status{font-size:9.5px;padding:3px 7px;white-space:normal;line-height:1.2;text-align:center}
+.leader-row.vcf-row{grid-template-columns:26px 1fr repeat(4,56px) 64px}
+.rank{font-weight:900;color:#64748b;font-size:12px}
+.centre{font-weight:900;font-size:13px}
+.centre .mini{font-weight:700;color:var(--muted);font-size:10.5px;margin-top:1px}
+.togo{text-align:right;font-size:11px;color:var(--muted);font-weight:800;line-height:1.3}
+.togo strong{display:block;color:var(--ink);font-size:14px;font-weight:900}
+.pct{text-align:right;font-weight:900;font-size:16px}
+.pillarpct{text-align:center;font-weight:900;font-size:13px;border-radius:8px;padding:4px 2px}
+.pillarpct.green{background:var(--lightgreen);color:var(--green)}
+.pillarpct.amber{background:var(--lightamber);color:var(--amber)}
+.pillarpct.red{background:var(--lightred);color:var(--red)}
+.pillar-head{font-size:9px;text-align:center;text-transform:uppercase;letter-spacing:.03em}
+.status{display:inline-flex;align-items:center;justify-content:center;font-weight:800;border-radius:999px;padding:4px 9px;font-size:11px;white-space:nowrap}
+.status.green{background:var(--lightgreen);color:var(--green)}
+.status.amber{background:var(--lightamber);color:var(--amber)}
+.status.red{background:var(--lightred);color:var(--red)}
+.footnote{position:absolute;bottom:6px;left:28px;right:28px;font-size:10px;color:#94a3b8}
+.extra-line{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.extra-line strong{color:var(--ink)}
+.variance{font-weight:800}
+.variance.positive{color:var(--green)}
+.variance.negative{color:var(--red)}
+.cda-card .extra-line{margin-top:6px;padding-top:6px;font-size:11px}
+
+/* Trade Parts needs 5 left-col cards (Group + 4 CDAs incl. Lexus), one more
+   than the 4-card layout (Group + 3 CDAs) every other slide uses - this
+   compact variant shrinks padding/fonts so all 5 fit without overlapping. */
+.left-col.compact{gap:6px}
+.left-col.compact .group-card{padding:8px 12px}
+.left-col.compact .group-card .kpi-split-main{margin-top:4px}
+.left-col.compact .group-card .value{font-size:22px;margin:1px 0 2px}
+.left-col.compact .group-card .extra-line{margin-top:4px;padding-top:4px;font-size:10px}
+.left-col.compact .cda-card{padding:5px 12px;max-height:94px}
+.left-col.compact .cda-card .label{font-size:10px;margin-bottom:2px}
+.left-col.compact .cda-split .mini-label{font-size:8px}
+.left-col.compact .cda-split .value{font-size:15px}
+.left-col.compact .cda-split .note{font-size:9.5px}
+.left-col.compact .cda-card .status{font-size:9px;padding:2px 6px;margin-top:2px}
+.left-col.compact .cda-card .extra-line{display:none}
+
+/* Cover slide */
+.cover{background:var(--head);color:#fff}
+.cover .accent{width:70px;height:6px;background:var(--blue);border-radius:3px;margin-bottom:26px}
+.cover .org{font-size:16px;font-weight:800;color:#cbd5e1;letter-spacing:.04em;text-transform:uppercase}
+.cover h1{font-size:54px;font-weight:900;letter-spacing:-.03em;margin:10px 0 18px;line-height:1.05}
+.cover .period{font-size:22px;color:#e5e7eb;font-weight:700}
+.cover .asof{font-size:14px;color:#9aa7bb;margin-top:10px}
+.cover-body{position:absolute;top:0;left:0;right:0;bottom:0;padding:70px 72px;display:flex;flex-direction:column;justify-content:center}
+.cover-foot{position:absolute;bottom:28px;left:72px;right:72px;font-size:12px;color:#9aa7bb}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:none}
+  .bar{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .slides{gap:0}
+  .frame{width:1280px;height:720px;aspect-ratio:auto;border-radius:0;box-shadow:none}
+  .frame:not(:last-child){page-break-after:always;break-after:page}
+  .slide{transform:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Monthly Aftersales Meeting Deck</h1>
+  <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#cbd5e1">Site
+    <select id="siteSelect"><option value="">All sites</option></select>
+  </label>
+  <button id="updateBtn" class="primary">Preview / Refresh from hub</button>
+  <button id="printBtn">Export to PDF</button>
+  <a href="./programmes.html">&larr; Programmes Hub</a>
+  <a href="./index.html">Weekly Update &rarr;</a>
+  <span class="updateStatus" id="updateStatus"></span>
+</div>
+<div class="wrap">
+  <div class="slides" id="slides"><div class="frame"><div class="slide" style="display:flex;align-items:center;justify-content:center;color:#64748b;font-size:18px">Click "Preview / Refresh from hub" to load live figures.</div></div></div>
+</div>
+
+<script>
+const fmt = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n);
+const fmtGbp = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : '£'+new Intl.NumberFormat('en-GB',{maximumFractionDigits:0}).format(n);
+const pct = n => (n===null||n===undefined||Number.isNaN(n)) ? '-' : Math.round(n*100)+'%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shortSite = c => String(c||'').replace(/^RRG\s+/i,'');
+
+function siteFilter(){ return document.getElementById('siteSelect').value || ''; }
+
+function loadFrame(url, isReady, timeoutMs=20000){
+  return new Promise((resolve, reject)=>{
+    const f = document.createElement('iframe');
+    f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px';
+    let done = false;
+    const timer = setTimeout(()=>{ if(!done){ done=true; cleanup(); reject(new Error(url+' took too long to load')); } }, timeoutMs);
+    function cleanup(){ clearTimeout(timer); }
+    function poll(){
+      if (done) return;
+      let w = null;
+      try { w = f.contentWindow; } catch(e){}
+      if (w && w.DATA) {
+        let ready = false;
+        try { ready = isReady(w.DATA); } catch(e){}
+        if (ready) { done = true; cleanup(); resolve({ win:w, el:f }); return; }
+      }
+      setTimeout(poll, 250);
+    }
+    f.onload = () => poll();
+    f.onerror = () => { if(!done){ done=true; cleanup(); reject(new Error('Failed to load '+url)); } };
+    f.src = url;
+    document.body.appendChild(f);
+  });
+}
+
+// --- Status pills ---------------------------------------------------------
+// VCF and WRR share the Programmes Hub's own SvO thresholds (>=100% On/
+// Ahead, >=90% Slightly behind, else Behind) with no time-elapsed "pace"
+// adjustment - that's a Weekly Update dashboard concept, not how this hub
+// reads its own figures. Trade Parts keeps its own tighter amber band
+// (>=95%) and "Tracking..." wording, matching tradePartsStatusPill in
+// service-app.js exactly, because its headline number is already a
+// full-quarter forecast rather than a to-date actual.
+function svoClass(n){ return n===null||n===undefined ? '' : (n>=1?'green':n>=.9?'amber':'red'); }
+function svoLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'On / Ahead':n>=.9?'Slightly behind':'Behind'); }
+function svoPill(n){ return `<span class="status ${svoClass(n)}">${svoLabel(n)}</span>`; }
+function tpClass(n){ return n===null||n===undefined ? '' : (n>=1?'green':n>=.95?'amber':'red'); }
+function tpLabel(n){ return n===null||n===undefined ? 'No data' : (n>=1?'Tracking ahead':n>=.95?'Tracking slightly behind':'Tracking behind'); }
+function tpPill(n){ return `<span class="status ${tpClass(n)}">${tpLabel(n)}</span>`; }
+
+function gapLine(actual, target, isCurrency){
+  if(actual===null||actual===undefined||target===null||target===undefined) return '';
+  const gap = actual-target;
+  const cls = gap>=0?'positive':'negative';
+  const f = isCurrency?fmtGbp:fmt;
+  const text = gap>=0 ? `${f(gap)} over` : `${f(Math.abs(gap))} behind`;
+  return `<div class="extra-line"><span class="variance ${cls}">${text}</span></div>`;
+}
+function rewardLine(reward){
+  if(reward===null||reward===undefined) return '';
+  return `<div class="extra-line">Reward band <strong>${pct(reward)}</strong></div>`;
+}
+
+// --- Generic dual-period (Quarter/YTD) card builders ----------------------
+// cell: {actual, target, ratio, pillHtml, isCurrency}
+function periodCell(label, c, accent, unit){
+  const f = c.isCurrency ? fmtGbp : fmt;
+  return `<div><div class="mini-label" style="color:${accent}">${label}</div><div class="value">${c.ratio===null||c.ratio===undefined?'-':pct(c.ratio)}</div><div class="note"><strong>${f(c.actual)}</strong> / <strong>${f(c.target)}</strong>${unit||' target'}</div>${c.pillHtml||''}</div>`;
+}
+function dualCard(opts){
+  // opts: {label, accent, p1Label, p1, p2Label, p2, unit, extra}
+  const one = opts.p2 ? '' : ' one';
+  return `<div class="card group-card" style="border-top-color:${opts.accent}">
+    <div class="label">${esc(opts.label)}</div>
+    <div class="kpi-split-main${one}">
+      ${periodCell(opts.p1Label, opts.p1, opts.accent, opts.unit)}
+      ${opts.p2 ? periodCell(opts.p2Label, opts.p2, opts.accent, opts.unit) : ''}
+    </div>
+    ${opts.extra||''}
+  </div>`;
+}
+function cdaCard(opts){
+  const one = opts.p2 ? '' : ' one';
+  const f = opts.p1.isCurrency ? fmtGbp : fmt;
+  const cell = (label,c) => `<div><div class="mini-label" style="color:${opts.accent}">${label}</div><div class="value">${c.ratio===null||c.ratio===undefined?'-':pct(c.ratio)}</div><div class="note">${f(c.actual)} / ${f(c.target)}</div>${c.pillHtml||''}</div>`;
+  return `<div class="card cda-card" style="border-top-color:${opts.accent}">
+    <div class="label">${esc(opts.label)}</div>
+    <div class="cda-split${one}">
+      ${cell(opts.p1Label, opts.p1)}
+      ${opts.p2 ? cell(opts.p2Label, opts.p2) : ''}
+    </div>
+    ${opts.extra||''}
+  </div>`;
+}
+function leagueRow(i, label, actual, target, ratio, pillHtml, extraMini, highlight, isCurrency){
+  const f = isCurrency ? fmtGbp : fmt;
+  const togo = (target||0) - (actual||0);
+  return `<div class="leader-row"${highlight?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
+    <div class="rank">${i+1}</div>
+    <div class="centre">${esc(label)}${extraMini?`<div class="mini">${extraMini}</div>`:''}</div>
+    <div class="togo"><strong>${f(Math.max(togo,0))}</strong>to go</div>
+    <div class="pct">${ratio===null||ratio===undefined?'-':pct(ratio)}</div>
+    ${pillHtml}
+  </div>`;
+}
+
+// --- Trade Parts helpers (mirrors service-app.js exactly) -----------------
+function tradePartsRow(data, period){
+  if(!data || !data.rows) return null;
+  return data.rows.find(r => String(r.Period||'').toLowerCase()===period.toLowerCase()) || null;
+}
+function tradePartsYtdThroughQ4(data){
+  const quarters = ['Q1','Q2','Q3','Q4'].map(p=>tradePartsRow(data,p)).filter(Boolean);
+  if(!quarters.length) return null;
+  const forecast = quarters.reduce((a,r)=>a+(Number(r['SMROE Sales Out (Forecast)*'])||0),0);
+  const target = quarters.reduce((a,r)=>a+(Number(r['SMROE Target'])||0),0);
+  const achieved = target ? forecast/target : null;
+  return { 'SMROE Sales Out (Forecast)*': forecast, 'SMROE Target': target, 'Target % Achieved (Forecast)*': achieved, 'Target Reward %*': rewardBandFor(achieved) };
+}
+function rewardBandFor(achieved){
+  if(achieved===null||achieved===undefined) return null;
+  return achieved>=1 ? 0.12 : achieved>=0.9 ? 0.09 : 0.05;
+}
+function tpCellFrom(row){
+  if(!row) return { actual:null, target:null, ratio:null, isCurrency:true, pillHtml:tpPill(null) };
+  const actual = row['SMROE Sales Out (Forecast)*'], target = row['SMROE Target'], ratio = row['Target % Achieved (Forecast)*'];
+  return { actual, target, ratio, isCurrency:true, pillHtml:tpPill(ratio) };
+}
+const TRADE_PARTS_CDA_ORDER = ['North Manchester', 'South Manchester', 'West Yorkshire', 'Lexus'];
+const CDA_ACCENTS = {'North Manchester':'#2563eb','South Manchester':'#15803d','West Yorkshire':'#b45309','Lexus':'#7e22ce'};
+
+// --- WRR helpers (mirrors service-app.js exactly) --------------------------
+function wrrGroupRollup(rows){
+  const byGroup = {}; const order = [];
+  (rows||[]).forEach(r=>{
+    const g = r['WRR Group'];
+    if(!g) return;
+    if(!byGroup[g]){ byGroup[g] = { group:g, actual:0, target:0 }; order.push(g); }
+    byGroup[g].actual += Number(r['CPUS Unique'])||0;
+    byGroup[g].target += Number(r['Target'])||0;
+  });
+  return order.map(g=>{ const v=byGroup[g]; return { group:v.group, actual:v.actual, target:v.target, achieved: v.target ? v.actual/v.target : null }; });
+}
+function wrrCellFrom(row){
+  if(!row) return { actual:null, target:null, ratio:null, isCurrency:false, pillHtml:svoPill(null) };
+  const actual = row['CPUS Unique'] ?? row.actual, target = row['Target'] ?? row.target, ratio = row['Centre % Achieved'] ?? row.achieved;
+  return { actual, target, ratio, isCurrency:false, pillHtml:svoPill(ratio) };
+}
+
+// --- VCF slide (built, previewed and approved as part of the Monthly Sales
+// and Marketing Meeting Deck - reused here verbatim, same figures) --------
+const VCF_PILLARS = ['Part Purchases','Accessory Purchases','Used Vehicles','Service Plans Plus'];
+const VCF_ACCENTS = {'Part Purchases':'#2563eb','Accessory Purchases':'#15803d','Used Vehicles':'#7e22ce','Service Plans Plus':'#b45309'};
+const VCF_CURRENCY = {'Part Purchases':true,'Accessory Purchases':true,'Used Vehicles':false,'Service Plans Plus':false};
+function vcfFmt(pillar, n){ return VCF_CURRENCY[pillar] ? fmtGbp(n) : fmt(n); }
+function renderVcfSlide(q4Data, ytdData){
+  const filterSite = siteFilter();
+  const pillarTotals = (data, name) => {
+    if(!data) return {actual:null,target:null,svo:null};
+    if(data.total && data.total.values[name]){
+      const v = data.total.values[name];
+      return { actual: v.actual ?? null, target: v.target ?? null, svo: v.svo ?? (v.target ? (v.actual||0)/v.target : null) };
+    }
+    const actual = data.rows.reduce((a,r)=>a+(Number(r.values[name]?.actual)||0),0);
+    const target = data.rows.reduce((a,r)=>a+(Number(r.values[name]?.target)||0),0);
+    return { actual, target, svo: target ? actual/target : null };
+  };
+  const cards = VCF_PILLARS.map(name=>{
+    const q4 = pillarTotals(q4Data, name), ytd = pillarTotals(ytdData, name);
+    const accent = VCF_ACCENTS[name];
+    return `<div class="card cda-card" style="border-top-color:${accent}">
+      <div class="label">${esc(name)}</div>
+      <div class="cda-split">
+        <div><div class="mini-label" style="color:${accent}">Quarter</div><div class="value">${q4.svo===null?'-':pct(q4.svo)}</div><div class="note">${vcfFmt(name,q4.actual)} / ${vcfFmt(name,q4.target)}</div><span class="status ${svoClass(q4.svo)}">${svoLabel(q4.svo)}</span></div>
+        <div><div class="mini-label" style="color:${accent}">YTD</div><div class="value">${ytd.svo===null?'-':pct(ytd.svo)}</div><div class="note">${vcfFmt(name,ytd.actual)} / ${vcfFmt(name,ytd.target)}</div><span class="status ${svoClass(ytd.svo)}">${svoLabel(ytd.svo)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const rowsWithAvg = (q4Data.rows||[]).map(r=>{
+    const svos = VCF_PILLARS.map(name=> r.values[name] ? (r.values[name].svo ?? (r.values[name].target ? (r.values[name].actual||0)/r.values[name].target : null)) : null);
+    const valid = svos.filter(v=>v!==null);
+    const avg = valid.length ? valid.reduce((a,b)=>a+b,0)/valid.length : null;
+    return { centre: r.centre, svos, avg, isFilter: filterSite && r.centre===filterSite };
+  }).sort((a,b)=> (b.avg??-Infinity) - (a.avg??-Infinity));
+  const rowsHtml = rowsWithAvg.map((r,i)=>`<div class="leader-row vcf-row"${r.isFilter?' style="border-color:#2563eb;border-width:2px;background:#eff6ff"':''}>
+    <div class="rank">${i+1}</div>
+    <div class="centre">${esc(shortSite(r.centre))}</div>
+    ${r.svos.map(v=>`<div class="pillarpct ${svoClass(v)}">${v===null?'-':pct(v)}</div>`).join('')}
+    <div class="pct" style="font-size:13px">${r.avg===null?'-':pct(r.avg)}</div>
+  </div>`).join('');
+  const headRow = `<div class="leader-row vcf-row" style="background:transparent;border:0;padding:0 10px">
+    <div></div><div></div>
+    ${VCF_PILLARS.map(n=>`<div class="pillar-head">${n.split(' ')[0]}</div>`).join('')}
+    <div class="pillar-head">Avg</div>
+  </div>`;
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">VCF Programme</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="slide-body">
+      <div class="cols" style="grid-template-columns:420px 1fr">
+        <div class="left-col">${cards}</div>
+        <div class="panel card"><h3>By Site &middot; SvO by pillar${filterSite?` &middot; ${shortSite(filterSite)} highlighted`:''}</h3>${headRow}<div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; SvO = Sales vs Objective, from the Programmes Hub's own Toyota VCF export</div>
+  </div>`;
+}
+
+// --- Trade Parts slide: Group + CDA (incl. Lexus) cards, site league -----
+function renderTradePartsSlide(groupData, cdaList, sitesList){
+  const filterSite = siteFilter();
+  const siteCda = window.SITE_TO_CDA || {};
+  let cdaOrdered = (cdaList||[]).slice().sort((a,b)=>{
+    const ia = TRADE_PARTS_CDA_ORDER.indexOf(a.cda), ib = TRADE_PARTS_CDA_ORDER.indexOf(b.cda);
+    return (ia===-1?TRADE_PARTS_CDA_ORDER.length:ia) - (ib===-1?TRADE_PARTS_CDA_ORDER.length:ib);
+  });
+
+  const groupQ4 = tpCellFrom(tradePartsRow(groupData,'Q4')), groupYtd = tpCellFrom(tradePartsYtdThroughQ4(groupData));
+  const groupReward = tradePartsRow(groupData,'Q4') ? tradePartsRow(groupData,'Q4')['Target Reward %*'] : null;
+
+  let leftHtml, rightRows, rightTitle;
+  if(filterSite){
+    const site = (sitesList||[]).find(s=>s.site===filterSite);
+    const siteQ4 = tpCellFrom(site ? tradePartsRow(site,'Q4') : null), siteYtd = tpCellFrom(site ? tradePartsYtdThroughQ4(site) : null);
+    const cdaName = siteCda[filterSite];
+    const cda = cdaOrdered.find(c=>c.cda===cdaName);
+    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:'Quarter (forecast)', p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, extra:gapLine(siteQ4.actual,siteQ4.target,true)})
+      + (cda ? cdaCard({label:cda.cda, accent:CDA_ACCENTS[cda.cda]||'#2563eb', p1Label:'Quarter', p1:tpCellFrom(tradePartsRow(cda,'Q4')), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(cda))}) : '');
+    rightRows = sitesList||[];
+    rightTitle = 'By Site &middot; ' + shortSite(filterSite) + ' highlighted';
+  } else {
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter (forecast)', p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, extra:rewardLine(groupReward)+gapLine(groupQ4.actual,groupQ4.target,true)})
+      + cdaOrdered.map(c=>{
+          const q4Row = tradePartsRow(c,'Q4');
+          return cdaCard({label:c.cda, accent:CDA_ACCENTS[c.cda]||'#2563eb', p1Label:'Quarter', p1:tpCellFrom(q4Row), p2Label:'YTD', p2:tpCellFrom(tradePartsYtdThroughQ4(c))});
+        }).join('');
+    rightRows = sitesList||[];
+    rightTitle = 'By Site &middot; ranked on Quarter %';
+  }
+  rightRows = rightRows.slice().sort((a,b)=>{
+    const ra = tradePartsRow(a,'Q4'), rb = tradePartsRow(b,'Q4');
+    const va = (ra && ra['Target % Achieved (Forecast)*']) ?? -Infinity, vb = (rb && rb['Target % Achieved (Forecast)*']) ?? -Infinity;
+    return vb - va;
+  });
+  const rowsHtml = rightRows.map((s,i)=>{
+    const row = tradePartsRow(s,'Q4');
+    const c = tpCellFrom(row);
+    return leagueRow(i, shortSite(s.site), c.actual, c.target, c.ratio, c.pillHtml, siteCda[s.site]?`${siteCda[s.site]} CDA`:'', s.site===filterSite, true);
+  }).join('');
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">Trade Parts</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="left-col${filterSite?'':' compact'}">${leftHtml}</div>
+        <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; Quarter figure is the full-quarter forecast (Toyota's own headline measure); Year to Date is Q1+Q2+Q3+Q4</div>
+  </div>`;
+}
+
+// --- WRR slide: Group + CDA (3 groups) cards, site league ----------------
+function renderWrrSlide(q4Data, ytdData){
+  const filterSite = siteFilter();
+  const siteCda = window.SITE_TO_CDA || {};
+  const q4Groups = wrrGroupRollup(q4Data.rows), ytdGroups = wrrGroupRollup(ytdData.rows);
+  let cdaNames = Array.from(new Set(q4Groups.map(g=>g.group)));
+  cdaNames = cdaNames.slice().sort((a,b)=>{
+    const ia = TRADE_PARTS_CDA_ORDER.indexOf(a), ib = TRADE_PARTS_CDA_ORDER.indexOf(b);
+    return (ia===-1?TRADE_PARTS_CDA_ORDER.length:ia) - (ib===-1?TRADE_PARTS_CDA_ORDER.length:ib);
+  });
+
+  const groupQ4 = wrrCellFrom(q4Data.total), groupYtd = wrrCellFrom(ytdData.total);
+
+  let leftHtml, rightRows, rightTitle;
+  if(filterSite){
+    const siteQ4Row = q4Data.rows.find(r=>r['Centre Name']===filterSite), siteYtdRow = ytdData.rows.find(r=>r['Centre Name']===filterSite);
+    const siteQ4 = wrrCellFrom(siteQ4Row), siteYtd = wrrCellFrom(siteYtdRow);
+    const cdaName = siteCda[filterSite];
+    leftHtml = dualCard({label:shortSite(filterSite), accent:'#2563eb', p1Label:'Quarter to date', p1:siteQ4, p2Label:'Year to Date', p2:siteYtd, unit:' target', extra:gapLine(siteQ4.actual,siteQ4.target,false)})
+      + (cdaName ? cdaCard({label:cdaName, accent:CDA_ACCENTS[cdaName]||'#2563eb', p1Label:'Quarter', p1:wrrCellFrom(q4Groups.find(g=>g.group===cdaName)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===cdaName))}) : '');
+    rightRows = q4Data.rows.filter(r=>r['Centre Name']);
+    rightTitle = 'By Site &middot; ' + shortSite(filterSite) + ' highlighted';
+  } else {
+    leftHtml = dualCard({label:'Group', accent:'#2563eb', p1Label:'Quarter to date', p1:groupQ4, p2Label:'Year to Date', p2:groupYtd, unit:' target', extra:gapLine(groupQ4.actual,groupQ4.target,false)})
+      + cdaNames.map(name=>cdaCard({label:name, accent:CDA_ACCENTS[name]||'#2563eb', p1Label:'Quarter', p1:wrrCellFrom(q4Groups.find(g=>g.group===name)), p2Label:'YTD', p2:wrrCellFrom(ytdGroups.find(g=>g.group===name))})).join('');
+    rightRows = q4Data.rows.filter(r=>r['Centre Name']);
+    rightTitle = 'By Site &middot; ranked on Quarter %';
+  }
+  rightRows = rightRows.slice().sort((a,b)=>(b['Centre % Achieved']??-Infinity)-(a['Centre % Achieved']??-Infinity));
+  const rowsHtml = rightRows.map((r,i)=>{
+    const c = wrrCellFrom(r);
+    return leagueRow(i, shortSite(r['Centre Name']), c.actual, c.target, c.ratio, c.pillHtml, r['WRR Group']?`${r['WRR Group']} CDA`:'', r['Centre Name']===filterSite, false);
+  }).join('');
+
+  return `<div class="slide">
+    <div class="bar-top"><div class="title">WRR</div><div class="sub">Quarter (Q4) &amp; Year to Date 2026<br>As of ${todayLabel()}</div></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="left-col">${leftHtml}</div>
+        <div class="panel card"><h3>${rightTitle}</h3><div class="leader">${rowsHtml}</div></div>
+      </div>
+    </div>
+    <div class="footnote">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; CPUS = Customer Pay Unique Souls against a full-quarter / full-year target</div>
+  </div>`;
+}
+
+function todayLabel(){ return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+
+function renderCover(){
+  return `<div class="slide">
+    <div class="cover-body cover">
+      <div class="accent"></div>
+      <div class="org">RRG Group</div>
+      <h1>Monthly Aftersales<br>Meeting</h1>
+      <div class="period">VCF &middot; Trade Parts &middot; WRR &middot; Quarter 4 2026</div>
+      <div class="asof">As of ${todayLabel()}</div>
+    </div>
+    <div class="cover-foot">RRG Group &middot; Monthly Aftersales Meeting Deck &middot; Source: Programmes Hub</div>
+  </div>`;
+}
+
+let LAST_PROG = null;
+let PENDING_SITE = null;
+
+function buildSiteToCda(wrrRows){
+  const map = {};
+  (wrrRows||[]).forEach(r=>{ if(r['Centre Name'] && r['WRR Group']) map[r['Centre Name']] = r['WRR Group']; });
+  return map;
+}
+function populateSiteSelect(prog){
+  const names = new Set();
+  (prog.DATA.centre.q4 && prog.DATA.centre.q4.rows || []).forEach(r=>names.add(r.centre));
+  (prog.DATA.tradePartsSites||[]).forEach(s=>names.add(s.site));
+  (prog.DATA.wrr.q4 && prog.DATA.wrr.q4.rows || []).forEach(r=>{ if(r['Centre Name']) names.add(r['Centre Name']); });
+  const sorted = Array.from(names).sort();
+  const sel = document.getElementById('siteSelect');
+  const cur = PENDING_SITE || sel.value;
+  PENDING_SITE = null;
+  sel.innerHTML = '<option value="">All sites</option>' + sorted.map(s=>`<option value="${esc(s)}">${esc(shortSite(s))}</option>`).join('');
+  if(sorted.includes(cur)) sel.value = cur;
+}
+
+function render(){
+  const prog = LAST_PROG;
+  if(!prog) return;
+  window.SITE_TO_CDA = buildSiteToCda(prog.DATA.wrr.q4 && prog.DATA.wrr.q4.rows);
+
+  const slides = [
+    renderCover(),
+    renderVcfSlide(prog.DATA.centre.q4, prog.DATA.centre.ytd),
+    renderTradePartsSlide(prog.DATA.tradeParts, prog.DATA.tradePartsCda, prog.DATA.tradePartsSites),
+    renderWrrSlide(prog.DATA.wrr.q4, prog.DATA.wrr.ytd),
+  ];
+  document.getElementById('slides').innerHTML = slides.map(s=>`<div class="frame">${s}</div>`).join('');
+  scale();
+}
+
+function scale(){
+  const f = document.querySelector('.frame');
+  if (f) document.documentElement.style.setProperty('--s', f.clientWidth / 1280);
+}
+addEventListener('resize', scale);
+
+async function updateFromHub(){
+  const btn = document.getElementById('updateBtn');
+  const statusEl = document.getElementById('updateStatus');
+  btn.disabled = true; btn.textContent = 'Loading…'; statusEl.textContent = '';
+  try{
+    const prog = await loadFrame('./programmes.html', d => d.centre && d.centre.q4 && d.centre.ytd && d.tradeParts && d.tradePartsCda && d.tradePartsSites && d.wrr && d.wrr.q4 && d.wrr.ytd);
+    LAST_PROG = prog.win;
+    populateSiteSelect(prog.win);
+    render();
+    statusEl.textContent = 'Updated from Programmes Hub just now.';
+    if(new URLSearchParams(location.search).get('autoprint')==='1') setTimeout(()=>window.print(), 300);
+  } catch(err){
+    console.error(err);
+    statusEl.textContent = 'Update failed: ' + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Preview / Refresh from hub';
+  }
+}
+document.getElementById('updateBtn').onclick = updateFromHub;
+document.getElementById('siteSelect').onchange = () => { if(LAST_PROG) render(); };
+document.getElementById('printBtn').onclick = () => { if(!LAST_PROG){ alert('Click "Preview / Refresh from hub" first.'); return; } window.print(); };
+
+// Deep-link from the Reports tab card: ?site=RRG%20Bolton&autoload=1
+(function initFromQuery(){
+  const params = new URLSearchParams(location.search);
+  const qSite = params.get('site');
+  if(qSite) PENDING_SITE = qSite;
+  if(params.get('autoload')==='1') setTimeout(()=>document.getElementById('updateBtn').click(), 50);
+})();
+</script>
+</body>
+</html>
