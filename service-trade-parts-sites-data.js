@@ -165,60 +165,60 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q1",
         "Working Days": 63,
         "Days to Date": 63,
-        "SMROE Sales Out To Date*": 97835.26570000002,
-        "SMROE Sales Out (Forecast)*": 97835.26570000005,
-        "SMROE Target": 115190.38569999998,
-        "Target % Achieved (Forecast)*": 0.8493353425762517,
+        "SMROE Sales Out To Date*": 97835.26570000005,
+        "SMROE Sales Out (Forecast)*": 97835.26570000003,
+        "SMROE Target": 115190.3857,
+        "Target % Achieved (Forecast)*": 0.8493353425762514,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 4891.763285000003
+        "Reward Payable*": 4891.763285000002
       },
       {
         "Period": "Q2",
         "Working Days": 61,
         "Days to Date": 61,
         "SMROE Sales Out To Date*": 80935.83949999999,
-        "SMROE Sales Out (Forecast)*": 80935.83949999997,
+        "SMROE Sales Out (Forecast)*": 80935.83949999999,
         "SMROE Target": 102912.3407,
-        "Target % Achieved (Forecast)*": 0.7864541701168397,
+        "Target % Achieved (Forecast)*": 0.7864541701168399,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 4046.7919749999987
+        "Reward Payable*": 4046.7919749999996
       },
       {
         "Period": "Q3",
         "Working Days": 65,
         "Days to Date": 65,
-        "SMROE Sales Out To Date*": 102306.22119999996,
-        "SMROE Sales Out (Forecast)*": 102306.22119999993,
-        "SMROE Target": 112511.5395,
-        "Target % Achieved (Forecast)*": 0.9092953634324764,
+        "SMROE Sales Out To Date*": 102306.22119999997,
+        "SMROE Sales Out (Forecast)*": 102306.22119999994,
+        "SMROE Target": 112511.53949999998,
+        "Target % Achieved (Forecast)*": 0.9092953634324766,
         "Target Reward %*": 0.09,
         "Reward Payable*": 9207.559907999994
       },
       {
         "Period": "Q4",
         "Working Days": 64,
-        "Days to Date": 27,
-        "SMROE Sales Out To Date*": 36462.393399999986,
-        "SMROE Sales Out (Forecast)*": 99027.84087999997,
-        "SMROE Target": 115860.0972,
-        "Target % Achieved (Forecast)*": 0.8547191248170295,
+        "Days to Date": 32,
+        "SMROE Sales Out To Date*": 43595.85829999999,
+        "SMROE Sales Out (Forecast)*": 93478.27462,
+        "SMROE Target": 115860.09719999999,
+        "Target % Achieved (Forecast)*": 0.8068202675390126,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 4951.392043999999
+        "Reward Payable*": 4673.913731000001
       },
       {
         "Period": "Total",
         "Working Days": 253,
-        "Days to Date": 216,
-        "SMROE Sales Out To Date*": 317539.7198000004,
-        "SMROE Sales Out (Forecast)*": 380105.16728000034,
-        "SMROE Target": 446474.3631,
-        "Target % Achieved (Forecast)*": 0.8513482490703851,
+        "Days to Date": 221,
+        "SMROE Sales Out To Date*": 324673.18469999975,
+        "SMROE Sales Out (Forecast)*": 374555.60102,
+        "SMROE Target": 446474.3630999999,
+        "Target % Achieved (Forecast)*": 0.838918495609362,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 23097.507211999997
+        "Reward Payable*": 22820.028898999997
       }
     ],
     "sheet": "Export",
-    "importedAt": "2026-11-09T11:59:58.578633+00:00"
+    "importedAt": "2026-11-16T10:48:45.858Z"
   },
   {
     "site": "RRG Huddersfield",
@@ -238,7 +238,7 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q1",
         "Working Days": 63,
         "Days to Date": 63,
-        "SMROE Sales Out To Date*": 42772.889899999995,
+        "SMROE Sales Out To Date*": 42772.88989999999,
         "SMROE Sales Out (Forecast)*": 42772.889899999995,
         "SMROE Target": 50118.9563,
         "Target % Achieved (Forecast)*": 0.8534273867151538,
@@ -249,49 +249,49 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q2",
         "Working Days": 61,
         "Days to Date": 61,
-        "SMROE Sales Out To Date*": 43765.8257,
-        "SMROE Sales Out (Forecast)*": 43765.82569999999,
-        "SMROE Target": 44776.81939999999,
+        "SMROE Sales Out To Date*": 43765.825700000016,
+        "SMROE Sales Out (Forecast)*": 43765.825699999994,
+        "SMROE Target": 44776.8194,
         "Target % Achieved (Forecast)*": 0.9774214936758101,
         "Target Reward %*": 0.09,
-        "Reward Payable*": 3938.9243129999986
+        "Reward Payable*": 3938.9243129999995
       },
       {
         "Period": "Q3",
         "Working Days": 65,
         "Days to Date": 65,
-        "SMROE Sales Out To Date*": 49231.3986,
-        "SMROE Sales Out (Forecast)*": 49231.398599999986,
+        "SMROE Sales Out To Date*": 49231.39859999997,
+        "SMROE Sales Out (Forecast)*": 49231.39859999999,
         "SMROE Target": 48953.3991,
-        "Target % Achieved (Forecast)*": 1.0056788599997335,
+        "Target % Achieved (Forecast)*": 1.0056788599997337,
         "Target Reward %*": 0.12,
-        "Reward Payable*": 5907.767831999998
+        "Reward Payable*": 5907.767831999999
       },
       {
         "Period": "Q4",
         "Working Days": 64,
-        "Days to Date": 27,
-        "SMROE Sales Out To Date*": 19404.978699999996,
-        "SMROE Sales Out (Forecast)*": 49597.78751999999,
+        "Days to Date": 32,
+        "SMROE Sales Out To Date*": 21773.324799999995,
+        "SMROE Sales Out (Forecast)*": 42408.382079999996,
         "SMROE Target": 50410.345499999996,
-        "Target % Achieved (Forecast)*": 0.9838811265437567,
-        "Target Reward %*": 0.09,
-        "Reward Payable*": 4463.800876799999
+        "Target % Achieved (Forecast)*": 0.8412634680315769,
+        "Target Reward %*": 0.05,
+        "Reward Payable*": 2120.419104
       },
       {
         "Period": "Total",
         "Working Days": 253,
-        "Days to Date": 216,
-        "SMROE Sales Out To Date*": 155175.09289999996,
-        "SMROE Sales Out (Forecast)*": 185367.90171999997,
+        "Days to Date": 221,
+        "SMROE Sales Out To Date*": 157543.43899999995,
+        "SMROE Sales Out (Forecast)*": 178178.49628,
         "SMROE Target": 194259.52029999997,
-        "Target % Achieved (Forecast)*": 0.954228145080002,
+        "Target % Achieved (Forecast)*": 0.9172188627091962,
         "Target Reward %*": 0.09,
-        "Reward Payable*": 16449.137516799994
+        "Reward Payable*": 14105.755743999998
       }
     ],
     "sheet": "Export",
-    "importedAt": "2026-11-09T11:59:58.581177+00:00"
+    "importedAt": "2026-11-16T10:48:45.855Z"
   },
   {
     "site": "RRG Silsden",
@@ -311,7 +311,7 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q1",
         "Working Days": 63,
         "Days to Date": 63,
-        "SMROE Sales Out To Date*": 33531.37020000002,
+        "SMROE Sales Out To Date*": 33531.37019999999,
         "SMROE Sales Out (Forecast)*": 33531.37020000001,
         "SMROE Target": 41512.1475,
         "Target % Achieved (Forecast)*": 0.8077483873846809,
@@ -322,7 +322,7 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q2",
         "Working Days": 61,
         "Days to Date": 61,
-        "SMROE Sales Out To Date*": 33144.40990000001,
+        "SMROE Sales Out To Date*": 33144.4099,
         "SMROE Sales Out (Forecast)*": 33144.409900000006,
         "SMROE Target": 37087.4031,
         "Target % Achieved (Forecast)*": 0.8936837613200262,
@@ -333,7 +333,7 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
         "Period": "Q3",
         "Working Days": 65,
         "Days to Date": 65,
-        "SMROE Sales Out To Date*": 42387.267900000006,
+        "SMROE Sales Out To Date*": 42387.2679,
         "SMROE Sales Out (Forecast)*": 42387.267900000006,
         "SMROE Target": 40546.7487,
         "Target % Achieved (Forecast)*": 1.0453925224342342,
@@ -343,28 +343,28 @@ window.SERVICE_DATA_TRADE_PARTS_SITES = [
       {
         "Period": "Q4",
         "Working Days": 64,
-        "Days to Date": 27,
-        "SMROE Sales Out To Date*": 14664.211599999999,
-        "SMROE Sales Out (Forecast)*": 35360.68996,
+        "Days to Date": 32,
+        "SMROE Sales Out To Date*": 16335.7565,
+        "SMROE Sales Out (Forecast)*": 30634.528660000004,
         "SMROE Target": 41753.4973,
-        "Target % Achieved (Forecast)*": 0.846891691633218,
+        "Target % Achieved (Forecast)*": 0.7336997051981081,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 1768.0344980000002
+        "Reward Payable*": 1531.7264330000003
       },
       {
         "Period": "Total",
         "Working Days": 253,
-        "Days to Date": 216,
-        "SMROE Sales Out To Date*": 123727.25959999993,
-        "SMROE Sales Out (Forecast)*": 144423.73795999994,
+        "Days to Date": 221,
+        "SMROE Sales Out To Date*": 125398.80450000003,
+        "SMROE Sales Out (Forecast)*": 139697.57666000005,
         "SMROE Target": 160899.79660000003,
-        "Target % Achieved (Forecast)*": 0.8976005005092711,
+        "Target % Achieved (Forecast)*": 0.8682271799714631,
         "Target Reward %*": 0.05,
-        "Reward Payable*": 10188.295651000002
+        "Reward Payable*": 9951.987586000003
       }
     ],
     "sheet": "Export",
-    "importedAt": "2026-11-09T11:59:58.583575+00:00"
+    "importedAt": "2026-11-16T10:48:45.850Z"
   },
   {
     "site": "RRG Bolton",
