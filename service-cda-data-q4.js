@@ -1,3 +1,196 @@
 // Live Service Figures (VCF) data source - CDA level, Q4 (current quarter).
 // After using Admin Update > Publish, download and replace this file in GitHub.
-window.SERVICE_DATA_CDA_Q4 = {"pillars": ["Part Purchases", "Accessory Purchases", "Used Vehicles", "Service Plans Plus"], "pillarGroups": [{"name": "Part Purchases", "cols": [{"label": "Actual", "key": "actual", "idx": 1}, {"label": "Target", "key": "target", "idx": 2}, {"label": "SvO", "key": "svo", "idx": 3}]}, {"name": "Accessory Purchases", "cols": [{"label": "Actual", "key": "actual", "idx": 4}, {"label": "Target", "key": "target", "idx": 5}, {"label": "SvO", "key": "svo", "idx": 6}]}, {"name": "Used Vehicles", "cols": [{"label": "Actual", "key": "actual", "idx": 7}, {"label": "Target", "key": "target", "idx": 8}, {"label": "SvO", "key": "svo", "idx": 9}]}, {"name": "Service Plans Plus", "cols": [{"label": "Actual", "key": "actual", "idx": 10}, {"label": "Target", "key": "target", "idx": 11}, {"label": "SvO", "key": "svo", "idx": 12}]}], "rows": [{"centre": "North Manchester", "values": {"Part Purchases": {"actual": 472886.1099999999, "target": 527986.1375428571, "svo": 0.8956411473239018}, "Accessory Purchases": {"actual": 58451.84, "target": 51650, "svo": 1.1316909970958373}, "Used Vehicles": {"actual": 203, "target": 274.2857142857143, "svo": 0.7401041666666667}, "Service Plans Plus": {"actual": 137, "target": 139.85, "svo": 0.9796210225241331}}}, {"centre": "South Manchester", "values": {"Part Purchases": {"actual": 242527.31999999998, "target": 286328.5563380952, "svo": 0.8470245619288669}, "Accessory Purchases": {"actual": 42510.12, "target": 37500, "svo": 1.1336032}, "Used Vehicles": {"actual": 214, "target": 281.7142857142857, "svo": 0.7596348884381339}, "Service Plans Plus": {"actual": 127, "target": 149.25, "svo": 0.8509212730318257}}}, {"centre": "West Yorkshire", "values": {"Part Purchases": {"actual": 153396.94, "target": 214502.51402857143, "svo": 0.7151288678116273}, "Accessory Purchases": {"actual": 24850.47, "target": 23480, "svo": 1.0583675468483817}, "Used Vehicles": {"actual": 104, "target": 126.85714285714286, "svo": 0.8198198198198198}, "Service Plans Plus": {"actual": 74, "target": 72.8, "svo": 1.0164835164835164}}}], "total": {"centre": "Total", "values": {"Part Purchases": {"actual": 868810.37, "target": 1028817.2079095237, "svo": 0.844474959517206}, "Accessory Purchases": {"actual": 125812.43, "target": 112630, "svo": 1.1170419071295392}, "Used Vehicles": {"actual": 521, "target": 682.8571428571429, "svo": 0.7629707112970711}, "Service Plans Plus": {"actual": 338, "target": 361.9, "svo": 0.9339596573639127}}}, "sheet": "Export", "importedAt": "2026-11-09T11:33:43.073645+00:00"};
+window.SERVICE_DATA_CDA_Q4 = {
+  "pillars": [
+    "Part Purchases",
+    "Accessory Purchases",
+    "Used Vehicles",
+    "Service Plans Plus"
+  ],
+  "pillarGroups": [
+    {
+      "name": "Part Purchases",
+      "cols": [
+        {
+          "label": "Actual",
+          "key": "actual",
+          "idx": 1
+        },
+        {
+          "label": "Target",
+          "key": "target",
+          "idx": 2
+        },
+        {
+          "label": "SvO",
+          "key": "svo",
+          "idx": 3
+        }
+      ]
+    },
+    {
+      "name": "Accessory Purchases",
+      "cols": [
+        {
+          "label": "Actual",
+          "key": "actual",
+          "idx": 4
+        },
+        {
+          "label": "Target",
+          "key": "target",
+          "idx": 5
+        },
+        {
+          "label": "SvO",
+          "key": "svo",
+          "idx": 6
+        }
+      ]
+    },
+    {
+      "name": "Used Vehicles",
+      "cols": [
+        {
+          "label": "Actual",
+          "key": "actual",
+          "idx": 7
+        },
+        {
+          "label": "Target",
+          "key": "target",
+          "idx": 8
+        },
+        {
+          "label": "SvO",
+          "key": "svo",
+          "idx": 9
+        }
+      ]
+    },
+    {
+      "name": "Service Plans Plus",
+      "cols": [
+        {
+          "label": "Actual",
+          "key": "actual",
+          "idx": 10
+        },
+        {
+          "label": "Target",
+          "key": "target",
+          "idx": 11
+        },
+        {
+          "label": "SvO",
+          "key": "svo",
+          "idx": 12
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "centre": "North Manchester",
+      "values": {
+        "Part Purchases": {
+          "actual": 577167.6000000001,
+          "target": 626770.6406857143,
+          "svo": 0.9208593423721214
+        },
+        "Accessory Purchases": {
+          "actual": 67663.66,
+          "target": 59850,
+          "svo": 1.1305540517961572
+        },
+        "Used Vehicles": {
+          "actual": 231,
+          "target": 323.57142857142856,
+          "svo": 0.713907284768212
+        },
+        "Service Plans Plus": {
+          "actual": 153,
+          "target": 159.05,
+          "svo": 0.9619616472807293
+        }
+      }
+    },
+    {
+      "centre": "South Manchester",
+      "values": {
+        "Part Purchases": {
+          "actual": 280313.49,
+          "target": 339899.7055761905,
+          "svo": 0.8246947125912296
+        },
+        "Accessory Purchases": {
+          "actual": 48445.35,
+          "target": 44220,
+          "svo": 1.0955529172320218
+        },
+        "Used Vehicles": {
+          "actual": 250,
+          "target": 332.42857142857144,
+          "svo": 0.7520412548345509
+        },
+        "Service Plans Plus": {
+          "actual": 152,
+          "target": 173.75,
+          "svo": 0.874820143884892
+        }
+      }
+    },
+    {
+      "centre": "West Yorkshire",
+      "values": {
+        "Part Purchases": {
+          "actual": 185734.75,
+          "target": 254635.24245714286,
+          "svo": 0.729414939612142
+        },
+        "Accessory Purchases": {
+          "actual": 34191.229999999996,
+          "target": 29850,
+          "svo": 1.1454348408710215
+        },
+        "Used Vehicles": {
+          "actual": 135,
+          "target": 149.71428571428572,
+          "svo": 0.9017175572519084
+        },
+        "Service Plans Plus": {
+          "actual": 88,
+          "target": 92.85,
+          "svo": 0.94776521270867
+        }
+      }
+    }
+  ],
+  "total": {
+    "centre": "Total",
+    "values": {
+      "Part Purchases": {
+        "actual": 1043215.84,
+        "target": 1221305.5887190476,
+        "svo": 0.8541808451840174
+      },
+      "Accessory Purchases": {
+        "actual": 150300.24,
+        "target": 133920,
+        "svo": 1.1223136200716846
+      },
+      "Used Vehicles": {
+        "actual": 616,
+        "target": 805.7142857142858,
+        "svo": 0.7645390070921986
+      },
+      "Service Plans Plus": {
+        "actual": 393,
+        "target": 425.65,
+        "svo": 0.9232937859743922
+      }
+    }
+  },
+  "sheet": "Export",
+  "importedAt": "2026-11-16T10:33:55.711Z"
+};
