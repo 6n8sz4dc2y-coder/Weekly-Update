@@ -348,28 +348,17 @@ function updateProgressKpi(prefix, rows, config){
  setText(prefix+'Remaining', fmt(remaining));
  setText(prefix+'RunRate', fmt(Math.max(0, Math.ceil(remaining / weeks))));
 
- // Carryover: net over/under-achievement banked from months that have
- // already closed (before the current month-to-date one) - context for
- // why "Remaining"/"Run rate required" might look better or worse than
- // the current month alone would suggest. Hidden until at least one month
- // has actually closed. Reuses the same forecast-delta green/amber-free
- // positive/negative colouring as the Used Cars forecast line, rather than
- // variance-cell, so it isn't overridden by the per-card <strong> accent
- // colour rules (.blue-card .kpi-footer-strip strong etc).
- const carryEl = document.getElementById(prefix+'Carryover');
- if(carryEl){
-   const row = carryEl.closest('.forecast-wide');
-   const completedMonths = months.slice(0, months.indexOf(currentMonth));
-   if(completedMonths.length){
-     const carryover = completedMonths.reduce((acc,m)=> acc + (sum(rows,m+'_'+valueKey) - sum(rows,m+'_'+targetKey)), 0);
-     const monthLabel = completedMonths.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join('+');
-     const ahead = carryover >= 0;
-     carryEl.textContent = `${ahead?'+':''}${fmt(Math.round(carryover))} ${ahead?'ahead of':'behind'} ${monthLabel} target`;
-     carryEl.className = 'forecast-delta ' + (ahead ? 'positive' : 'negative');
-     if(row) row.style.display = '';
-   } else if(row){
-     row.style.display = 'none';
-   }
+ // Inc O/A (Registrations only): same "including overachievement" figure
+ // already shown per-CDA on the CDA Summary card (actual + Toyota's
+ // reissued CDA SvO adjustment), rolled up to Group level here so the
+ // headline card tells the same story - actual is further ahead than the
+ // raw QTR total alone shows once that banked overachievement counts.
+ const incOAEl = document.getElementById(prefix+'Carryover');
+ if(incOAEl && config.groupAdjustment){
+   const row = incOAEl.closest('.forecast-wide');
+   const adjActual = qtrValue + config.groupAdjustment;
+   incOAEl.textContent = `${fmt(adjActual)} / ${fmt(qtrTarget)}`;
+   if(row) row.style.display = '';
  }
 }
 
@@ -521,7 +510,7 @@ function build(){
  const nonFleetTotals = non.filter(r=>['NORTH CDA','WY CDA','SOUTH CDA'].includes((r.centre||'').toUpperCase()) && ((Number(r.qtr_budget)||0) || (Number(r.qtr_total)||0)));
   if(!nonFleetTotals.length) nonFleetTotals.push(...non.filter(r=>['NORTH CDA','WY CDA'].includes((r.centre||'').toUpperCase())));
  const nonFleetBudget=sum(nonFleetTotals,'qtr_budget'), nonFleetCurrent=sum(nonFleetTotals,'qtr_total');
- updateProgressKpi('q3', regs, {valueKey:'total', targetKey:'target', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_target'});
+ updateProgressKpi('q3', regs, {valueKey:'total', targetKey:'target', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_target', groupAdjustment: Object.values(CDA_REG_ADJUSTMENT).reduce((a,b)=>a+b,0)});
  updateProgressKpi('used', used, {valueKey:'counting', targetKey:'target', qtrValueKey:'qtr_counting', qtrTargetKey:'qtr_target'});
  updateProgressKpi('nonFleet', nonFleetTotals, {valueKey:'total', targetKey:'budget', qtrValueKey:'qtr_total', qtrTargetKey:'qtr_budget'});
  const usedGroupForecast=usedForecastFinish({qtr_counting:usedCurrent});
