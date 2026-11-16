@@ -347,6 +347,30 @@ function updateProgressKpi(prefix, rows, config){
  });
  setText(prefix+'Remaining', fmt(remaining));
  setText(prefix+'RunRate', fmt(Math.max(0, Math.ceil(remaining / weeks))));
+
+ // Carryover: net over/under-achievement banked from months that have
+ // already closed (before the current month-to-date one) - context for
+ // why "Remaining"/"Run rate required" might look better or worse than
+ // the current month alone would suggest. Hidden until at least one month
+ // has actually closed. Reuses the same forecast-delta green/amber-free
+ // positive/negative colouring as the Used Cars forecast line, rather than
+ // variance-cell, so it isn't overridden by the per-card <strong> accent
+ // colour rules (.blue-card .kpi-footer-strip strong etc).
+ const carryEl = document.getElementById(prefix+'Carryover');
+ if(carryEl){
+   const row = carryEl.closest('.forecast-wide');
+   const completedMonths = months.slice(0, months.indexOf(currentMonth));
+   if(completedMonths.length){
+     const carryover = completedMonths.reduce((acc,m)=> acc + (sum(rows,m+'_'+valueKey) - sum(rows,m+'_'+targetKey)), 0);
+     const monthLabel = completedMonths.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join('+');
+     const ahead = carryover >= 0;
+     carryEl.textContent = `${ahead?'+':''}${fmt(Math.round(carryover))} ${ahead?'ahead of':'behind'} ${monthLabel} target`;
+     carryEl.className = 'forecast-delta ' + (ahead ? 'positive' : 'negative');
+     if(row) row.style.display = '';
+   } else if(row){
+     row.style.display = 'none';
+   }
+ }
 }
 
 
