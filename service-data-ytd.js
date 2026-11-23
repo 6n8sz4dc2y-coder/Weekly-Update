@@ -94,24 +94,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Altrincham",
       "values": {
         "Part Purchases": {
-          "actual": 420862.52,
-          "target": 395070.72301904764,
-          "svo": 1.0652839997453034
+          "actual": 425941.24,
+          "target": 404251.0523285714,
+          "svo": 1.0536552410846887
         },
         "Accessory Purchases": {
-          "actual": 79044.33,
-          "target": 85050,
-          "svo": 0.9293865961199295
+          "actual": 78902.32000000002,
+          "target": 86240,
+          "svo": 0.9149155844155846
         },
         "Used Vehicles": {
-          "actual": 471,
-          "target": 520.9047619047619,
-          "svo": 0.9041959959776944
+          "actual": 476,
+          "target": 531.8571428571429,
+          "svo": 0.8949771689497716
         },
         "Service Plans Plus": {
-          "actual": 375,
-          "target": 350.55,
-          "svo": 1.0697475395806588
+          "actual": 377,
+          "target": 355,
+          "svo": 1.0619718309859154
         }
       }
     },
@@ -119,24 +119,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Bolton",
       "values": {
         "Part Purchases": {
-          "actual": 892845.8200000001,
-          "target": 919158.1756,
-          "svo": 0.9713734193977832
+          "actual": 909388.83,
+          "target": 940516.8191,
+          "svo": 0.9669033147862395
         },
         "Accessory Purchases": {
-          "actual": 139239.94,
-          "target": 104880,
-          "svo": 1.3276119374523265
+          "actual": 140126.59,
+          "target": 106520,
+          "svo": 1.315495587683064
         },
         "Used Vehicles": {
-          "actual": 600,
-          "target": 647.1428571428571,
-          "svo": 0.9271523178807948
+          "actual": 608,
+          "target": 660.7142857142857,
+          "svo": 0.9202162162162163
         },
         "Service Plans Plus": {
-          "actual": 426,
-          "target": 449.5,
-          "svo": 0.9477196885428254
+          "actual": 432,
+          "target": 455.45000000000005,
+          "svo": 0.9485124602041936
         }
       }
     },
@@ -144,24 +144,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Bradford",
       "values": {
         "Part Purchases": {
-          "actual": 727917.22,
-          "target": 827931.4866952379,
-          "svo": 0.8791998271566482
+          "actual": 741109.29,
+          "target": 847170.2792428571,
+          "svo": 0.8748055829606686
         },
         "Accessory Purchases": {
-          "actual": 111308.11000000002,
-          "target": 164310,
-          "svo": 0.6774274846327065
+          "actual": 115847.68000000001,
+          "target": 166500,
+          "svo": 0.6957818618618619
         },
         "Used Vehicles": {
-          "actual": 413,
-          "target": 372.7142857142857,
-          "svo": 1.1080873898045227
+          "actual": 422,
+          "target": 380.57142857142856,
+          "svo": 1.1088588588588588
         },
         "Service Plans Plus": {
-          "actual": 236,
-          "target": 283.85,
-          "svo": 0.831425048441078
+          "actual": 244,
+          "target": 289.65,
+          "svo": 0.8423959951665804
         }
       }
     },
@@ -169,24 +169,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Bury",
       "values": {
         "Part Purchases": {
-          "actual": 510456.08999999997,
-          "target": 553296.5617476191,
-          "svo": 0.9225723152656055
+          "actual": 533892.79,
+          "target": 566153.6132714286,
+          "svo": 0.9430175441519933
         },
         "Accessory Purchases": {
-          "actual": 145918.74,
-          "target": 84420,
-          "svo": 1.7284854299928927
+          "actual": 149701.44,
+          "target": 85530,
+          "svo": 1.750279901788846
         },
         "Used Vehicles": {
-          "actual": 454,
-          "target": 562.8095238095239,
-          "svo": 0.8066672307301802
+          "actual": 463,
+          "target": 574.7142857142857,
+          "svo": 0.805617698235148
         },
         "Service Plans Plus": {
-          "actual": 322,
-          "target": 341.4,
-          "svo": 0.9431751611013475
+          "actual": 325,
+          "target": 346.55,
+          "svo": 0.9378156110229404
         }
       }
     },
@@ -194,24 +194,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Denton",
       "values": {
         "Part Purchases": {
-          "actual": 585286.06,
-          "target": 666734.6259333333,
-          "svo": 0.8778396039963923
+          "actual": 599415.76,
+          "target": 682227.6581,
+          "svo": 0.8786154487922249
         },
         "Accessory Purchases": {
-          "actual": 114355.19,
-          "target": 148720,
-          "svo": 0.7689294647660032
+          "actual": 116774.39000000001,
+          "target": 150910,
+          "svo": 0.7738015373401366
         },
         "Used Vehicles": {
-          "actual": 432,
-          "target": 460.5238095238095,
-          "svo": 0.938062247957812
+          "actual": 441,
+          "target": 470.2857142857143,
+          "svo": 0.9377278250303767
         },
         "Service Plans Plus": {
-          "actual": 274,
-          "target": 318.05,
-          "svo": 0.8614997641880208
+          "actual": 283,
+          "target": 326.45,
+          "svo": 0.8669015163118395
         }
       }
     },
@@ -219,24 +219,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Huddersfield",
       "values": {
         "Part Purchases": {
-          "actual": 521980.68000000005,
-          "target": 586005.5154666667,
-          "svo": 0.8907436299201377
+          "actual": 521204.75000000006,
+          "target": 599622.6308,
+          "svo": 0.8692212788977344
         },
         "Accessory Purchases": {
-          "actual": 97044.97,
-          "target": 95870,
-          "svo": 1.0122558673203297
+          "actual": 97371.48,
+          "target": 97420,
+          "svo": 0.9995019503182098
         },
         "Used Vehicles": {
-          "actual": 429,
-          "target": 484.4761904761905,
-          "svo": 0.885492431688618
+          "actual": 434,
+          "target": 494.7142857142857,
+          "svo": 0.8772740398498412
         },
         "Service Plans Plus": {
-          "actual": 364,
-          "target": 352.3,
-          "svo": 1.033210332103321
+          "actual": 370,
+          "target": 356.75,
+          "svo": 1.0371408549404344
         }
       }
     },
@@ -244,24 +244,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Macclesfield",
       "values": {
         "Part Purchases": {
-          "actual": 381913.13,
-          "target": 368433.90357619047,
-          "svo": 1.0365851955886087
+          "actual": 387632.89999999997,
+          "target": 376995.2683142857,
+          "svo": 1.0282168838173482
         },
         "Accessory Purchases": {
-          "actual": 105853.90000000002,
-          "target": 96230,
-          "svo": 1.1000093525927468
+          "actual": 108997.15000000001,
+          "target": 98590,
+          "svo": 1.1055598945126281
         },
         "Used Vehicles": {
-          "actual": 441,
-          "target": 483.4761904761905,
-          "svo": 0.9121441938343346
+          "actual": 449,
+          "target": 493.7142857142857,
+          "svo": 0.9094328703703703
         },
         "Service Plans Plus": {
-          "actual": 361,
-          "target": 365.45000000000005,
-          "svo": 0.9878232316322341
+          "actual": 369,
+          "target": 372.70000000000005,
+          "svo": 0.9900724443251944
         }
       }
     },
@@ -269,24 +269,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Rochdale",
       "values": {
         "Part Purchases": {
-          "actual": 720199.15,
-          "target": 758520.2231428572,
-          "svo": 0.9494791674978982
+          "actual": 730636.3,
+          "target": 776146.0937142856,
+          "svo": 0.9413643976529004
         },
         "Accessory Purchases": {
-          "actual": 171650.53,
-          "target": 87450,
-          "svo": 1.9628419668381933
+          "actual": 172616.58,
+          "target": 89890,
+          "svo": 1.9203090443875848
         },
         "Used Vehicles": {
-          "actual": 459,
-          "target": 520.9047619047619,
-          "svo": 0.8811591553158423
+          "actual": 475,
+          "target": 531.8571428571429,
+          "svo": 0.8930969648133226
         },
         "Service Plans Plus": {
-          "actual": 364,
-          "target": 344.55,
-          "svo": 1.056450442606298
+          "actual": 372,
+          "target": 355.8,
+          "svo": 1.0455311973018548
         }
       }
     },
@@ -294,24 +294,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Salford Quays",
       "values": {
         "Part Purchases": {
-          "actual": 2020228.44,
-          "target": 2020165.0368952383,
-          "svo": 1.000031385111416
+          "actual": 2067932.46,
+          "target": 2067107.974442857,
+          "svo": 1.0003988594535633
         },
         "Accessory Purchases": {
-          "actual": 438684.70999999996,
-          "target": 385670,
-          "svo": 1.1374613270412528
+          "actual": 448377.55000000005,
+          "target": 393240,
+          "svo": 1.1402134828603399
         },
         "Used Vehicles": {
-          "actual": 565,
-          "target": 616.7142857142857,
-          "svo": 0.9161454713921705
+          "actual": 572,
+          "target": 629.5714285714286,
+          "svo": 0.9085545722713865
         },
         "Service Plans Plus": {
-          "actual": 401,
-          "target": 412.5,
-          "svo": 0.9721212121212122
+          "actual": 408,
+          "target": 418.6,
+          "svo": 0.9746774964166268
         }
       }
     },
@@ -319,24 +319,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Silsden",
       "values": {
         "Part Purchases": {
-          "actual": 294472.49,
-          "target": 313154.2080952381,
-          "svo": 0.9403433911718136
+          "actual": 300727.13,
+          "target": 320431.02864285716,
+          "svo": 0.9385081440885722
         },
         "Accessory Purchases": {
-          "actual": 48225.57000000001,
-          "target": 42910,
-          "svo": 1.1238771848054068
+          "actual": 48341.670000000006,
+          "target": 43240,
+          "svo": 1.1179849676225717
         },
         "Used Vehicles": {
-          "actual": 237,
-          "target": 221.52380952380952,
-          "svo": 1.0698624247635427
+          "actual": 240,
+          "target": 226.28571428571428,
+          "svo": 1.0606060606060606
         },
         "Service Plans Plus": {
-          "actual": 143,
-          "target": 168.55,
-          "svo": 0.8484129338475229
+          "actual": 145,
+          "target": 170.05,
+          "svo": 0.8526903851808291
         }
       }
     },
@@ -344,24 +344,24 @@ window.SERVICE_DATA_CENTRE_YTD = {
       "centre": "RRG Stockport",
       "values": {
         "Part Purchases": {
-          "actual": 826271.5900000001,
-          "target": 875167.445947619,
-          "svo": 0.9441297134919419
+          "actual": 852359.2000000001,
+          "target": 895503.8689714286,
+          "svo": 0.9518207899861066
         },
         "Accessory Purchases": {
-          "actual": 120991.68,
-          "target": 138520,
-          "svo": 0.8734600057753392
+          "actual": 123713.51,
+          "target": 140670,
+          "svo": 0.8794590886471885
         },
         "Used Vehicles": {
-          "actual": 836,
-          "target": 933.5238095238095,
-          "svo": 0.895531524178739
+          "actual": 853,
+          "target": 953.2857142857143,
+          "svo": 0.8947999400569459
         },
         "Service Plans Plus": {
-          "actual": 518,
-          "target": 594.8,
-          "svo": 0.8708809683927371
+          "actual": 528,
+          "target": 604.6,
+          "svo": 0.8733046642408203
         }
       }
     }
@@ -370,27 +370,27 @@ window.SERVICE_DATA_CENTRE_YTD = {
     "centre": "Total",
     "values": {
       "Part Purchases": {
-        "actual": 7902433.1899999995,
-        "target": 8283637.906119048,
-        "svo": 0.9539810020139272
+        "actual": 8070240.649999999,
+        "target": 8476126.286928572,
+        "svo": 0.9521142532344631
       },
       "Accessory Purchases": {
-        "actual": 1572317.6700000002,
-        "target": 1434030,
-        "svo": 1.0964328988933287
+        "actual": 1600770.36,
+        "target": 1458750,
+        "svo": 1.0973575732647816
       },
       "Used Vehicles": {
-        "actual": 5337,
-        "target": 5824.714285714285,
-        "svo": 0.9162681186079024
+        "actual": 5433,
+        "target": 5947.571428571428,
+        "svo": 0.9134820935315735
       },
       "Service Plans Plus": {
-        "actual": 3784,
-        "target": 3981.5,
-        "svo": 0.950395579555444
+        "actual": 3853,
+        "target": 4051.6000000000004,
+        "svo": 0.9509823279691972
       }
     }
   },
   "sheet": "Export",
-  "importedAt": "2026-11-16T10:33:55.708Z"
+  "importedAt": "2026-11-23T10:37:35.431Z"
 };
