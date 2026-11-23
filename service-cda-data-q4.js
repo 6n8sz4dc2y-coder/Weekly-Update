@@ -94,24 +94,24 @@ window.SERVICE_DATA_CDA_Q4 = {
       "centre": "North Manchester",
       "values": {
         "Part Purchases": {
-          "actual": 577167.6000000001,
-          "target": 626770.6406857143,
-          "svo": 0.9208593423721214
+          "actual": 675288.48,
+          "target": 725555.1438285714,
+          "svo": 0.9307197195745496
         },
         "Accessory Purchases": {
-          "actual": 67663.66,
-          "target": 59850,
-          "svo": 1.1305540517961572
+          "actual": 82991.90000000001,
+          "target": 72540,
+          "svo": 1.1440846429556109
         },
         "Used Vehicles": {
-          "actual": 231,
-          "target": 323.57142857142856,
-          "svo": 0.713907284768212
+          "actual": 270,
+          "target": 372.8571428571429,
+          "svo": 0.7241379310344827
         },
         "Service Plans Plus": {
-          "actual": 153,
-          "target": 159.05,
-          "svo": 0.9619616472807293
+          "actual": 178,
+          "target": 187,
+          "svo": 0.9518716577540107
         }
       }
     },
@@ -119,24 +119,24 @@ window.SERVICE_DATA_CDA_Q4 = {
       "centre": "South Manchester",
       "values": {
         "Part Purchases": {
-          "actual": 280313.49,
-          "target": 339899.7055761905,
-          "svo": 0.8246947125912296
+          "actual": 331329.29,
+          "target": 393470.8548142857,
+          "svo": 0.8420681886499168
         },
         "Accessory Purchases": {
-          "actual": 48445.35,
-          "target": 44220,
-          "svo": 1.0955529172320218
+          "actual": 56587.62,
+          "target": 52110,
+          "svo": 1.0859263097294185
         },
         "Used Vehicles": {
-          "actual": 250,
-          "target": 332.42857142857144,
-          "svo": 0.7520412548345509
+          "actual": 289,
+          "target": 383.1428571428571,
+          "svo": 0.7542878448918718
         },
         "Service Plans Plus": {
-          "actual": 152,
-          "target": 173.75,
-          "svo": 0.874820143884892
+          "actual": 181,
+          "target": 203.65,
+          "svo": 0.8887797692118831
         }
       }
     },
@@ -144,24 +144,24 @@ window.SERVICE_DATA_CDA_Q4 = {
       "centre": "West Yorkshire",
       "values": {
         "Part Purchases": {
-          "actual": 185734.75,
-          "target": 254635.24245714286,
-          "svo": 0.729414939612142
+          "actual": 204405.52999999997,
+          "target": 294767.9708857143,
+          "svo": 0.6934455239007323
         },
         "Accessory Purchases": {
-          "actual": 34191.229999999996,
-          "target": 29850,
-          "svo": 1.1454348408710215
+          "actual": 39173.409999999996,
+          "target": 33920,
+          "svo": 1.1548764740566038
         },
         "Used Vehicles": {
-          "actual": 135,
-          "target": 149.71428571428572,
-          "svo": 0.9017175572519084
+          "actual": 152,
+          "target": 172.57142857142856,
+          "svo": 0.880794701986755
         },
         "Service Plans Plus": {
-          "actual": 88,
-          "target": 92.85,
-          "svo": 0.94776521270867
+          "actual": 104,
+          "target": 104.6,
+          "svo": 0.994263862332696
         }
       }
     }
@@ -170,27 +170,27 @@ window.SERVICE_DATA_CDA_Q4 = {
     "centre": "Total",
     "values": {
       "Part Purchases": {
-        "actual": 1043215.84,
-        "target": 1221305.5887190476,
-        "svo": 0.8541808451840174
+        "actual": 1211023.3,
+        "target": 1413793.9695285712,
+        "svo": 0.8565769313642037
       },
       "Accessory Purchases": {
-        "actual": 150300.24,
-        "target": 133920,
-        "svo": 1.1223136200716846
+        "actual": 178752.93000000002,
+        "target": 158570,
+        "svo": 1.1272808854133822
       },
       "Used Vehicles": {
-        "actual": 616,
-        "target": 805.7142857142858,
-        "svo": 0.7645390070921986
+        "actual": 711,
+        "target": 928.5714285714287,
+        "svo": 0.7656923076923076
       },
       "Service Plans Plus": {
-        "actual": 393,
-        "target": 425.65,
-        "svo": 0.9232937859743922
+        "actual": 463,
+        "target": 495.25,
+        "svo": 0.9348813730439172
       }
     }
   },
   "sheet": "Export",
-  "importedAt": "2026-11-16T10:33:55.711Z"
+  "importedAt": "2026-11-23T10:37:35.435Z"
 };
